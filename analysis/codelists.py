@@ -560,10 +560,10 @@ care_home_primis_snomed_codes = codelist_from_csv(
 #     system = "snomed", 
     column = "code")
 
-carehome_primis_codes = codelist_from_csv(
-  "codelists/primis-covid19-vacc-uptake-longres.csv", 
-  column = "code",
-)
+# carehome_primis_codes = codelist_from_csv(
+#   "codelists/primis-covid19-vacc-uptake-longres.csv", 
+#   column = "code",
+# )
 
 
 # ## Dementia
