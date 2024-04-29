@@ -26,6 +26,9 @@ from ehrql.tables.raw.tpp import(
     covid_therapeutics_raw,
 )
 
+#from ehrql.codes import *
+from ehrql.codes import CTV3Code, ICD10Code
+
 ## codelists 
 from codelists import(ethnicity_codelist, covid_icd10_codes, ethnicity,dialysis_codes,dialysis_icd10_codelist,
     dialysis_opcs4_codelist, kidney_transplant_codes, kidney_tx_icd10_codelist, kidney_tx_opcs4_codelist,
@@ -454,8 +457,7 @@ dataset.dialysis = had_clinc_event_ctv3snome_lastdate(dialysis_codes) #tpp-clini
 dataset.dialysis_icd10 = had_apcs_diag_icd10_lastdate(dialysis_icd10_codelist) #tpp-apcs
 
 ######################apcs_admis_alldiag_match######################
-#from ehrql.codes import *
-from ehrql.codes import CTV3Code, ICD10Code
+
 def apcs_proc_match(codelist):
     code_strings = set()
     for code in codelist:
