@@ -2,16 +2,16 @@
 # --- IMPORT STATEMENTS ---
 
 from ehrql import codelist_from_csv 
-
+#snomedct_code
 ethnicity_codelist = codelist_from_csv(
     "codelists/primis-covid19-vacc-uptake-eth2001.csv",
     column="code",
     category_column="grouping_6_id",
 )
 
-
+#ctv3_code
 ethnicity = codelist_from_csv( ##< ethnicity from repo: comparative-booster-spring2023<codelists.py>
-    "codelists/opensafely-ethnicity.csv",
+    "codelists/opensafely-ethnicity-2020-04-27.csv",
     column="Code",
     category_column="Grouping_6",
 )
