@@ -461,9 +461,9 @@ def had_apcs_diag_icd10_lastdate(codelist, dt=apcs_diags_bf_treat, code_type='ic
 dataset.dialysis = had_clinc_event_ctv3snome_lastdate(dialysis_codes) #tpp-clinical_events  #CTV3ID
 dataset.dialysis_icd10 = had_apcs_diag_icd10_lastdate(dialysis_icd10_codelist) #tpp-apcs
 
-######################apcs_admis_alldiag_match--<comparative_booster_spring_2023>-----
-from ehrql.codes import *
-#from ehrql.codes import CTV3Code, ICD10Code
+######################apcs_admis_alldiag_match--
+#from ehrql.codes import *
+from ehrql.codes import CTV3Code, ICD10Code
 def apcs_proc_match(codelist):
     code_strings = set()
     for code in codelist:
