@@ -76,11 +76,6 @@ is_adult = (patients.age_on(index_startdate) >= 18) & (
     patients.age_on(index_startdate) <= 110
 )
 
-# is_alive = (
-#     patients.date_of_death.is_after(treat_date)
-#     |patients.date_of_death.is_null()
-# )
-
 is_alive = (
     patients.date_of_death.is_after(index_startdate)
     | patients.date_of_death.is_null()
