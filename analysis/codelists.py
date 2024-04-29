@@ -17,13 +17,13 @@ ethnicity = codelist_from_csv( ##< ethnicity from repo: comparative-booster-spri
 )
 
 # ### Require hospitalisation for COVID-19
-covid_icd10_codes = codelist_from_csv(
-  "codelists/opensafely-covid-identification.csv",
- # system = "icd10",
-  column = "icd10_code",
-)
+# covid_icd10_codes = codelist_from_csv(
+#   "codelists/opensafely-covid-identification.csv",
+#  # system = "icd10",
+#   column = "icd10_code",
+# )
 
-#covid_icd10_codes = ["U071", "U072", "U099","U109"]
+covid_icd10_codes = ["U071", "U072", "U099","U109"]
 #https://github.com/opensafely/documentation/discussions/1480
 #covid_icd10_codes = ["U071", "U072"]
 #covid_icd10_codes = ["U071", "U072", "U109"]
