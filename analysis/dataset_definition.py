@@ -202,8 +202,7 @@ dataset.imd = case(
     otherwise="unknown"
 )
 
-#####################
-# Rurality
+##Rurality##
 #dataset.rural_urban = addresses.rural_urban_classification
 # Index of Multiple Deprevation Rank (rounded down to nearest 100)
 #dataset.imd = addresses.imd_rounded  ## code not working
@@ -277,8 +276,7 @@ dataset.first_sotrovimab_status = first_sotrovimab.current_status
 dataset.first_sotrovimab_interve= first_sotrovimab.intervention
 dataset.first_sotrovimab_diag = first_sotrovimab.diagnosis
 
-###########################admission##################################
-# main outcome variables -hospital admission per primary_diagnosis
+##main outcome variables -hospital admission per primary_diagnosis
 dataset.date_of_first_admis_af_treat = (
     apcs.where(apcs.admission_date.is_after(treat_date))
     .sort_by(apcs.admission_date).first_for_patient().admission_date
@@ -305,8 +303,8 @@ dataset.hosp_covid_classfic = hosp_af60d_covid_pdiag_1stdate_df.patient_classifi
 dataset.hosp_covid_pdiag = hosp_af60d_covid_pdiag_1stdate_df.primary_diagnosis #hosp_af60d_covid_pdiag
 dataset.had_ccare_covid = ccare_af60d_covid_pdiag #had_ccare_covid_af60d_6mon_pdiag_date
 
-#################
- ##critical_care-date
+
+##critical_care-date
 dataset.ccare_covid_date = (  
     apcs.where(
         (apcs.primary_diagnosis.is_in(covid_icd10_codes)) &    #primary_diagnosis
@@ -344,7 +342,6 @@ dataset.hospitalise_disc_allcause = (      #allcause-first discharge after 60day
     ).sort_by(apcs.discharge_date).first_for_patient()
 ).discharge_date
 
-#dataset.hosp_discharge_covid_date_af60d_6mon = hos_disc_covid.discharge_date
 
 dataset.ons_dead_date = ons_deaths.date
 dataset.underly_deathcause = ons_deaths.underlying_cause_of_death 
@@ -461,7 +458,7 @@ def had_apcs_diag_icd10_lastdate(codelist, dt=apcs_diags_bf_treat, code_type='ic
 dataset.dialysis = had_clinc_event_ctv3snome_lastdate(dialysis_codes) #tpp-clinical_events  #CTV3ID
 dataset.dialysis_icd10 = had_apcs_diag_icd10_lastdate(dialysis_icd10_codelist) #tpp-apcs
 
-######################apcs_admis_alldiag_match--
+######################apcs_admis_alldiag_match######################
 #from ehrql.codes import *
 from ehrql.codes import CTV3Code, ICD10Code
 def apcs_proc_match(codelist):
@@ -577,7 +574,6 @@ transplant_ileum_2_Y_codes_opcs4_df= apcs_proc_bf_treat_af01Feb20_df(codelist=il
 #"date": {"earliest": "2020-02-01"}
 dataset.transplant_ileum_2_opcs4 = apcs_proc_bf_treat_af01Feb20_lastdate(codelist=ileum_2_transplant_nhsd_opcs4_codes)
 dataset.transplant_ileum_2_opcs4_count = apcs_proc_bf_treat_af01Feb20_df(codelist=ileum_2_transplant_nhsd_opcs4_codes).count_for_patient()
-
 dataset.transplant_ileum_2_opcs4_a = dataset.transplant_ileum_2_opcs4.is_on_or_between(dataset.transplant_ileum_2_Y_codes_opcs4,dataset.transplant_ileum_2_Y_codes_opcs4) 
 
 def proc_match(codelist, dt):
@@ -697,15 +693,14 @@ dataset.haematological_disease_nhsd_ever = minimum_of(
     dataset.sickle_cell_disease_nhsd_snomed, 
     dataset.sickle_cell_disease_nhsd_icd10)
 
-## Immune-mediated inflammatory disorders (IMID)
+
 #on_or_before = "start_date",
+##Primary immune deficiencies
 dataset.immunosupression_nhsd = had_clinc_event_ctv3snome_lastdate(codelist=immunosupression_nhsd_codes, code_type='snomedct') #tpp-clinical_events  #snomedct
 #on_or_before = "start_date",
 dataset.immunosupression_nhsd_new  = had_clinc_event_ctv3snome_lastdate(codelist=immunosupression_nhsd_codes_new, code_type='snomedct') #tpp-clinical_events  #snomedct
 
 #immunosuppresant_drugs_dmd_codes, immunosuppresant_drugs_snomed_codes
-#dataset.immunosuppresant_drugs_nhsd 
-##Primary immune deficiencies
 
 ### Solid cancer
 dataset.cancer_opensafely_snomed= c_events_bf6m.where(
@@ -727,14 +722,14 @@ dataset.cancer_opensafely_snomed_ever= c_events_bf_treat.where(
         .sort_by(c_events_bf_treat.date).last_for_patient().date
 
 
-# # List of diseases, removing any extra commas and normalizing the list
-highrisk_list = [
-    "Downs syndrome", "HIV", "AIDS", "IMID", "haematologic malignancy",
-    "Patients with a haematological diseases", "immune deficiencies", "liver disease",
-    "primary immune deficiencies", "rare neurological conditions",
-    "rare neurological diseases", "renal disease", "sickle cell disease",
-    "solid cancer", "solid organ recipients", "stem cell transplant recipient"
-]
+# # List of diseases
+# highrisk_list = [
+#     "Downs syndrome", "HIV", "AIDS", "IMID", "haematologic malignancy",
+#     "Patients with a haematological diseases", "immune deficiencies", "liver disease",
+#     "primary immune deficiencies", "rare neurological conditions",
+#     "rare neurological diseases", "renal disease", "sickle cell disease",
+#     "solid cancer", "solid organ recipients", "stem cell transplant recipient"
+# ]
 
 dataset.high_risk_covid_thera_MOL_count = non_hospital.MOL1_high_risk_cohort.count_distinct_for_patient()  #exists_for_patient()  
 dataset.high_risk_covid_thera_MOL_count_dist = non_hospital.where(non_hospital.treatment_start_date.is_on_or_between(treat_date,treat_date)
@@ -748,8 +743,8 @@ dataset.high_risk_covid_thera_SOT02_count_dist = non_hospital.where(non_hospital
 dataset.high_risk_covid_thera_CASIM05_count_dist = non_hospital.where(non_hospital.treatment_start_date.is_on_or_between(treat_date,treat_date)
     ).CASIM05_risk_cohort.count_distinct_for_patient() 
 
-################
-#### Pregnancy
+
+#####Pregnancy#####
 ### pregnancy record in last 36 weeks
 dataset.preg_36wks_date = (
     c_events_bf_treat.where((c_events_bf_treat.snomedct_code.is_in(pregnancy_primis_codes)) & \
