@@ -30,7 +30,7 @@ covid_icd10_codes = ["U071", "U072", "U099","U109"]
 
 # --- CODELISTS ---
 # SUS-HES mabs
-mabs_procedure_codes = ["X891", "X892"]
+#mabs_procedure_codes = ["X891", "X892"]
 
 # mabs_procedure_codes = codelist(
 #   ["X891", "X892"], system="opcs4"
