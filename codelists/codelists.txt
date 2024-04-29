@@ -24,7 +24,7 @@ nhsd/transplant-thymus-gland-spl-hes-opcs4/5feb5f2d
 opensafely/chemotherapy-or-radiotherapy-snomed/2020-04-15
 opensafely/diabetes-snomed/2020-04-15/
 opensafely/dialysis/3ce108ac
-opensafely/opensafely-ethnicity/746e4c98
+opensafely/ethnicity/2020-04-27
 opensafely/kidney-transplant/2020-07-15
 opensafely/lung-cancer-snomed/2020-04-15
 primis-covid19-vacc-uptake/eth2001/v1
