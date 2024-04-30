@@ -32,7 +32,7 @@ from ehrql.codes import *
 
 ## codelists 
 from codelists import(ethnicity_codelist, covid_icd10_codes, ethnicity,dialysis_codes,dialysis_icd10_codelist,
-    dialysis_opcs4_codelist, kidney_transplant_codes, kidney_tx_icd10_codelist, kidney_tx_opcs4_codelist,
+    dialysis_opcs4_codelist, kidney_transplant_codes, kidney_tx_icd10_codelist, kidney_tx_opcs4_codelist, solid_organ_transplant_codes,
     solid_organ_transplant_nhsd_snomed_codes, solid_organ_transplant_nhsd_snomed_codes_new, dialysis_opcs4_codelist,
     haematopoietic_stem_cell_transplant_nhsd_snomed_codes, haematopoietic_stem_cell_transplant_nhsd_icd10_codes, 
     haematological_malignancies_nhsd_snomed_codes, haematological_malignancies_nhsd_icd10_codes, 
@@ -191,8 +191,7 @@ dataset.imd = case(
     otherwise="unknown"
 )
 
-##Rurality
-#dataset.rural_urban = addresses.rural_urban_classification
+
 # Index of Multiple Deprevation Rank (rounded down to nearest 100)
 dataset.imd1 = addresses.for_patient_on(treat_date).imd_rounded
 
@@ -256,7 +255,7 @@ non_hospital_df = (
 
 first_molnupiravir = first_covid_therap_date(pre_df = non_hospital_df, covid_drug = "Molnupiravir")
 dataset.first_molnupiravir_date = first_molnupiravir.treatment_start_date
-dataset.first_molnupiravir_status = first_molnupiravir.current_status  # further define approved/completed later
+dataset.first_molnupiravir_status = first_molnupiravir.current_status  # further define later (approved/completed)
 dataset.first_molnupiravir_interve= first_molnupiravir.intervention
 dataset.first_molnupiravir_diag = first_molnupiravir.diagnosis
 
@@ -355,8 +354,8 @@ dataset.ons_dead_trstart_60d_covid_treat = (ons_deaths.date.is_after(treat_date)
 dataset.ons_dead_trstart_30d_covid_treat = (ons_deaths.date.is_after(treat_date) & 
     ons_deaths.date.is_on_or_before(treat_date + days(30))) 
 
-#######comorbidities #######
-#######tpp-clinical_events, apcs.admission_date,tpp-medications
+##comorbidities
+#tpp-clinical_events, apcs.admission_date,tpp-medications
 c_events = clinical_events  #tpp-clinical_events
 c_events_bf_treat = c_events.where(c_events.date.is_on_or_before(treat_date))
 apcs_diags_bf_treat = apcs.where(apcs.admission_date.is_on_or_before(treat_date))
@@ -386,7 +385,7 @@ def had_meds_count(codelist1,codelist2,dt=pcmeds_bf_treat, where=True):
     .count_for_patient()
 )
 
-## Immune-mediated inflammatory disorders (IMID)
+#Immune-mediated inflammatory disorders (IMID)
 dataset.immunosuppresant_drugs_nhsd = had_meds_lastdate (codelist1=immunosuppresant_drugs_dmd_codes, 
     codelist2= immunosuppresant_drugs_snomed_codes, dt=pcmeds_bf_6m 
 )
@@ -428,8 +427,6 @@ def had_apcs_diag_icd10_lastdate(codelist, dt=apcs_diags_bf_treat, code_type='ic
         code_field = dt.primary_diagnosis
     elif code_type == 'icd10_sec':
         code_field = dt.secondary_diagnosis
-    # else:
-    #     print("Use 'ctv3' or 'snomedct'.")
     return (
     dt.where(where)
     .where(code_field.is_in(codelist) & (dt.admission_date.is_on_or_before(treat_date)))
@@ -498,6 +495,9 @@ dataset.kidney_transplant_icd10 = had_apcs_diag_icd10_lastdate (codelist=kidney_
 dataset.kidney_transplant_procedure = apcs_proc_bf_treat_lastdate(codelist= kidney_tx_opcs4_codelist)
 
 ##Solid organ transplant
+dataset.solid_organ_transplant_snomed = had_clinc_event_ctv3snome_lastdate(  ##added 202404-30
+    codelist = solid_organ_transplant_codes, code_type='snomedct')
+
 dataset.solid_organ_transplant_nhsd_snomed = had_clinc_event_ctv3snome_lastdate(
     codelist = solid_organ_transplant_nhsd_snomed_codes, code_type='snomedct') #tpp-clinical_events  #snomedct
 dataset.solid_organ_nhsd_snomed_new = had_clinc_event_ctv3snome_lastdate(
@@ -543,7 +543,7 @@ dataset.transplant_ileum_1_Y_codes_opcs4 = apcs_proc_bf_treat_af01Feb20_lastdate
 dataset.transplant_ileum_1_Y_codes_opcs4_count = apcs_proc_bf_treat_af01Feb20_df(codelist=ileum_1_y_codes_transplant_nhsd_opcs4_codes).count_for_patient()
 transplant_ileum_1_Y_codes_opcs4_df = apcs_proc_bf_treat_af01Feb20_df(codelist=ileum_1_y_codes_transplant_nhsd_opcs4_codes)
 
-#between = ["transplant_ileum_1_Y_codes_opcs4","transplant_ileum_1_Y_codes_opcs4"],
+#between = ["transplant_ileum_1_Y_codes_opcs4","transplant_ileum_1_Y_codes_opcs4"]
 dataset.transplant_ileum_1_opcs4 = apcs_proc_bf_treat_af01Feb20_lastdate(codelist=ileum_1_transplant_nhsd_opcs4_codes) #not defined by transplant_ileum_1_Y_codes_opcs4
 dataset.transplant_ileum_1_opcs4_count = apcs_proc_bf_treat_af01Feb20_df(codelist=ileum_1_transplant_nhsd_opcs4_codes).count_for_patient() #
 dataset.transplant_ileum_1_opcs4_a = dataset.transplant_ileum_1_opcs4.is_on_or_between(dataset.transplant_ileum_1_Y_codes_opcs4,dataset.transplant_ileum_1_Y_codes_opcs4) 
@@ -552,7 +552,7 @@ dataset.transplant_ileum_2_Y_codes_opcs4 = apcs_proc_bf_treat_af01Feb20_lastdate
 dataset.transplant_ileum_2_Y_codes_opcs4_count= apcs_proc_bf_treat_af01Feb20_df(codelist=ileum_2_y_codes_transplant_nhsd_opcs4_codes).count_for_patient()
 transplant_ileum_2_Y_codes_opcs4_df= apcs_proc_bf_treat_af01Feb20_df(codelist=ileum_2_y_codes_transplant_nhsd_opcs4_codes)
 
-#between = ["transplant_ileum_2_Y_codes_opcs4","transplant_ileum_2_Y_codes_opcs4"],
+#between = ["transplant_ileum_2_Y_codes_opcs4","transplant_ileum_2_Y_codes_opcs4"]
 #"date": {"earliest": "2020-02-01"}
 dataset.transplant_ileum_2_opcs4 = apcs_proc_bf_treat_af01Feb20_lastdate(codelist=ileum_2_transplant_nhsd_opcs4_codes)
 dataset.transplant_ileum_2_opcs4_count = apcs_proc_bf_treat_af01Feb20_df(codelist=ileum_2_transplant_nhsd_opcs4_codes).count_for_patient()
