@@ -56,11 +56,11 @@ bmi_record = (
     .last_for_patient()
 )
 
-def first_covid_therap_date(pre_dataset,covid_drug,start_date="2021-12-16",end_date="2022-02-10"):
+def first_covid_therap_date(pre_df,covid_drug,start_date="2021-12-16",end_date="2022-02-10"):
     covid_treat=(
-        pre_dataset
-        .where(pre_dataset.intervention.is_in([covid_drug]) )
-        .sort_by(pre_dataset.treatment_start_date)
+        pre_df
+        .where(pre_df.intervention.is_in([covid_drug]) )
+        .sort_by(pre_df.treatment_start_date)
     )
 #Approved, Treatment Complete, Treatment Not Started, Treatment Stopped
     first_covid_therap = covid_treat.where(
