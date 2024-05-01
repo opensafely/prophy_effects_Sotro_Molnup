@@ -15,7 +15,7 @@ actions:
     run: r:analysis/data_prep_descrip.R
     needs: [gen_dataset_table]
     outputs:
-      moderately_sensitive:
+      highly_sensitive:
         data: output/data/data_input.csv
 
   prep_descrip_stata:
