@@ -1,5 +1,6 @@
 
-
+## Function written by Qing Wen ## 
+## Date last updated: 30/04/2024 ## 
 freq_single<-function(idx_colname){ta_feq<-table(idx_colname)
 		total<-sum(as.numeric(ta_feq))
 		ft2<-cbind(t(ta_feq),total)
