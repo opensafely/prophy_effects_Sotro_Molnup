@@ -27,6 +27,7 @@ opensafely/dialysis/3ce108ac
 opensafely/ethnicity/2020-04-27
 opensafely/kidney-transplant/2020-07-15
 opensafely/lung-cancer-snomed/2020-04-15
+opensafely/solid-organ-transplantation-snomed/2020-04-10
 primis-covid19-vacc-uptake/eth2001/v1
 primis-covid19-vacc-uptake/longres/v1
 primis-covid19-vacc-uptake/preg/v1
