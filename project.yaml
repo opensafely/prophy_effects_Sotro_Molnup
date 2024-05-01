@@ -12,11 +12,11 @@ actions:
         cohort: output/data/dataset_table.csv.gz
 
   prep_descrip_r:
-    run: r:latest analysis/data_prep_descrip.R 
+    run: r:latest analysis/data_prep_descrip.R
     needs: [gen_dataset_table]
     outputs:
       highly_sensitive:
-        data: output/table/data4analyse.csv
+        data: output/tables/data4analyse.csv
         rds: output/data/data4analyse.rds
 
   prep_descrip_stata:
