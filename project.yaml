@@ -16,7 +16,8 @@ actions:
     needs: [gen_dataset_table]
     outputs:
       highly_sensitive:
-        data: output/data/data_input.csv
+        data: output/table/data4analyse.csv
+        rds: output/data/data4analyse.rds
 
   prep_descrip_stata:
    run: stata-mp:analysis/data_prep_descrip.do
