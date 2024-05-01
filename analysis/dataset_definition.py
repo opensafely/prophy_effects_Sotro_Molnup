@@ -35,45 +35,48 @@ from codelists import(ethnicity_codelist, covid_icd10_codes, ethnicity,dialysis_
     dialysis_opcs4_codelist, kidney_transplant_codes, kidney_tx_icd10_codelist, kidney_tx_opcs4_codelist, solid_organ_transplant_codes,
     solid_organ_transplant_nhsd_snomed_codes, solid_organ_transplant_nhsd_snomed_codes_new, dialysis_opcs4_codelist,
     haematopoietic_stem_cell_transplant_nhsd_snomed_codes, haematopoietic_stem_cell_transplant_nhsd_icd10_codes, 
-    haematological_malignancies_nhsd_snomed_codes, haematological_malignancies_nhsd_icd10_codes, 
-    sickle_cell_disease_nhsd_snomed_codes, sickle_cell_disease_nhsd_icd10_codes, immunosupression_nhsd_codes,
-    immunosupression_nhsd_codes_new, immunosuppresant_drugs_dmd_codes, immunosuppresant_drugs_snomed_codes, 
-    oral_steroid_drugs_dmd_codes, oral_steroid_drugs_snomed_codes, solid_organ_transplant_nhsd_opcs4_codes,
-    replacement_of_organ_transplant_nhsd_opcs4_codes,thymus_gland_transplant_nhsd_opcs4_codes, conjunctiva_y_codes_transplant_nhsd_opcs4_codes, 
-    conjunctiva_transplant_nhsd_opcs4_codes, stomach_transplant_nhsd_opcs4_codes, ileum_1_y_codes_transplant_nhsd_opcs4_codes, 
-    ileum_2_y_codes_transplant_nhsd_opcs4_codes, ileum_1_transplant_nhsd_opcs4_codes, ileum_2_transplant_nhsd_opcs4_codes, 
-    ileum_2_transplant_nhsd_opcs4_codes, haematopoietic_stem_cell_transplant_nhsd_opcs4_codes, 
-    haematopoietic_stem_cell_transplant_nhsd_opcs4_codes, pregnancy_primis_codes,pregdel_primis_codes, non_haematological_cancer_opensafely_snomed_codes,
-    non_haematological_cancer_opensafely_snomed_codes_new, lung_cancer_opensafely_snomed_codes, chemotherapy_radiotherapy_opensafely_snomed_codes,
-    care_home_primis_snomed_codes)
-
-index_startdate = "2021-12-16"  #index_date-studystart1_date
-index_enddate = "2022-02-10"
+    haematological_malignancies_nhsd_snomed_codes, haematological_malignancies_nhsd_icd10_codes, sickle_cell_disease_nhsd_snomed_codes, 
+    sickle_cell_disease_nhsd_icd10_codes, immunosupression_nhsd_codes, immunosupression_nhsd_codes_new, 
+    immunosuppresant_drugs_dmd_codes, immunosuppresant_drugs_snomed_codes, oral_steroid_drugs_dmd_codes, 
+    oral_steroid_drugs_snomed_codes, solid_organ_transplant_nhsd_opcs4_codes, replacement_of_organ_transplant_nhsd_opcs4_codes,
+    thymus_gland_transplant_nhsd_opcs4_codes, conjunctiva_y_codes_transplant_nhsd_opcs4_codes, conjunctiva_transplant_nhsd_opcs4_codes, 
+    stomach_transplant_nhsd_opcs4_codes, ileum_1_y_codes_transplant_nhsd_opcs4_codes, ileum_2_y_codes_transplant_nhsd_opcs4_codes,
+    ileum_1_transplant_nhsd_opcs4_codes, ileum_2_transplant_nhsd_opcs4_codes, haematopoietic_stem_cell_transplant_nhsd_opcs4_codes, 
+    haematopoietic_stem_cell_transplant_nhsd_opcs4_codes, pregnancy_primis_codes,pregdel_primis_codes, 
+    non_haematological_cancer_opensafely_snomed_codes, non_haematological_cancer_opensafely_snomed_codes_new, 
+    lung_cancer_opensafely_snomed_codes, chemotherapy_radiotherapy_opensafely_snomed_codes, care_home_primis_snomed_codes)
 
 ## def_funs files
 from def_funs import(is_fem_male, is_registered, 
     bmi_record, first_covid_therap_date, cause_of_death_matches, any_of) 
 
+index_startdate = "2021-12-16"  
+index_enddate = "2022-02-10"
+
 dataset = create_dataset()
 dataset.configure_dummy_data(population_size = 3000)
 
 ##covid_therapeutics
-had_covid_treat = (
+had_covid_treat_df = (
     covid_therapeutics_raw
     .where(covid_therapeutics_raw.covid_indication.is_in(["non_hospitalised"])) 
     .sort_by(covid_therapeutics_raw.treatment_start_date) 
-    .where(covid_therapeutics_raw.intervention.is_in(["Molnupiravir","Sotrovimab"]) & #["Molnupiravir","Sotrovimab","Paxlovid"]
-    (covid_therapeutics_raw.treatment_start_date>=index_startdate) &
-    (covid_therapeutics_raw.treatment_start_date<=index_enddate)
-    ).sort_by(covid_therapeutics_raw.treatment_start_date).first_for_patient()
+    .where(covid_therapeutics_raw.intervention.is_in(["Molnupiravir","Sotrovimab"]) & \
+    (covid_therapeutics_raw.current_status.is_in(["Approved", "Treatment Complete"])) & \
+    (covid_therapeutics_raw.treatment_start_date>=index_startdate) &  \
+    (covid_therapeutics_raw.treatment_start_date<=index_enddate)  \
+    ).sort_by(covid_therapeutics_raw.treatment_start_date).first_for_patient() \
 )
 
-dataset.first_covid_treat_date = had_covid_treat.treatment_start_date
-dataset.first_covid_treat_interve= had_covid_treat.intervention
-dataset.first_covid_treat_status= had_covid_treat.current_status
+had_first_covid_treat = had_covid_treat_df.exists_for_patient()
+dataset.first_covid_treat_date = had_covid_treat_df.treatment_start_date
+
+dataset.had_first_covid_treat = had_first_covid_treat
+dataset.first_covid_treat_interve= had_covid_treat_df.intervention
+dataset.first_covid_treat_status= had_covid_treat_df.current_status
 
 treat_date = dataset.first_covid_treat_date
-dataset.start_date = treat_date
+
 dataset.date_treated = treat_date
 
 is_adult = (patients.age_on(index_startdate) >= 18) & (
@@ -90,166 +93,15 @@ dataset.define_population(
     & is_adult
     & is_alive
     & is_registered
+    & had_first_covid_treat
 )
 
-##demographic variables 1
-dataset.dob = patients.date_of_birth ##dob
-dataset.dod = patients.date_of_death  #dod: date of death
-dataset.sex = patients.sex
-
-dataset.age_sstart = patients.age_on("2021-12-16")
-dataset.age_sstart_group = case(
-        when(dataset.age_sstart < 30).then("18-29"),
-        when(dataset.age_sstart < 40).then("30-39"),
-        when(dataset.age_sstart < 50).then("40-49"),
-        when(dataset.age_sstart < 60).then("50-59"),
-        when(dataset.age_sstart < 70).then("60-69"),
-        when(dataset.age_sstart < 80).then("70-79"),
-        when(dataset.age_sstart < 90).then("80-89"),
-        when(dataset.age_sstart >= 90).then("90+"),
-        otherwise="unknown",
-)
-
-##demographic variables on treatment day
-dataset.age_treated = patients.age_on(treat_date)
-
-dataset.age_treated_group = case(
-        when(dataset.age_treated < 30).then("18-29"),
-        when(dataset.age_treated < 40).then("30-39"),
-        when(dataset.age_treated < 50).then("40-49"),
-        when(dataset.age_treated < 60).then("50-59"),
-        when(dataset.age_treated < 70).then("60-69"),
-        when(dataset.age_treated < 80).then("70-79"),
-        when(dataset.age_treated < 90).then("80-89"),
-        when(dataset.age_treated >= 90).then("90+"),
-        otherwise="unknown",
-)
-
-ethnicity_snome = clinical_events.where(
-        clinical_events.snomedct_code.is_in(ethnicity_codelist)
-).sort_by(clinical_events.date).last_for_patient().snomedct_code.to_category(ethnicity_codelist)  # (dummy data-more missing 1879)
-
-dataset.ethnicity_snome = ethnicity_snome
-
-dataset.ethnicity_snome_cat = case(
-    when (ethnicity_snome == "1").then("White"),
-    when (ethnicity_snome == "2").then("Mixed"),
-    when (ethnicity_snome == "3").then("South Asian"),
-    when (ethnicity_snome == "4").then("Black"),
-    when (ethnicity_snome == "5").then("Other"),
-    otherwise = "Unknown",
-)
- 
-##ethnicity2_ctv3
-dataset.ethnicity_ctv3 = clinical_events.where(
-        clinical_events.ctv3_code.is_in(ethnicity)
-).sort_by(clinical_events.date).last_for_patient().ctv3_code.to_category(ethnicity) #(dummy data-missing 367)
-
-spanning_addrs = addresses.where(addresses.start_date <= treat_date).except_where(
-    addresses.end_date < treat_date
-)
-
-ordered_addrs = spanning_addrs.sort_by(
-    case(when(addresses.has_postcode).then(1), otherwise=0),
-    addresses.start_date,
-    addresses.end_date,
-    addresses.address_id,
-).last_for_patient()
-
-# dataset.has_postcode = ordered_addrs.has_postcode
-# dataset.addrs_type = ordered_addrs.address_type
-# dataset.care_home = ordered_addrs.care_home_is_potential_match 
-# dataset.care_home_nurse = ordered_addrs.care_home_requires_nursing 
-# dataset.care_home_nonurse = ordered_addrs.care_home_does_not_require_nursing 
-
-#######
-# Care home based on primis codes/TPP address match
-carehome_primis = clinical_events.where(
-        clinical_events.snomedct_code.is_in(care_home_primis_snomed_codes)
-    ).where(
-        clinical_events.date.is_on_or_before(treat_date)
-    ).exists_for_patient() 
-
-carehome_tpp = addresses.for_patient_on(treat_date).care_home_is_potential_match 
-
-carehome = case(
-    when(carehome_primis).then(True),
-    when(carehome_tpp).then(True),
-    otherwise=False
-)
-
-dataset.care_home_primis = carehome
-
-##max_imd = 32844
-imd0 = addresses.for_patient_on(treat_date).imd_rounded
-dataset.imd = case(
-    when((imd0 >=0) & (imd0 < int(32844 * 1 / 5))).then("1 (most deprived)"),
-    when(imd0 < int(32844 * 2 / 5)).then("2"),
-    when(imd0 < int(32844 * 3 / 5)).then("3"),
-    when(imd0 < int(32844 * 4 / 5)).then("4"),
-    when(imd0 < int(32844 * 5 / 5)).then("5 (least deprived)"),
-    otherwise="unknown"
-)
-
-
-# Index of Multiple Deprevation Rank (rounded down to nearest 100)
-dataset.imd1 = addresses.for_patient_on(treat_date).imd_rounded
-
-##registrations
-regd = practice_registrations.for_patient_on(treat_date)
-dataset.region = regd.practice_nuts1_region_name
-##STP
-dataset.stp = regd.practice_stp
-
-regd_end = practice_registrations.spanning(index_startdate, index_enddate
-).sort_by(practice_registrations.end_date).first_for_patient()
-
-dataset.dereg_date= regd_end.end_date
-
-de_reg = (practice_registrations
-    .where((practice_registrations.start_date.is_on_or_before(treat_date)) & (practice_registrations.start_date.is_not_null()) & 
-    practice_registrations.end_date.is_after(treat_date))).sort_by(practice_registrations.end_date).first_for_patient()
-
-dataset.dereg_date1 = de_reg.end_date
-
-##Rurality
-dataset.rural_urban = addresses.for_patient_on(treat_date).rural_urban_classification
-##bmi
-dataset.bmi = bmi_record.numeric_value
-dataset.bmi_date = bmi_record.date
-
-##vaccination 
-# first vaccine from during trials and up to treatment date
-covid_vacc = (
-    vaccinations.where((vaccinations.target_disease.is_in(["SARS-2 CORONAVIRUS"])) &
-    (vaccinations.date.is_before(treat_date)) & (vaccinations.date.is_after("2020-06-08")))
-    .sort_by(vaccinations.date)
-)
-
-#vaccination count
-dataset.total_covid_vacc = covid_vacc.count_for_patient()
-#first-4 vaccination
-dataset.covid_vacc01 = covid_vacc.first_for_patient().date
-
-dataset.covid_vacc02 = covid_vacc.where(covid_vacc.date.is_after(dataset.covid_vacc01 + days(19))
-    ).sort_by(covid_vacc.date).first_for_patient().date
-
-dataset.covid_vacc03 = covid_vacc.where(covid_vacc.date.is_after(dataset.covid_vacc02 + days(56))
-    ).sort_by(covid_vacc.date).first_for_patient().date
-
-dataset.covid_vacc04 = covid_vacc.where(covid_vacc.date.is_after(dataset.covid_vacc03 + days(56))
-    ).sort_by(covid_vacc.date).first_for_patient().date
-
-dataset.covid_vacc_last = covid_vacc.last_for_patient().date
-
-dataset.last_vaccination_date = covid_vacc.last_for_patient().date
-
-##### ############
+##covid_therapeutics
 non_hospital_df = (  
     covid_therapeutics_raw
     #.where(covid_therapeutics_raw.diagnosis.is_in(["Covid-19"]))
-    .where(covid_therapeutics_raw.covid_indication.is_in(["non_hospitalised"])) #&
-    #(covid_therapeutics_raw.current_status.is_in(["Approved", "Treatment Complete"])) ) #"Approved", "Treatment Complete")
+    .where(covid_therapeutics_raw.covid_indication.is_in(["non_hospitalised"]) &
+    (covid_therapeutics_raw.current_status.is_in(["Approved", "Treatment Complete"])))  #"Approved", "Treatment Complete")
     .sort_by(covid_therapeutics_raw.treatment_start_date) #current_status
 )
 
@@ -360,7 +212,7 @@ c_events = clinical_events  #tpp-clinical_events
 c_events_bf_treat = c_events.where(c_events.date.is_on_or_before(treat_date))
 apcs_diags_bf_treat = apcs.where(apcs.admission_date.is_on_or_before(treat_date))
 pcmeds_bf_treat = medications.where(medications.date.is_on_or_before(treat_date)) #prescribed medications in primary care.
-pcmeds_bf_3m = medications.where(medications.date.is_on_or_between(treat_date - months(3),treat_date)) # primary care.
+pcmeds_bf_3m = medications.where(medications.date.is_on_or_between(treat_date - months(3),treat_date)) 
 pcmeds_bf_6m = medications.where(medications.date.is_on_or_between(treat_date - months(6),treat_date))
 pcmeds_bf_12m = medications.where(medications.date.is_on_or_between(treat_date - months(12),treat_date))
 c_events_bf6m = c_events.where(c_events.date.is_on_or_between(treat_date - months(6),treat_date))
@@ -371,7 +223,7 @@ apcs_diags_bf12m = apcs.where(apcs.admission_date.is_on_or_between(treat_date - 
 c_events_bf24m = c_events.where(c_events.date.is_on_or_between(treat_date - months(24),treat_date))
 apcs_diags_bf24m = apcs.where(apcs.admission_date.is_on_or_between(treat_date - months(24),treat_date))
 
-def had_meds_lastdate(codelist1,codelist2,dt=pcmeds_bf_treat, where=True):
+def had_meds_lastdate(codelist1,codelist2,dt = pcmeds_bf_treat, where=True):
     return(
     dt.where(where)
     .where(dt.dmd_code.is_in(codelist1)|dt.dmd_code.is_in(codelist2))
@@ -387,26 +239,26 @@ def had_meds_count(codelist1,codelist2,dt=pcmeds_bf_treat, where=True):
 
 #Immune-mediated inflammatory disorders (IMID)
 dataset.immunosuppresant_drugs_nhsd = had_meds_lastdate (codelist1=immunosuppresant_drugs_dmd_codes, 
-    codelist2= immunosuppresant_drugs_snomed_codes, dt=pcmeds_bf_6m 
+    codelist2= immunosuppresant_drugs_snomed_codes, dt = pcmeds_bf_6m 
 )
 dataset.oral_steroid_drugs_nhsd = had_meds_lastdate (codelist1=oral_steroid_drugs_dmd_codes, 
-    codelist2= oral_steroid_drugs_snomed_codes, dt=pcmeds_bf_12m
+    codelist2= oral_steroid_drugs_snomed_codes, dt = pcmeds_bf_12m
 )
 
-dataset.oral_steroid_drug_nhsd_3m_count=had_meds_count (codelist1=oral_steroid_drugs_dmd_codes, 
-    codelist2=oral_steroid_drugs_snomed_codes, dt=pcmeds_bf_3m
+dataset.oral_steroid_drug_nhsd_3m_count = had_meds_count (codelist1=oral_steroid_drugs_dmd_codes, 
+    codelist2=oral_steroid_drugs_snomed_codes, dt = pcmeds_bf_3m
 )
 
-dataset.oral_steroid_drug_nhsd_12m_count=had_meds_count (codelist1=oral_steroid_drugs_dmd_codes, 
-    codelist2=oral_steroid_drugs_snomed_codes, dt=pcmeds_bf_12m
+dataset.oral_steroid_drug_nhsd_12m_count = had_meds_count (codelist1=oral_steroid_drugs_dmd_codes, 
+    codelist2=oral_steroid_drugs_snomed_codes, dt = pcmeds_bf_12m
 )
 
-dataset.immunosuppresant_drugs_nhsd_ever=had_meds_lastdate (codelist1=immunosuppresant_drugs_dmd_codes,
-    codelist2=immunosuppresant_drugs_snomed_codes, dt=pcmeds_bf_treat
+dataset.immunosuppresant_drugs_nhsd_ever = had_meds_lastdate (codelist1=immunosuppresant_drugs_dmd_codes,
+    codelist2=immunosuppresant_drugs_snomed_codes, dt = pcmeds_bf_treat
 )
 
-dataset.oral_steroid_drugs_nhsd_ever=had_meds_lastdate(codelist1=oral_steroid_drugs_dmd_codes, 
-    codelist2=oral_steroid_drugs_snomed_codes, dt=pcmeds_bf_treat
+dataset.oral_steroid_drugs_nhsd_ever = had_meds_lastdate(codelist1=oral_steroid_drugs_dmd_codes, 
+    codelist2=oral_steroid_drugs_snomed_codes, dt = pcmeds_bf_treat
 )
 
 def had_clinc_event_ctv3snome_lastdate (codelist, dt=c_events_bf_treat, code_type='ctv3', where=True):
@@ -422,7 +274,7 @@ def had_clinc_event_ctv3snome_lastdate (codelist, dt=c_events_bf_treat, code_typ
         .last_for_patient().date
 )
 
-def had_apcs_diag_icd10_lastdate(codelist, dt=apcs_diags_bf_treat, code_type='icd10_prim', where=True): #Currently only use for primary diagnosis
+def had_apcs_diag_icd10_lastdate(codelist, dt = apcs_diags_bf_treat, code_type='icd10_prim', where=True): #Currently only use for primary diagnosis
     if code_type == 'icd10_prim':
         code_field = dt.primary_diagnosis
     elif code_type == 'icd10_sec':
@@ -784,11 +636,11 @@ def apcs_admis_60daf_treat_alldiag_firstdate(codelist=None, where=True): #60days
 
 ##hospitalisation as per all_diagnosis
 # covid-related admission
-dataset.covid_first_admi_af_treat_alldiag_firstdate_ = apcs_admis_af_treat_alldiag_firstdate(
+dataset.covid_first_admi_af_treat_alldiag_firstdate = apcs_admis_af_treat_alldiag_firstdate(
     codelist= covid_icd10_codes,   
 )
 
-dataset.apcs_admis_60daf_treat_alldiag_firstdate=apcs_admis_60daf_treat_alldiag_firstdate(
+dataset.apcs_admis_60daf_treat_alldiag_firstdate = apcs_admis_60daf_treat_alldiag_firstdate(
     codelist= covid_icd10_codes,   
 )
 
@@ -799,3 +651,155 @@ dataset.ccare_covid_first_af_treat_alldiag_date = apcs_admis_af_treat_alldiag_fi
     )) & (apcs.days_in_critical_care>0),
 )
 
+
+##demographic variables 1
+dataset.dob = patients.date_of_birth ##dob
+dataset.dod = patients.date_of_death  #dod: date of death
+dataset.sex = patients.sex
+
+dataset.age_sstart = patients.age_on("2021-12-16")
+dataset.age_sstart_group = case(
+        when(dataset.age_sstart < 30).then("18-29"),
+        when(dataset.age_sstart < 40).then("30-39"),
+        when(dataset.age_sstart < 50).then("40-49"),
+        when(dataset.age_sstart < 60).then("50-59"),
+        when(dataset.age_sstart < 70).then("60-69"),
+        when(dataset.age_sstart < 80).then("70-79"),
+        when(dataset.age_sstart < 90).then("80-89"),
+        when(dataset.age_sstart >= 90).then("90+"),
+        otherwise="unknown",
+)
+
+##demographic variables on treatment day
+dataset.age_treated = patients.age_on(treat_date)
+
+dataset.age_treated_group = case(
+        when(dataset.age_treated < 30).then("18-29"),
+        when(dataset.age_treated < 40).then("30-39"),
+        when(dataset.age_treated < 50).then("40-49"),
+        when(dataset.age_treated < 60).then("50-59"),
+        when(dataset.age_treated < 70).then("60-69"),
+        when(dataset.age_treated < 80).then("70-79"),
+        when(dataset.age_treated < 90).then("80-89"),
+        when(dataset.age_treated >= 90).then("90+"),
+        otherwise="unknown",
+)
+
+ethnicity_snome = clinical_events.where(
+        clinical_events.snomedct_code.is_in(ethnicity_codelist)
+).sort_by(clinical_events.date).last_for_patient().snomedct_code.to_category(ethnicity_codelist)  # (dummy data-more missing 1879)
+
+dataset.ethnicity_snome = ethnicity_snome
+
+dataset.ethnicity_snome_cat = case(
+    when (ethnicity_snome == "1").then("White"),
+    when (ethnicity_snome == "2").then("Mixed"),
+    when (ethnicity_snome == "3").then("South Asian"),
+    when (ethnicity_snome == "4").then("Black"),
+    when (ethnicity_snome == "5").then("Other"),
+    otherwise = "Unknown",
+)
+ 
+##ethnicity2_ctv3
+dataset.ethnicity_ctv3 = clinical_events.where(
+        clinical_events.ctv3_code.is_in(ethnicity)
+).sort_by(clinical_events.date).last_for_patient().ctv3_code.to_category(ethnicity) #(dummy data-missing 367)
+
+spanning_addrs = addresses.where(addresses.start_date <= treat_date).except_where(
+    addresses.end_date < treat_date
+)
+
+ordered_addrs = spanning_addrs.sort_by(
+    case(when(addresses.has_postcode).then(1), otherwise=0),
+    addresses.start_date,
+    addresses.end_date,
+    addresses.address_id,
+).last_for_patient()
+
+# dataset.has_postcode = ordered_addrs.has_postcode
+# dataset.addrs_type = ordered_addrs.address_type
+# dataset.care_home = ordered_addrs.care_home_is_potential_match 
+# dataset.care_home_nurse = ordered_addrs.care_home_requires_nursing 
+# dataset.care_home_nonurse = ordered_addrs.care_home_does_not_require_nursing 
+
+#######
+# Care home based on primis codes/TPP address match
+carehome_primis = clinical_events.where(
+        clinical_events.snomedct_code.is_in(care_home_primis_snomed_codes)
+    ).where(
+        clinical_events.date.is_on_or_before(treat_date)
+    ).exists_for_patient() 
+
+carehome_tpp = addresses.for_patient_on(treat_date).care_home_is_potential_match 
+
+carehome = case(
+    when(carehome_primis).then(True),
+    when(carehome_tpp).then(True),
+    otherwise=False
+)
+
+dataset.care_home_primis = carehome
+
+##max_imd = 32844
+imd0 = addresses.for_patient_on(treat_date).imd_rounded
+dataset.imd = case(
+    when((imd0 >=0) & (imd0 < int(32844 * 1 / 5))).then("1 (most deprived)"),
+    when(imd0 < int(32844 * 2 / 5)).then("2"),
+    when(imd0 < int(32844 * 3 / 5)).then("3"),
+    when(imd0 < int(32844 * 4 / 5)).then("4"),
+    when(imd0 < int(32844 * 5 / 5)).then("5 (least deprived)"),
+    otherwise="unknown"
+)
+
+# Index of Multiple Deprevation Rank (rounded down to nearest 100)
+dataset.imd1 = addresses.for_patient_on(treat_date).imd_rounded
+
+##registrations
+regd = practice_registrations.for_patient_on(treat_date)
+dataset.region = regd.practice_nuts1_region_name
+##STP
+dataset.stp = regd.practice_stp
+
+regd_end = practice_registrations.spanning(index_startdate, index_enddate
+).sort_by(practice_registrations.end_date).first_for_patient()
+
+dataset.dereg_date= regd_end.end_date
+
+de_reg = (practice_registrations
+    .where((practice_registrations.start_date.is_on_or_before(treat_date)) & (practice_registrations.start_date.is_not_null()) & 
+    practice_registrations.end_date.is_after(treat_date))).sort_by(practice_registrations.end_date).first_for_patient()
+
+dataset.dereg_date1 = de_reg.end_date
+
+##Rurality
+dataset.rural_urban = addresses.for_patient_on(treat_date).rural_urban_classification
+
+##bmi
+dataset.bmi = bmi_record.numeric_value
+dataset.bmi_date = bmi_record.date
+
+##vaccination 
+# first vaccine from during trials and up to treatment date
+covid_vacc = (
+    vaccinations.where((vaccinations.target_disease.is_in(["SARS-2 CORONAVIRUS"])) &
+    (vaccinations.date.is_before(treat_date)) & (vaccinations.date.is_after("2020-06-08")))
+    .sort_by(vaccinations.date)
+)
+
+#vaccination count
+dataset.total_covid_vacc = covid_vacc.count_for_patient()
+#first-4 vaccination
+dataset.covid_vacc01 = covid_vacc.first_for_patient().date
+
+dataset.covid_vacc02 = covid_vacc.where(covid_vacc.date.is_after(dataset.covid_vacc01 + days(19))
+    ).sort_by(covid_vacc.date).first_for_patient().date
+
+dataset.covid_vacc03 = covid_vacc.where(covid_vacc.date.is_after(dataset.covid_vacc02 + days(56))
+    ).sort_by(covid_vacc.date).first_for_patient().date
+
+dataset.covid_vacc04 = covid_vacc.where(covid_vacc.date.is_after(dataset.covid_vacc03 + days(56))
+    ).sort_by(covid_vacc.date).first_for_patient().date
+
+dataset.covid_vacc_last = covid_vacc.last_for_patient().date
+
+dataset.last_vaccination_date = covid_vacc.last_for_patient().date
