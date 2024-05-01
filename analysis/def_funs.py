@@ -1,20 +1,19 @@
 #def_funs
 from ehrql.tables.tpp import ( 
-    addresses,
-    clinical_events,
-    apcs,
-    medications,
     patients,
+    addresses,
+    apcs,
+    clinical_events,
+    medications,
     practice_registrations,
     ons_deaths,
    )
 
 from ehrql import (
     days,
-    years,
     months,
+    years,
     create_dataset,
-    days,
 )
 
 
@@ -23,25 +22,23 @@ from ehrql.tables.raw.tpp import (
     covid_therapeutics_raw,
     isaric,
 )
+index_startdate = "2021-12-16"  
+index_enddate = "2022-02-10"
 
-
-index_date = "2021-12-16"
-index_date_end = "2022-02-10"
 is_fem_male = patients.sex.is_in(["female", "male"])
 
-index_date = "2021-12-16"
 is_alive = (
-    patients.date_of_death.is_after(index_date)
+    patients.date_of_death.is_after(index_startdate)
     | patients.date_of_death.is_null()
 )
 
 is_registered = practice_registrations.spanning (  
-    index_date, index_date_end
+    index_startdate, index_enddate
 ).exists_for_patient()
 
 
-def get_registration_status(index_date):
-    return practice_registration_as_of(index_date).exists_for_patient() 
+def get_registration_status(index_startdate):
+    return practice_registration_as_of(index_startdate).exists_for_patient() 
 
 
 bmi_record = (
@@ -88,22 +85,22 @@ def cause_of_death_matches(codelist):
 
     return any_of(conditions) 
 
-def has_prev_event(codelist, where=True):
-    return (
-        prev_events.where(where)
-        .where(prev_events.ctv3_code.is_in(codelist))
-        .sort_by(prev_events.date)
-        .last_for_patient().date
-    )
+# def has_prev_event(codelist, where=True):
+#     return (
+#         prev_events.where(where)
+#         .where(prev_events.ctv3_code.is_in(codelist))
+#         .sort_by(prev_events.date)
+#         .last_for_patient().date
+#     )
 
 
-def has_prev_event_numeric(codelist, where=True):
-    prev_events_exists = prev_events.where(where) \
-        .where(prev_events.ctv3_code.is_in(codelist)) \
-        .exists_for_patient()
-    return (
-        case(
-            when(prev_events_exists).then(1),
-            when(~prev_events_exists).then(0)
-            )
-    )
+# def has_prev_event_numeric(codelist, where=True):
+#     prev_events_exists = prev_events.where(where) \
+#         .where(prev_events.ctv3_code.is_in(codelist)) \
+#         .exists_for_patient()
+#     return (
+#         case(
+#             when(prev_events_exists).then(1),
+#             when(~prev_events_exists).then(0)
+#             )
+#     )
