@@ -12,7 +12,7 @@ actions:
         cohort: output/data/dataset_table.csv.gz
 
   prep_descrip_r:
-    run: r:analysis/data_prep_descrip.R
+    run: r:latest analysis/data_prep_descrip.R 
     needs: [gen_dataset_table]
     outputs:
       highly_sensitive:
@@ -20,7 +20,7 @@ actions:
         rds: output/data/data4analyse.rds
 
   prep_descrip_stata:
-   run: stata-mp:analysis/data_prep_descrip.do
+   run: stata-mp:latest analysis/data_prep_descrip.do
    needs: [gen_dataset_table]
    outputs:
       moderately_sensitive:
