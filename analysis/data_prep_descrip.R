@@ -16,8 +16,8 @@ dir_create(here::here("output", "data"), showWarnings = FALSE, recurse = TRUE)
 
 ## Read in data 
 
-sel_data <- read_csv("C:/Users/qw/Documents/Github/prophy_effects_Sotro_Molnup/output/data/dataset_table.csv.gz") %>% #,
-#sel_data <- read_csv(here::here("output", "data", "dataset_table.csv.gz")) %>%
+#sel_data <- read_csv("C:/Users/qw/Documents/Github/prophy_effects_Sotro_Molnup/output/data/dataset_table.csv.gz") %>% #,
+sel_data <- read_csv(here::here("output", "data", "dataset_table.csv.gz")) %>%
   select(patient_id,age_treated, sex, age_treated_group, ethnicity_snome,ethnicity_snome_cat, had_first_covid_treat, first_covid_treat_interve,first_covid_treat_date, first_covid_treat_status,
   first_molnupiravir_date, first_sotrovimab_date, date_of_first_admis_af_treat, covid_first_admi_af_treat_alldiag_firstdate, apcs_admis_60daf_treat_alldiag_firstdate, ccare_covid_first_af_treat_alldiag_date,
   hosp_covid_date,  hosp_covid_classfic, hosp_covid_pdiag, had_ccare_covid, ccare_covid_date, hosp_allcause_date,
@@ -27,6 +27,7 @@ sel_data <- read_csv("C:/Users/qw/Documents/Github/prophy_effects_Sotro_Molnup/o
 
 dim(sel_data)
 str(sel_data,list.len= ncol(sel_data),give.attr = F)
+
 freq_single(sel_data$had_first_covid_treat)
 freq_single(sel_data$first_covid_treat_interve)
 #cat("# hosp_covid_date_count#\n")
