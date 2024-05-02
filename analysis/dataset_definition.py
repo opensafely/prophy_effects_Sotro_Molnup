@@ -57,23 +57,35 @@ dataset = create_dataset()
 dataset.configure_dummy_data(population_size = 3000)
 
 ##covid_therapeutics
-had_covid_treat_df = (
+had_covid_treat_df0 = (
     covid_therapeutics_raw
-    .where(covid_therapeutics_raw.covid_indication.is_in(["non_hospitalised"])) 
-    .sort_by(covid_therapeutics_raw.treatment_start_date) 
+    .where(covid_therapeutics_raw.covid_indication.is_in(["non_hospitalised"])) \
+    .sort_by(covid_therapeutics_raw.treatment_start_date) \
     .where(covid_therapeutics_raw.intervention.is_in(["Molnupiravir","Sotrovimab"]) & \
-    (covid_therapeutics_raw.current_status.is_in(["Approved", "Treatment Complete"])) & \
-    (covid_therapeutics_raw.treatment_start_date>=index_startdate) &  \
-    (covid_therapeutics_raw.treatment_start_date<=index_enddate)  \
+    (covid_therapeutics_raw.current_status.is_in(["Approved", "Treatment Complete"]))
+    ))
+
+dataset.prev_covid_treat_date = had_covid_treat_df0.sort_by(covid_therapeutics_raw.treatment_start_date).first_for_patient().treatment_start_date
+
+had_covid_treat_df = (had_covid_treat_df0
+    .where(
+    # covid_therapeutics_raw
+    # .where(covid_therapeutics_raw.covid_indication.is_in(["non_hospitalised"])) \
+    # .sort_by(covid_therapeutics_raw.treatment_start_date) \
+    # .where(covid_therapeutics_raw.intervention.is_in(["Molnupiravir","Sotrovimab"]) & \
+    # (covid_therapeutics_raw.current_status.is_in(["Approved", "Treatment Complete"])) & \
+    ((covid_therapeutics_raw.treatment_start_date>=index_startdate) &  \
+    (covid_therapeutics_raw.treatment_start_date<=index_enddate))  \
     ).sort_by(covid_therapeutics_raw.treatment_start_date).first_for_patient() \
 )
 
 had_first_covid_treat = had_covid_treat_df.exists_for_patient()
 dataset.first_covid_treat_date = had_covid_treat_df.treatment_start_date
-
 dataset.had_first_covid_treat = had_first_covid_treat
 dataset.first_covid_treat_interve= had_covid_treat_df.intervention
 dataset.first_covid_treat_status= had_covid_treat_df.current_status
+
+dataset.if_old_covid_treat = dataset.prev_covid_treat_date < dataset.first_covid_treat_date
 
 treat_date = dataset.first_covid_treat_date
 
@@ -107,7 +119,7 @@ non_hospital_df = (
 
 first_molnupiravir = first_covid_therap_date(pre_df = non_hospital_df, covid_drug = "Molnupiravir")
 dataset.first_molnupiravir_date = first_molnupiravir.treatment_start_date
-dataset.first_molnupiravir_status = first_molnupiravir.current_status  # further define later (approved/completed)
+dataset.first_molnupiravir_status = first_molnupiravir.current_status  
 dataset.first_molnupiravir_interve= first_molnupiravir.intervention
 dataset.first_molnupiravir_diag = first_molnupiravir.diagnosis
 
@@ -117,13 +129,13 @@ dataset.first_sotrovimab_status = first_sotrovimab.current_status
 dataset.first_sotrovimab_interve= first_sotrovimab.intervention
 dataset.first_sotrovimab_diag = first_sotrovimab.diagnosis
 
-##main outcome variables -hospital admission per primary_diagnosis
+##main outcome variables-Any causes -hospital admission per primary_diagnosis
 dataset.date_of_first_admis_af_treat = (
     apcs.where(apcs.admission_date.is_after(treat_date))
     .sort_by(apcs.admission_date).first_for_patient().admission_date
 )
 
-##hospitalisation as per primary_diagnosis == OUTCOME
+##covid_hospitalisation as per primary_diagnosis == OUTCOME
 hosp_af60d_covid_pdiag_1stdate_df = (  #covid_icd10_codes==>codelists.covid_icd10_codes
     apcs.where(
         (apcs.primary_diagnosis.is_in(covid_icd10_codes)) &    #primary_diagnosis
@@ -138,13 +150,13 @@ ccare_af60d_covid_pdiag = (hosp_af60d_covid_pdiag_1stdate_df
     .admission_method.is_in(["21", "22", "23", "24", "25", "2A", "2B", "2C", "2D", "28"]) &
     (hosp_af60d_covid_pdiag_1stdate_df.days_in_critical_care>0))
 
-##hospitalisation as per primary_diagnosis
+##covid_hospitalisation as per primary_diagnosis
 dataset.hosp_covid_date = hosp_af60d_covid_pdiag_1stdate_df.admission_date #hosp_af60d_covid_pdiag_1stdate_df
 dataset.hosp_covid_classfic = hosp_af60d_covid_pdiag_1stdate_df.patient_classification #hosp_af60d_covid_pdiag_classfic
 dataset.hosp_covid_pdiag = hosp_af60d_covid_pdiag_1stdate_df.primary_diagnosis #hosp_af60d_covid_pdiag
 dataset.had_ccare_covid = ccare_af60d_covid_pdiag #had_ccare_covid_af60d_6mon_pdiag_date
 
-##critical_care-date
+##covid_critical_care-date
 dataset.ccare_covid_date = (  
     apcs.where(
         (apcs.primary_diagnosis.is_in(covid_icd10_codes)) &    #primary_diagnosis
@@ -155,6 +167,7 @@ dataset.ccare_covid_date = (
         (apcs.days_in_critical_care>0)
         ).sort_by(apcs.admission_date).first_for_patient()).admission_date
 
+##allcause_hospitalisation
 hosp_allcause_af60d_6mon_df = ( 
     apcs.where(
     (apcs.admission_date.is_after(treat_date + days(60))) &
@@ -170,7 +183,7 @@ dataset.hosp_allcause_pdiag = hosp_allcause_af60d_6mon_df.primary_diagnosis
 hosp_covid_date = dataset.hosp_covid_date #first hospitalise after 60days
 hosp_allcause_date = dataset.hosp_allcause_date 
 
-dataset.hospitalise_disc_covid = ( #first discharge after 60days
+dataset.hospitalise_disc_covid = ( #covid_first discharge after 60days
     apcs.where(
         apcs.discharge_date.is_on_or_before(hosp_covid_date)
     ).sort_by(apcs.discharge_date).first_for_patient()
@@ -182,28 +195,27 @@ dataset.hospitalise_disc_allcause = (      #allcause-first discharge after 60day
     ).sort_by(apcs.discharge_date).first_for_patient()
 ).discharge_date
 
-
+##Death_date##
 dataset.ons_dead_date = ons_deaths.date
 dataset.underly_deathcause = ons_deaths.underlying_cause_of_death 
 dataset.death_cause_covid = cause_of_death_matches(covid_icd10_codes) 
 
-dead_date_covid_treat = (ons_deaths.date.is_after(treat_date + days(60)) &
-    (ons_deaths.date.is_on_or_before(treat_date + days(60) + months(6)))
-)
-
-dataset.ons_dead_tr60d_6mon_covid_treat = (ons_deaths.date.is_after(treat_date + days(60)) & 
+##all-cause death 60d-6m #ons_dead_tr60d_6mon_covid_treat
+dataset.allcause_death_60d_6m = (ons_deaths.date.is_after(treat_date + days(60)) & 
     ons_deaths.date.is_on_or_before(treat_date + days(60) + months(6)) 
 )
 
-dataset.ons_dead_tr60d_6mon_covid_treat2 = (ons_deaths.date.is_after(treat_date + days(60)) & 
+#covid-death 60d-6m #ons_dead_tr60d_6mon_covid_treat2
+dataset.covid_death_60d_6m = (ons_deaths.date.is_after(treat_date + days(60)) & 
     ons_deaths.date.is_on_or_before(treat_date + days(60) + months(6)) & dataset.death_cause_covid
 )
 
-## Death of any cause
-dataset.ons_dead_trstart_60d_covid_treat = (ons_deaths.date.is_after(treat_date) & 
+#all-cause death <60d #ons_dead_trstart_60d_covid_treat
+dataset.allcause_death_under60d = (ons_deaths.date.is_after(treat_date) & 
     ons_deaths.date.is_on_or_before(treat_date + days(60)))
 
-dataset.ons_dead_trstart_30d_covid_treat = (ons_deaths.date.is_after(treat_date) & 
+#all-cause death <30d #ons_dead_trstart_30d_covid_treat
+dataset.allcause_death_under30d = (ons_deaths.date.is_after(treat_date) & 
     ons_deaths.date.is_on_or_before(treat_date + days(30))) 
 
 ##comorbidities
@@ -569,6 +581,7 @@ dataset.high_risk_covid_thera_SOT02_count_dist = non_hospital_df.where(non_hospi
 dataset.high_risk_covid_thera_CASIM05_count_dist = non_hospital_df.where(non_hospital_df.treatment_start_date.is_on_or_between(treat_date,treat_date)
     ).CASIM05_risk_cohort.count_distinct_for_patient() 
 
+dataset.high_risk_covid_thera_MOL_solid_cancer = non_hospital_df.first_for_patient().MOL1_high_risk_cohort.contains("solid cancer")
 ##Pregnancy
 #pregnancy record in last 36 weeks
 dataset.preg_36wks_date = (
