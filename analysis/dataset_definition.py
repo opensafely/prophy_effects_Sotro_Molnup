@@ -61,13 +61,13 @@ had_covid_treat_df0 = (
     covid_therapeutics_raw
     .where(covid_therapeutics_raw.covid_indication.is_in(["non_hospitalised"])) \
     .where(covid_therapeutics_raw.intervention.is_in(["Molnupiravir","Sotrovimab","Paxlovid" ,"Remdesivir","Casirivimab and imdevimab"]) & \
-    (covid_therapeutics_raw.current_status.is_in(["Approved", "Treatment Complete"])))
+    (covid_therapeutics_raw.current_status.is_in(["Approved", "Treatment Complete"]))) \
     .sort_by(covid_therapeutics_raw.treatment_start_date) \
 )
 
 had_covid_m_s_treat_df = (
     had_covid_treat_df0
-    .where(had_covid_treat_df0.intervention.is_in(["Molnupiravir","Sotrovimab"]) &
+    .where(had_covid_treat_df0.intervention.is_in(["Molnupiravir","Sotrovimab"]) & \
         (had_covid_treat_df0.treatment_start_date>=index_startdate) &  \
         (had_covid_treat_df0.treatment_start_date<=index_enddate) \
     ).sort_by(had_covid_treat_df0.treatment_start_date).first_for_patient() \
@@ -79,12 +79,54 @@ dataset.had_first_covid_treat = had_first_covid_treat
 dataset.first_covid_treat_interve= had_covid_m_s_treat_df.intervention
 dataset.first_covid_treat_status= had_covid_m_s_treat_df.current_status
 
-treat_date = dataset.first_covid_treat_date
-
+treat_date = dataset.first_covid_treat_date  #except_where(
 dataset.if_old_covid_treat = (
     had_covid_treat_df0
     .sort_by(had_covid_treat_df0.treatment_start_date)
     .where(had_covid_treat_df0.treatment_start_date.is_before(treat_date))).exists_for_patient()
+
+##censored
+had_covid_treat_excpt_molnu_df = (
+    had_covid_treat_df0
+    .except_where(had_covid_treat_df0.intervention.is_in(["Molnupiravir"]))
+    .where((had_covid_treat_df0.treatment_start_date> treat_date) &  \
+        (had_covid_treat_df0.treatment_start_date<=index_enddate) \
+    ).sort_by(had_covid_treat_df0.treatment_start_date).last_for_patient()\
+)
+
+had_covid_treat_excpt_sotro_df = (
+    had_covid_treat_df0
+    .except_where(had_covid_treat_df0.intervention.is_in(["Sotrovimab"]))
+    .where((had_covid_treat_df0.treatment_start_date> treat_date) &  \
+        (had_covid_treat_df0.treatment_start_date<=index_enddate) \
+    ).sort_by(had_covid_treat_df0.treatment_start_date).last_for_patient()) \
+
+dataset.molnu_censored_date = had_covid_treat_excpt_molnu_df.treatment_start_date
+dataset.sotro_censored_date = had_covid_treat_excpt_sotro_df.treatment_start_date
+dataset.molnu_censore_drug =had_covid_treat_excpt_molnu_df.intervention
+dataset.sotro_censore_drug =had_covid_treat_excpt_sotro_df.intervention
+
+dataset.molnu_censore_exist =had_covid_treat_excpt_molnu_df.exists_for_patient() 
+dataset.sotro_censore_exist =had_covid_treat_excpt_sotro_df.exists_for_patient() 
+
+dataset.is_censored =  ((dataset.molnu_censore_exist ) &  (dataset.first_covid_treat_interve.is_in(["Molnupiravir"])))| \
+                            ((dataset.sotro_censore_exist ) &  (dataset.first_covid_treat_interve.is_in(["Sotrovimab"])))
+
+dataset.censored = case(
+     when(dataset.is_censored).then(1), otherwise = 0
+)
+
+#####
+# dataset.is_high_risk_MOL_SOT02_SOR = (therapeutics_df.MOL1_high_risk_cohort.contains("solid organ recipients")) | \
+#     (therapeutics_df.MOL1_high_risk_cohort.contains("Solid organ recipients")) | therapeutics_df.SOT02_risk_cohorts.contains("solid organ recipients")| \
+#     therapeutics_df.SOT02_risk_cohorts.contains("Solid organ recipients") \
+    
+# dataset.high_risk_MOL_SOT02_SOR = case(
+#     when(dataset.is_high_risk_MOL_SOT02_SOR).then(1), otherwise=0
+# )
+
+
+####
 
 #dataset.if_old_covid_treat = dataset.prev_covid_treat_date < dataset.first_covid_treat_date
 
@@ -250,26 +292,26 @@ def had_meds_count(codelist1,codelist2,dt=pcmeds_bf_treat, where=True):
 )
 
 #Immune-mediated inflammatory disorders (IMID)
-dataset.immunosuppresant_drugs_nhsd = had_meds_lastdate (codelist1=immunosuppresant_drugs_dmd_codes, 
+dataset.immunosuppresant_drugs_nhsd = had_meds_lastdate (codelist1 = immunosuppresant_drugs_dmd_codes, 
     codelist2= immunosuppresant_drugs_snomed_codes, dt = pcmeds_bf_6m 
 )
-dataset.oral_steroid_drugs_nhsd = had_meds_lastdate (codelist1=oral_steroid_drugs_dmd_codes, 
+dataset.oral_steroid_drugs_nhsd = had_meds_lastdate (codelist1 = oral_steroid_drugs_dmd_codes, 
     codelist2= oral_steroid_drugs_snomed_codes, dt = pcmeds_bf_12m
 )
 
-dataset.oral_steroid_drug_nhsd_3m_count = had_meds_count (codelist1=oral_steroid_drugs_dmd_codes, 
+dataset.oral_steroid_drug_nhsd_3m_count = had_meds_count (codelist1 = oral_steroid_drugs_dmd_codes, 
     codelist2=oral_steroid_drugs_snomed_codes, dt = pcmeds_bf_3m
 )
 
-dataset.oral_steroid_drug_nhsd_12m_count = had_meds_count (codelist1=oral_steroid_drugs_dmd_codes, 
+dataset.oral_steroid_drug_nhsd_12m_count = had_meds_count (codelist1 = oral_steroid_drugs_dmd_codes, 
     codelist2=oral_steroid_drugs_snomed_codes, dt = pcmeds_bf_12m
 )
 
-dataset.immunosuppresant_drugs_nhsd_ever = had_meds_lastdate (codelist1=immunosuppresant_drugs_dmd_codes,
+dataset.immunosuppresant_drugs_nhsd_ever = had_meds_lastdate (codelist1 = immunosuppresant_drugs_dmd_codes,
     codelist2=immunosuppresant_drugs_snomed_codes, dt = pcmeds_bf_treat
 )
 
-dataset.oral_steroid_drugs_nhsd_ever = had_meds_lastdate(codelist1=oral_steroid_drugs_dmd_codes, 
+dataset.oral_steroid_drugs_nhsd_ever = had_meds_lastdate(codelist1 = oral_steroid_drugs_dmd_codes, 
     codelist2=oral_steroid_drugs_snomed_codes, dt = pcmeds_bf_treat
 )
 
@@ -483,10 +525,10 @@ dataset.haematopoietic_stem_cell_icd10  = had_apcs_diag_icd10_lastdate (dt = apc
 
 def apcs_proc_12m_bf_treat_af01Feb20_lastdate (codelist=None, where=True): 
     return (
-    (apcs_proc_match(codelist) if codelist else apcs)
+    (apcs_proc_match(codelist) if codelist else apcs) \
     .where(apcs.admission_date.is_on_or_between(treat_date- months(12),treat_date) & \
-    apcs.admission_date.is_on_or_after("2020-02-01"))
-    .where(where).sort_by(apcs.admission_date).last_for_patient().admission_date
+    apcs.admission_date.is_on_or_after("2020-02-01")) \
+    .where(where).sort_by(apcs.admission_date).last_for_patient().admission_date \
 )
 
 # between = ["start_date - 12 months", "start_date"], #"date": {"earliest": "2020-02-01"},
@@ -567,6 +609,8 @@ dataset.cancer_opensafely_snomed_ever= c_events_bf_treat.where(
 #     "solid cancer", "solid organ recipients", "stem cell transplant recipient"
 # ]
 
+
+
 #covid_therapeutics_raw-MOL1_high_risk_cohort-SOT02_risk_cohorts
 therapeutics_df = (covid_therapeutics_raw
     .where(covid_therapeutics_raw.intervention.is_in(["Molnupiravir","Sotrovimab", "Paxlovid" ,"Remdesivir","Casirivimab and imdevimab"])) 
@@ -575,6 +619,19 @@ therapeutics_df = (covid_therapeutics_raw
 
 dataset.high_risk_MOL_count = covid_therapeutics_raw.MOL1_high_risk_cohort.count_distinct_for_patient()  #exists_for_patient()  
 
+dataset.high_risk_MOL_last = therapeutics_df.MOL1_high_risk_cohort
+#SOT02_risk_cohorts
+dataset.high_risk_SOT02_count = covid_therapeutics_raw.SOT02_risk_cohorts.count_distinct_for_patient() 
+dataset.high_risk_SOT02_last = therapeutics_df.SOT02_risk_cohorts
+
+#IMID
+dataset.is_high_risk_MOL_SOT02_IMID = (therapeutics_df.MOL1_high_risk_cohort.contains("imid")) | \
+    (therapeutics_df.MOL1_high_risk_cohort.contains("IMID")) | therapeutics_df.SOT02_risk_cohorts.contains("imid")| \
+    therapeutics_df.SOT02_risk_cohorts.contains("IMID") \
+    
+dataset.high_risk_MOL_SOT02_IMID = case(
+    when(dataset.is_high_risk_MOL_SOT02_IMID).then(1), otherwise=0
+)
 #Haematologic malignancy
 dataset.is_high_risk_MOL_SOT02_HMAL = (therapeutics_df.MOL1_high_risk_cohort.contains("haematologic malignancy")) | \
     (therapeutics_df.MOL1_high_risk_cohort.contains("Haematologic malignancy")) | therapeutics_df.SOT02_risk_cohorts.contains("haematologic malignancy")| \
@@ -878,4 +935,4 @@ dataset.covid_vacc04 = covid_vacc.where(covid_vacc.date.is_after(dataset.covid_v
 
 dataset.covid_vacc_last = covid_vacc.last_for_patient().date
 
-dataset.last_vaccination_date = covid_vacc.last_for_patient().date
+#dataset.last_vaccination_date = covid_vacc.last_for_patient().date
