@@ -2,7 +2,7 @@
 ##<dadaset_definition.py> for repo: <prophy_effects_Sotro_Molnup>
 ##Description: This script extracts data for project 91:[Coverage, effectiveness and safety 
 ##of neutralising monoclonal antibodies or antivirals for non-hospitalised patients with COVID-19]
-##Author(s): Qing Wen   Date last updated: 30/04/2024
+##Author(s): Qing Wen   Date last updated: 03/05/2024
 ########################################################################################################
 from ehrql import(
     months,
@@ -56,36 +56,37 @@ index_enddate = "2022-02-10"
 dataset = create_dataset()
 dataset.configure_dummy_data(population_size = 3000)
 
-##covid_therapeutics
+##covid_therapeutics_raw
 had_covid_treat_df0 = (
     covid_therapeutics_raw
     .where(covid_therapeutics_raw.covid_indication.is_in(["non_hospitalised"])) \
+    .where(covid_therapeutics_raw.intervention.is_in(["Molnupiravir","Sotrovimab","Paxlovid" ,"Remdesivir","Casirivimab and imdevimab"]) & \
+    (covid_therapeutics_raw.current_status.is_in(["Approved", "Treatment Complete"])))
     .sort_by(covid_therapeutics_raw.treatment_start_date) \
-    .where(covid_therapeutics_raw.intervention.is_in(["Molnupiravir","Sotrovimab"]) & \
-    (covid_therapeutics_raw.current_status.is_in(["Approved", "Treatment Complete"]))
-    ))
-
-dataset.prev_covid_treat_date = had_covid_treat_df0.sort_by(covid_therapeutics_raw.treatment_start_date).first_for_patient().treatment_start_date
-
-had_covid_treat_df = (had_covid_treat_df0
-    .where(
-    # covid_therapeutics_raw
-    # .where(covid_therapeutics_raw.covid_indication.is_in(["non_hospitalised"])) \
-    # .sort_by(covid_therapeutics_raw.treatment_start_date) \
-    # .where(covid_therapeutics_raw.intervention.is_in(["Molnupiravir","Sotrovimab"]) & \
-    # (covid_therapeutics_raw.current_status.is_in(["Approved", "Treatment Complete"])) & \
-    ((covid_therapeutics_raw.treatment_start_date>=index_startdate) &  \
-    (covid_therapeutics_raw.treatment_start_date<=index_enddate))  \
-    ).sort_by(covid_therapeutics_raw.treatment_start_date).first_for_patient() \
 )
 
-had_first_covid_treat = had_covid_treat_df.exists_for_patient()
-dataset.first_covid_treat_date = had_covid_treat_df.treatment_start_date
-dataset.had_first_covid_treat = had_first_covid_treat
-dataset.first_covid_treat_interve= had_covid_treat_df.intervention
-dataset.first_covid_treat_status= had_covid_treat_df.current_status
+had_covid_m_s_treat_df = (
+    had_covid_treat_df0
+    .where(had_covid_treat_df0.intervention.is_in(["Molnupiravir","Sotrovimab"]) &
+        (had_covid_treat_df0.treatment_start_date>=index_startdate) &  \
+        (had_covid_treat_df0.treatment_start_date<=index_enddate) \
+    ).sort_by(had_covid_treat_df0.treatment_start_date).first_for_patient() \
+)
 
-dataset.if_old_covid_treat = dataset.prev_covid_treat_date < dataset.first_covid_treat_date
+had_first_covid_treat = had_covid_m_s_treat_df.exists_for_patient()
+dataset.first_covid_treat_date = had_covid_m_s_treat_df.treatment_start_date
+dataset.had_first_covid_treat = had_first_covid_treat
+dataset.first_covid_treat_interve= had_covid_m_s_treat_df.intervention
+dataset.first_covid_treat_status= had_covid_m_s_treat_df.current_status
+
+treat_date = dataset.first_covid_treat_date
+
+dataset.if_old_covid_treat = (
+    had_covid_treat_df0
+    .sort_by(had_covid_treat_df0.treatment_start_date)
+    .where(had_covid_treat_df0.treatment_start_date.is_before(treat_date))).exists_for_patient()
+
+#dataset.if_old_covid_treat = dataset.prev_covid_treat_date < dataset.first_covid_treat_date
 
 treat_date = dataset.first_covid_treat_date
 
@@ -112,8 +113,7 @@ dataset.define_population(
 non_hospital_df = (  
     covid_therapeutics_raw
     #.where(covid_therapeutics_raw.diagnosis.is_in(["Covid-19"]))
-    .where(covid_therapeutics_raw.covid_indication.is_in(["non_hospitalised"]) &
-    (covid_therapeutics_raw.current_status.is_in(["Approved", "Treatment Complete"])))  #"Approved", "Treatment Complete")
+    .where(covid_therapeutics_raw.covid_indication.is_in(["non_hospitalised"])) 
     .sort_by(covid_therapeutics_raw.treatment_start_date) #current_status
 )
 
@@ -136,7 +136,7 @@ dataset.date_of_first_admis_af_treat = (
 )
 
 ##covid_hospitalisation as per primary_diagnosis == OUTCOME
-hosp_af60d_covid_pdiag_1stdate_df = (  #covid_icd10_codes==>codelists.covid_icd10_codes
+hosp_af60d_covid_pdiag_1stdate_df = (  
     apcs.where(
         (apcs.primary_diagnosis.is_in(covid_icd10_codes)) &    #primary_diagnosis
         (apcs.admission_date.is_after(treat_date + days(60))) &
@@ -222,18 +222,18 @@ dataset.allcause_death_under30d = (ons_deaths.date.is_after(treat_date) &
 #tpp-clinical_events, apcs.admission_date,tpp-medications
 c_events = clinical_events  #tpp-clinical_events
 c_events_bf_treat = c_events.where(c_events.date.is_on_or_before(treat_date))
+c_events_bf6m = c_events.where(c_events.date.is_on_or_between(treat_date - months(6),treat_date))
+c_events_bf12m = c_events.where(c_events.date.is_on_or_between(treat_date - months(12),treat_date))
+c_events_bf24m = c_events.where(c_events.date.is_on_or_between(treat_date - months(24),treat_date))
+
 apcs_diags_bf_treat = apcs.where(apcs.admission_date.is_on_or_before(treat_date))
+apcs_diags_bf12m = apcs.where(apcs.admission_date.is_on_or_between(treat_date - months(12), treat_date))
+apcs_diags_bf24m = apcs.where(apcs.admission_date.is_on_or_between(treat_date - months(24),treat_date))
+
 pcmeds_bf_treat = medications.where(medications.date.is_on_or_before(treat_date)) #prescribed medications in primary care.
 pcmeds_bf_3m = medications.where(medications.date.is_on_or_between(treat_date - months(3),treat_date)) 
 pcmeds_bf_6m = medications.where(medications.date.is_on_or_between(treat_date - months(6),treat_date))
 pcmeds_bf_12m = medications.where(medications.date.is_on_or_between(treat_date - months(12),treat_date))
-c_events_bf6m = c_events.where(c_events.date.is_on_or_between(treat_date - months(6),treat_date))
-
-c_events_bf12m = c_events.where(c_events.date.is_on_or_between(treat_date - months(12),treat_date))
-apcs_diags_bf12m = apcs.where(apcs.admission_date.is_on_or_between(treat_date - months(12), treat_date))
-
-c_events_bf24m = c_events.where(c_events.date.is_on_or_between(treat_date - months(24),treat_date))
-apcs_diags_bf24m = apcs.where(apcs.admission_date.is_on_or_between(treat_date - months(24),treat_date))
 
 def had_meds_lastdate(codelist1,codelist2,dt = pcmeds_bf_treat, where=True):
     return(
@@ -307,8 +307,8 @@ dataset.dialysis_icd10 = had_apcs_diag_icd10_lastdate(dialysis_icd10_codelist) #
 def apcs_proc_match(codelist):
     code_strings = set()
     for code in codelist:
-            code_string = ICD10Code(code)._to_primitive_type()
-            code_strings.add(code_string)
+        code_string = ICD10Code(code)._to_primitive_type()
+        code_strings.add(code_string)
     conditions = [
         apcs.all_procedures.contains(code_str)
         for code_str in code_strings
@@ -327,7 +327,7 @@ def apcs_proc_bf_treat_lastdate(codelist=None, where=True):
     .admission_date
 )
 
-def apcs_proc_bf_treat_df(codelist=None, where=True): #return frame
+def apcs_proc_bf_treat_df(codelist=None, where=True): 
     return (
     (apcs_proc_match(codelist) if codelist else apcs)
     .where(apcs.admission_date.is_on_or_before(treat_date))
@@ -386,7 +386,6 @@ dataset.transplant_thymus_opcs4_count = apcs_proc_bf_treat_af01Feb20_df(codelist
 dataset.transplant_thymus_opcs4_a =dataset.transplant_thymus_opcs4.is_on_or_between(dataset.transplant_all_y_codes_opcs4,dataset.transplant_all_y_codes_opcs4)
 #dataset.transplant_thymus_opcs4_4 = dataset.transplant_thymus_opcs4.is_in(transplant_all_y_codes_opcs4_df)
 
-
 dataset.transplant_conjunctiva_y_code_opcs4 = apcs_proc_bf_treat_af01Feb20_lastdate(codelist=conjunctiva_y_codes_transplant_nhsd_opcs4_codes)
 dataset.transplant_conjunctiva_y_code_opcs4_count = apcs_proc_bf_treat_af01Feb20_df(codelist=conjunctiva_y_codes_transplant_nhsd_opcs4_codes).count_for_patient()
 transplant_conjunctiva_y_code_opcs4_df = apcs_proc_bf_treat_af01Feb20_df(codelist=conjunctiva_y_codes_transplant_nhsd_opcs4_codes)
@@ -425,8 +424,8 @@ dataset.transplant_ileum_2_opcs4_a = dataset.transplant_ileum_2_opcs4.is_on_or_b
 def proc_match(codelist, dt):
     code_strings = set()
     for code in codelist:
-            code_string = ICD10Code(code)._to_primitive_type()
-            code_strings.add(code_string)
+        code_string = ICD10Code(code)._to_primitive_type()
+        code_strings.add(code_string)
     conditions = [
         dt.all_procedures.contains(code_str)
         for code_str in code_strings
@@ -522,7 +521,7 @@ dataset.haematopoietic_stem_cell_opcs4_ever = apcs_proc_bf_treat_af01Feb20_lastd
 #on_or_before = "start_date"
 dataset.haematological_malignancies_snomed_ever = had_clinc_event_ctv3snome_lastdate(
     codelist = haematological_malignancies_nhsd_snomed_codes, 
-        code_type='snomedct') #tpp-clinical_events  #snomedct
+    code_type='snomedct') #tpp-clinical_events  #snomedct
 #on_or_before = "start_date"
 dataset.haematological_malignancies_icd10_ever = had_apcs_diag_icd10_lastdate(
     codelist = haematological_malignancies_nhsd_icd10_codes) ##tpp-apcs
@@ -562,26 +561,90 @@ dataset.cancer_opensafely_snomed_ever= c_events_bf_treat.where(
         (c_events_bf_treat.snomedct_code.is_in(chemotherapy_radiotherapy_opensafely_snomed_codes))) \
         .sort_by(c_events_bf_treat.date).last_for_patient().date
 
-
-## List of diseases
+## List of high-risk diseases
 # highrisk_list = ["haematologic malignancy","Patients with a haematological diseases", "immune deficiencies", 
-#     "primary immune deficiencies", "renal disease", "sickle cell disease",
+#     "primary immune deficiencies",  "sickle cell disease",
 #     "solid cancer", "solid organ recipients", "stem cell transplant recipient"
 # ]
 
-dataset.high_risk_covid_thera_MOL_count = non_hospital_df.MOL1_high_risk_cohort.count_distinct_for_patient()  #exists_for_patient()  
-dataset.high_risk_covid_thera_MOL_count_dist = non_hospital_df.where(non_hospital_df.treatment_start_date.is_on_or_between(treat_date,treat_date)
-    ).MOL1_high_risk_cohort.count_distinct_for_patient() 
-#dataset.high_risk_cohort_covid_therapeutics_MOL_exist = non_hospital_df.MOL1_high_risk_cohort.exists_for_patient()  
-high_risk_covid_thera_MOL_first = non_hospital_df.where(non_hospital_df.treatment_start_date.is_on_or_between(treat_date,treat_date)).first_for_patient().MOL1_high_risk_cohort
+#covid_therapeutics_raw-MOL1_high_risk_cohort-SOT02_risk_cohorts
+therapeutics_df = (covid_therapeutics_raw
+    .where(covid_therapeutics_raw.intervention.is_in(["Molnupiravir","Sotrovimab", "Paxlovid" ,"Remdesivir","Casirivimab and imdevimab"])) 
+    .sort_by(covid_therapeutics_raw.treatment_start_date).last_for_patient()
+    )
 
-dataset.high_risk_covid_thera_SOT02_count_dist = non_hospital_df.where(non_hospital_df.treatment_start_date.is_on_or_between(treat_date,treat_date)
-    ).SOT02_risk_cohorts.count_distinct_for_patient() 
+dataset.high_risk_MOL_count = covid_therapeutics_raw.MOL1_high_risk_cohort.count_distinct_for_patient()  #exists_for_patient()  
 
-dataset.high_risk_covid_thera_CASIM05_count_dist = non_hospital_df.where(non_hospital_df.treatment_start_date.is_on_or_between(treat_date,treat_date)
-    ).CASIM05_risk_cohort.count_distinct_for_patient() 
+#Haematologic malignancy
+dataset.is_high_risk_MOL_SOT02_HMAL = (therapeutics_df.MOL1_high_risk_cohort.contains("haematologic malignancy")) | \
+    (therapeutics_df.MOL1_high_risk_cohort.contains("Haematologic malignancy")) | therapeutics_df.SOT02_risk_cohorts.contains("haematologic malignancy")| \
+    therapeutics_df.SOT02_risk_cohorts.contains("Haematologic malignancy") \
+    
+dataset.high_risk_MOL_SOT02_HMAL = case(
+    when(dataset.is_high_risk_MOL_SOT02_HMAL).then(1), otherwise=0
+)
 
-dataset.high_risk_covid_thera_MOL_solid_cancer = non_hospital_df.first_for_patient().MOL1_high_risk_cohort.contains("solid cancer")
+#patients with a haematological diseases
+dataset.is_high_risk_MOL_SOT02_HMDs = (therapeutics_df.MOL1_high_risk_cohort.contains("patients with a haematological diseases")) | \
+    (therapeutics_df.MOL1_high_risk_cohort.contains("Patients with a haematological diseases")) | therapeutics_df.SOT02_risk_cohorts.contains("patients with a haematological diseases")| \
+    therapeutics_df.SOT02_risk_cohorts.contains("Patients with a haematological diseases") \
+
+dataset.high_risk_MOL_SOT02_HMDs = case(
+    when(dataset.is_high_risk_MOL_SOT02_HMDs).then(1), otherwise=0
+)
+
+#immune deficiencies
+dataset.is_high_risk_MOL_SOT02_IMDs = (therapeutics_df.MOL1_high_risk_cohort.contains("immune deficiencies")) | \
+    (therapeutics_df.MOL1_high_risk_cohort.contains("Immune deficiencies")) | therapeutics_df.SOT02_risk_cohorts.contains("immune deficiencies")| \
+    therapeutics_df.SOT02_risk_cohorts.contains("Immune deficiencies") \
+    
+dataset.high_risk_MOL_SOT02_IMDs = case(
+    when(dataset.is_high_risk_MOL_SOT02_IMDs).then(1), otherwise=0
+)    
+
+#primary immune deficiencies
+dataset.is_high_risk_MOL_SOT02_PIMDs = (therapeutics_df.MOL1_high_risk_cohort.contains("primary immune deficiencies")) | \
+    (therapeutics_df.MOL1_high_risk_cohort.contains("Primary immune deficiencies")) | therapeutics_df.SOT02_risk_cohorts.contains("primary immune deficiencies")| \
+    therapeutics_df.SOT02_risk_cohorts.contains("Primary immune deficiencies") \
+    
+dataset.high_risk_MOL_SOT02_PIMDs = case(
+    when(dataset.is_high_risk_MOL_SOT02_PIMDs).then(1), otherwise=0
+)
+#sickle cell disease-SCD
+dataset.is_high_risk_MOL_SOT02_SCD = (therapeutics_df.MOL1_high_risk_cohort.contains("sickle cell disease")) | \
+    (therapeutics_df.MOL1_high_risk_cohort.contains("Sickle cell disease")) | therapeutics_df.SOT02_risk_cohorts.contains("sickle cell disease")| \
+    therapeutics_df.SOT02_risk_cohorts.contains("Sickle cell disease") \
+    
+dataset.high_risk_MOL_SOT02_SCD = case(
+    when(dataset.is_high_risk_MOL_SOT02_SCD).then(1), otherwise=0
+)
+#Solid cancer
+dataset.is_high_risk_MOL_SOT02_solid_cancer = (therapeutics_df.MOL1_high_risk_cohort.contains("solid cancer")) | \
+    (therapeutics_df.MOL1_high_risk_cohort.contains("Solid cancer")) | therapeutics_df.SOT02_risk_cohorts.contains("solid cancer")| \
+    therapeutics_df.SOT02_risk_cohorts.contains("Solid cancer") \
+  
+dataset.highrisk_MOL_SOT02_solid_cancer = case(
+    when(dataset.is_high_risk_MOL_SOT02_solid_cancer).then(1), otherwise=0
+)
+
+#solid organ recipients-SOR, 
+dataset.is_high_risk_MOL_SOT02_SOR = (therapeutics_df.MOL1_high_risk_cohort.contains("solid organ recipients")) | \
+    (therapeutics_df.MOL1_high_risk_cohort.contains("Solid organ recipients")) | therapeutics_df.SOT02_risk_cohorts.contains("solid organ recipients")| \
+    therapeutics_df.SOT02_risk_cohorts.contains("Solid organ recipients") \
+    
+dataset.high_risk_MOL_SOT02_SOR = case(
+    when(dataset.is_high_risk_MOL_SOT02_SOR).then(1), otherwise=0
+)
+
+#stem cell transplant recipient -SCTR
+dataset.is_high_risk_MOL_SOT02_SCTR = (therapeutics_df.MOL1_high_risk_cohort.contains("stem cell transplant recipient")) | \
+    (therapeutics_df.MOL1_high_risk_cohort.contains("Stem cell transplant recipient")) | therapeutics_df.SOT02_risk_cohorts.contains("stem cell transplant recipient")| \
+    therapeutics_df.SOT02_risk_cohorts.contains("Stem cell transplant recipient") \
+    
+dataset.high_risk_MOL_SOT02_SCTR = case(
+    when(dataset.is_high_risk_MOL_SOT02_SCTR).then(1), otherwise=0
+)
+
 ##Pregnancy
 #pregnancy record in last 36 weeks
 dataset.preg_36wks_date = (
@@ -665,7 +728,7 @@ dataset.ccare_covid_first_af_treat_alldiag_date = apcs_admis_af_treat_alldiag_fi
 )
 
 
-##demographic variables 1
+##demographic
 dataset.dob = patients.date_of_birth ##dob
 dataset.dod = patients.date_of_death  #dod: date of death
 dataset.sex = patients.sex
@@ -683,7 +746,7 @@ dataset.age_sstart_group = case(
         otherwise="unknown",
 )
 
-##demographic variables on treatment day
+##demographic - treatment day
 dataset.age_treated = patients.age_on(treat_date)
 
 dataset.age_treated_group = case(
