@@ -71,7 +71,8 @@ print("#ethnicity_ctv3:")
 freq_single(as.character(sel_data$ethnicity_ctv3))
 
 print("#bmi")
-summary(as.numeric(sel_data$bmi))
+summary(sel_data$bmi)
+
 # Save dataset(s) ----
 write.csv(sel_data, here::here("output", "tables", "data4analyse.csv"), row.names = FALSE)
 write_rds(sel_data, here::here("output", "data", "data4analyse.rds"), compress = "gz")
