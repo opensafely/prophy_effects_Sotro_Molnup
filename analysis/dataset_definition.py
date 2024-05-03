@@ -110,23 +110,11 @@ dataset.molnu_censore_exist =had_covid_treat_excpt_molnu_df.exists_for_patient()
 dataset.sotro_censore_exist =had_covid_treat_excpt_sotro_df.exists_for_patient() 
 
 dataset.is_censored =  ((dataset.molnu_censore_exist ) &  (dataset.first_covid_treat_interve.is_in(["Molnupiravir"])))| \
-                            ((dataset.sotro_censore_exist ) &  (dataset.first_covid_treat_interve.is_in(["Sotrovimab"])))
+    ((dataset.sotro_censore_exist ) &  (dataset.first_covid_treat_interve.is_in(["Sotrovimab"])))
 
 dataset.censored = case(
      when(dataset.is_censored).then(1), otherwise = 0
 )
-
-#####
-# dataset.is_high_risk_MOL_SOT02_SOR = (therapeutics_df.MOL1_high_risk_cohort.contains("solid organ recipients")) | \
-#     (therapeutics_df.MOL1_high_risk_cohort.contains("Solid organ recipients")) | therapeutics_df.SOT02_risk_cohorts.contains("solid organ recipients")| \
-#     therapeutics_df.SOT02_risk_cohorts.contains("Solid organ recipients") \
-    
-# dataset.high_risk_MOL_SOT02_SOR = case(
-#     when(dataset.is_high_risk_MOL_SOT02_SOR).then(1), otherwise=0
-# )
-
-
-####
 
 #dataset.if_old_covid_treat = dataset.prev_covid_treat_date < dataset.first_covid_treat_date
 
@@ -177,7 +165,7 @@ dataset.date_of_first_admis_af_treat = (
     .sort_by(apcs.admission_date).first_for_patient().admission_date
 )
 
-##covid_hospitalisation as per primary_diagnosis == OUTCOME
+##covid_hospitalisation as per primary_diagnosis -OUTCOME
 hosp_af60d_covid_pdiag_1stdate_df = (  
     apcs.where(
         (apcs.primary_diagnosis.is_in(covid_icd10_codes)) &    #primary_diagnosis
