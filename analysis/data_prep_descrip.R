@@ -27,6 +27,8 @@ sel_data <- read_csv(here::here("output", "data", "dataset_table.csv.gz")) %>%
 
 cat("#total\n")
 dim(sel_data)
+cat("#is_censored\n")
+freq_single(sel_data$is_censored)
 cat("#censored\n")
 freq_single(sel_data$censored)
 cat("# str-START#\n")
