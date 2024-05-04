@@ -85,10 +85,13 @@ dataset.if_old_covid_treat = (
     .sort_by(had_covid_treat_df0.treatment_start_date)
     .where(had_covid_treat_df0.treatment_start_date.is_before(treat_date))).exists_for_patient()
 
+dataset.old_covid_treat = case(
+     when(dataset.if_old_covid_treat).then(1), otherwise = 0
+)
 ##censored
 had_covid_treat_excpt_molnu_df = (
     had_covid_treat_df0
-    .except_where(had_covid_treat_df0.intervention.is_in(["Molnupiravir"]))
+    .except_where(had_covid_treat_df0.intervention.is_in(["Molnupiravir"])) \
     .where((had_covid_treat_df0.treatment_start_date> treat_date) &  \
         (had_covid_treat_df0.treatment_start_date<=index_enddate) \
     ).sort_by(had_covid_treat_df0.treatment_start_date).last_for_patient()\
@@ -96,7 +99,7 @@ had_covid_treat_excpt_molnu_df = (
 
 had_covid_treat_excpt_sotro_df = (
     had_covid_treat_df0
-    .except_where(had_covid_treat_df0.intervention.is_in(["Sotrovimab"]))
+    .except_where(had_covid_treat_df0.intervention.is_in(["Sotrovimab"])) \
     .where((had_covid_treat_df0.treatment_start_date> treat_date) &  \
         (had_covid_treat_df0.treatment_start_date<=index_enddate) \
     ).sort_by(had_covid_treat_df0.treatment_start_date).last_for_patient()) \
