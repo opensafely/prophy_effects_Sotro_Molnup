@@ -1,19 +1,7 @@
 
 
 from ehrql import codelist_from_csv 
-#snomedct_code
-ethnicity_codelist = codelist_from_csv(
-    "codelists/primis-covid19-vacc-uptake-eth2001.csv",
-    column="code",
-    category_column="grouping_6_id",
-)
 
-#ctv3_code
-ethnicity = codelist_from_csv( ##
-    "codelists/opensafely-ethnicity-2020-04-27.csv",
-    column="Code",
-    category_column="Grouping_6",
-)
 
 # ### Require hospitalisation for COVID-19
 # covid_icd10_codes = codelist_from_csv(
@@ -341,7 +329,25 @@ ileum_2_y_codes_transplant_nhsd_opcs4_codes = codelist_from_csv(
 #   column = "code",
 #   category_column="grouping_6_id",
 # )
+#snomedct_code
+ethnicity_codelist = codelist_from_csv(
+    "codelists/primis-covid19-vacc-uptake-eth2001.csv",
+    column="code",
+    category_column="grouping_6_id",
+)
 
+#ctv3_code
+ethnicity = codelist_from_csv( ##
+    "codelists/opensafely-ethnicity-2020-04-27.csv",
+    column="Code",
+    category_column="Grouping_6",
+)
+
+ethnicity_codelist_with_categories = codelist_from_csv(
+    "codelists/opensafely-ethnicity-snomed-0removed.csv",
+    column = "snomedcode",
+    category_column = "Grouping_6"
+)
 
 # # OTHER COVARIATES ----
  
