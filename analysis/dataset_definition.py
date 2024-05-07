@@ -2,7 +2,7 @@
 ##<dadaset_definition.py> for repo: <prophy_effects_Sotro_Molnup>
 ##Description: This script extracts data for project 91:[Coverage, effectiveness and safety 
 ##of neutralising monoclonal antibodies or antivirals for non-hospitalised patients with COVID-19]
-##Author(s): Qing Wen   Date last updated: 03/05/2024
+##Author(s): Qing Wen   Date last updated: 04/05/2024
 ########################################################################################################
 from ehrql import(
     months,
@@ -21,6 +21,7 @@ from ehrql.tables.tpp import(
     practice_registrations,
     ons_deaths,
     vaccinations,
+    ethnicity_from_sus,
 )
 
 from ehrql.tables.raw.tpp import(
@@ -44,11 +45,11 @@ from codelists import(ethnicity_codelist, covid_icd10_codes, ethnicity,dialysis_
     ileum_1_transplant_nhsd_opcs4_codes, ileum_2_transplant_nhsd_opcs4_codes, haematopoietic_stem_cell_transplant_nhsd_opcs4_codes, 
     haematopoietic_stem_cell_transplant_nhsd_opcs4_codes, pregnancy_primis_codes,pregdel_primis_codes, 
     non_haematological_cancer_opensafely_snomed_codes, non_haematological_cancer_opensafely_snomed_codes_new, 
-    lung_cancer_opensafely_snomed_codes, chemotherapy_radiotherapy_opensafely_snomed_codes, care_home_primis_snomed_codes)
+    lung_cancer_opensafely_snomed_codes, chemotherapy_radiotherapy_opensafely_snomed_codes, care_home_primis_snomed_codes,
+    ethnicity_codelist_with_categories)
 
 ## def_funs files
-from def_funs import(is_fem_male, is_registered, 
-    bmi_record, first_covid_therap_date, cause_of_death_matches, any_of) 
+from def_funs import(is_fem_male, bmi_record, first_covid_therap_date, cause_of_death_matches, any_of) 
 
 index_startdate = "2021-12-16"  
 index_enddate = "2022-02-10"
@@ -58,8 +59,7 @@ dataset.configure_dummy_data(population_size = 3000)
 
 ##covid_therapeutics_raw
 had_covid_treat_df0 = (
-    covid_therapeutics_raw
-    .where(covid_therapeutics_raw.covid_indication.is_in(["non_hospitalised"])) \
+    covid_therapeutics_raw.where(covid_therapeutics_raw.covid_indication.is_in(["non_hospitalised"])) \
     .where(covid_therapeutics_raw.intervention.is_in(["Molnupiravir","Sotrovimab","Paxlovid" ,"Remdesivir","Casirivimab and imdevimab"]) & \
     (covid_therapeutics_raw.current_status.is_in(["Approved", "Treatment Complete"]))) \
     .sort_by(covid_therapeutics_raw.treatment_start_date) \
@@ -94,20 +94,19 @@ had_covid_treat_excpt_molnu_df = (
     .except_where(had_covid_treat_df0.intervention.is_in(["Molnupiravir"])) \
     .where((had_covid_treat_df0.treatment_start_date> treat_date) &  \
         (had_covid_treat_df0.treatment_start_date<=index_enddate) \
-    ).sort_by(had_covid_treat_df0.treatment_start_date).last_for_patient()\
-)
+    ).sort_by(had_covid_treat_df0.treatment_start_date)) 
 
 had_covid_treat_excpt_sotro_df = (
     had_covid_treat_df0
     .except_where(had_covid_treat_df0.intervention.is_in(["Sotrovimab"])) \
     .where((had_covid_treat_df0.treatment_start_date> treat_date) &  \
         (had_covid_treat_df0.treatment_start_date<=index_enddate) \
-    ).sort_by(had_covid_treat_df0.treatment_start_date).last_for_patient()) \
+    ).sort_by(had_covid_treat_df0.treatment_start_date)) 
 
-dataset.molnu_censored_date = had_covid_treat_excpt_molnu_df.treatment_start_date
-dataset.sotro_censored_date = had_covid_treat_excpt_sotro_df.treatment_start_date
-dataset.molnu_censore_drug =had_covid_treat_excpt_molnu_df.intervention
-dataset.sotro_censore_drug =had_covid_treat_excpt_sotro_df.intervention
+dataset.molnu_censored_date = had_covid_treat_excpt_molnu_df.first_for_patient().treatment_start_date
+dataset.sotro_censored_date = had_covid_treat_excpt_sotro_df.first_for_patient().treatment_start_date
+dataset.molnu_censore_drug =had_covid_treat_excpt_molnu_df.first_for_patient().intervention
+dataset.sotro_censore_drug =had_covid_treat_excpt_sotro_df.first_for_patient().intervention
 
 dataset.molnu_censore_exist =had_covid_treat_excpt_molnu_df.exists_for_patient() 
 dataset.sotro_censore_exist =had_covid_treat_excpt_sotro_df.exists_for_patient() 
@@ -125,6 +124,12 @@ treat_date = dataset.first_covid_treat_date
 
 dataset.date_treated = treat_date
 
+was_registered_treated = (
+    practice_registrations.where(practice_registrations.start_date <= treat_date)
+    .except_where(practice_registrations.end_date <= treat_date)
+    .exists_for_patient()
+)
+
 is_adult = (patients.age_on(index_startdate) >= 18) & (
     patients.age_on(index_startdate) <= 110
 )
@@ -138,15 +143,13 @@ dataset.define_population(
     is_fem_male
     & is_adult
     & is_alive
-    & is_registered
     & had_first_covid_treat
+    & was_registered_treated
 )
 
 ##covid_therapeutics
-non_hospital_df = (  
-    covid_therapeutics_raw
-    #.where(covid_therapeutics_raw.diagnosis.is_in(["Covid-19"]))
-    .where(covid_therapeutics_raw.covid_indication.is_in(["non_hospitalised"])) 
+non_hospital_df = (  # #.where(covid_therapeutics_raw.diagnosis.is_in(["Covid-19"]))
+    covid_therapeutics_raw.where(covid_therapeutics_raw.covid_indication.is_in(["non_hospitalised"])) 
     .sort_by(covid_therapeutics_raw.treatment_start_date) #current_status
 )
 
@@ -170,8 +173,7 @@ dataset.date_of_first_admis_af_treat = (
 
 ##covid_hospitalisation as per primary_diagnosis -OUTCOME
 hosp_af60d_covid_pdiag_1stdate_df = (  
-    apcs.where(
-        (apcs.primary_diagnosis.is_in(covid_icd10_codes)) &    #primary_diagnosis
+    apcs.where((apcs.primary_diagnosis.is_in(covid_icd10_codes)) &    #primary_diagnosis
         (apcs.admission_date.is_after(treat_date + days(60))) &
         (apcs.admission_date.is_on_or_before(treat_date + days(60) + months(6))) & #  apcs.snomedct_code.is_in(covid_icd10_codes)
         (apcs.patient_classification.is_in(["1"]))   ## ordinary admissions only - exclude day cases and regular attenders
@@ -179,8 +181,8 @@ hosp_af60d_covid_pdiag_1stdate_df = (
 )
 
 ##critical_care                    
-ccare_af60d_covid_pdiag = (hosp_af60d_covid_pdiag_1stdate_df
-    .admission_method.is_in(["21", "22", "23", "24", "25", "2A", "2B", "2C", "2D", "28"]) &
+ccare_af60d_covid_pdiag = (
+    hosp_af60d_covid_pdiag_1stdate_df.admission_method.is_in(["21", "22", "23", "24", "25", "2A", "2B", "2C", "2D", "28"]) & \
     (hosp_af60d_covid_pdiag_1stdate_df.days_in_critical_care>0))
 
 ##covid_hospitalisation as per primary_diagnosis
@@ -190,15 +192,13 @@ dataset.hosp_covid_pdiag = hosp_af60d_covid_pdiag_1stdate_df.primary_diagnosis #
 dataset.had_ccare_covid = ccare_af60d_covid_pdiag #had_ccare_covid_af60d_6mon_pdiag_date
 
 ##covid_critical_care-date
-dataset.ccare_covid_date = (  
-    apcs.where(
-        (apcs.primary_diagnosis.is_in(covid_icd10_codes)) &    #primary_diagnosis
-        (apcs.admission_date.is_after(treat_date + days(60))) &
-        (apcs.admission_date.is_on_or_before(treat_date + days(60) + months(6))) & #  apcs.snomedct_code.is_in(covid_icd10_codes)
-        (apcs.patient_classification.is_in(["1"])) &
-        (apcs.admission_method.is_in(["21", "22", "23", "24", "25", "2A", "2B", "2C", "2D", "28"])) &
-        (apcs.days_in_critical_care>0)
-        ).sort_by(apcs.admission_date).first_for_patient()).admission_date
+dataset.ccare_covid_date = (  #primary_diagnosis
+    apcs.where((apcs.primary_diagnosis.is_in(covid_icd10_codes)) &     
+        (apcs.admission_date.is_after(treat_date + days(60))) & 
+        (apcs.admission_date.is_on_or_before(treat_date + days(60) + months(6))) &   #  apcs.snomedct_code.is_in(covid_icd10_codes)
+        (apcs.patient_classification.is_in(["1"])) & \
+        (apcs.admission_method.is_in(["21", "22", "23", "24", "25", "2A", "2B", "2C", "2D", "28"])) & \
+        (apcs.days_in_critical_care>0)).sort_by(apcs.admission_date).first_for_patient()).admission_date
 
 ##allcause_hospitalisation
 hosp_allcause_af60d_6mon_df = ( 
@@ -217,16 +217,12 @@ hosp_covid_date = dataset.hosp_covid_date #first hospitalise after 60days
 hosp_allcause_date = dataset.hosp_allcause_date 
 
 dataset.hospitalise_disc_covid = ( #covid_first discharge after 60days
-    apcs.where(
-        apcs.discharge_date.is_on_or_before(hosp_covid_date)
-    ).sort_by(apcs.discharge_date).first_for_patient()
-).discharge_date
+    apcs.where(apcs.discharge_date.is_on_or_before(hosp_covid_date)
+    ).sort_by(apcs.discharge_date).first_for_patient()).discharge_date
 
 dataset.hospitalise_disc_allcause = (      #allcause-first discharge after 60days
-    apcs.where(
-        apcs.discharge_date.is_on_or_before(hosp_allcause_date)
-    ).sort_by(apcs.discharge_date).first_for_patient()
-).discharge_date
+    apcs.where(apcs.discharge_date.is_on_or_before(hosp_allcause_date)
+    ).sort_by(apcs.discharge_date).first_for_patient()).discharge_date
 
 ##Death_date##
 dataset.ons_dead_date = ons_deaths.date
@@ -251,7 +247,7 @@ dataset.allcause_death_under60d = (ons_deaths.date.is_after(treat_date) &
 dataset.allcause_death_under30d = (ons_deaths.date.is_after(treat_date) & 
     ons_deaths.date.is_on_or_before(treat_date + days(30))) 
 
-##comorbidities
+####### comorbidities ####### 
 #tpp-clinical_events, apcs.admission_date,tpp-medications
 c_events = clinical_events  #tpp-clinical_events
 c_events_bf_treat = c_events.where(c_events.date.is_on_or_before(treat_date))
@@ -306,7 +302,7 @@ dataset.oral_steroid_drugs_nhsd_ever = had_meds_lastdate(codelist1 = oral_steroi
     codelist2=oral_steroid_drugs_snomed_codes, dt = pcmeds_bf_treat
 )
 
-def had_clinc_event_ctv3snome_lastdate (codelist, dt=c_events_bf_treat, code_type='ctv3', where=True):
+def had_c_event_ctv3snome_lastdate (codelist, dt=c_events_bf_treat, code_type='ctv3', where=True):
        # Determine which code type to filter on
     if code_type == 'snomedct':
         code_field = dt.snomedct_code
@@ -333,7 +329,7 @@ def had_apcs_diag_icd10_lastdate(codelist, dt = apcs_diags_bf_treat, code_type='
 
 ##high-risk cohort
 #on_or_before = "start_date",
-dataset.dialysis = had_clinc_event_ctv3snome_lastdate(dialysis_codes) #tpp-clinical_events  #CTV3ID
+dataset.dialysis0 = had_c_event_ctv3snome_lastdate(dialysis_codes) #tpp-clinical_events  #CTV3ID
 dataset.dialysis_icd10 = had_apcs_diag_icd10_lastdate(dialysis_icd10_codelist) #tpp-apcs
 
 ##apcs_admis_alldiag_match
@@ -384,24 +380,36 @@ def apcs_proc_bf_treat_af01Feb20_df(codelist=None, where=True): ##get dataframe-
 
 #on_or_before="start_date"
 dataset.dialysis_procedure = apcs_proc_bf_treat_lastdate(codelist= dialysis_opcs4_codelist) ##use fun:apcs_proc_bf_treat_lastdate
-##kidney transplant
-dataset.kidney_transplant = had_clinc_event_ctv3snome_lastdate(codelist=kidney_transplant_codes) #tpp-clinical_events #CTV3ID
-dataset.kidney_transplant_icd10 = had_apcs_diag_icd10_lastdate (codelist=kidney_tx_icd10_codelist)
 
+dataset.had_dialysis =((dataset.dialysis0 <treat_date) | (dataset.dialysis_icd10<treat_date) |(dataset.dialysis_procedure<treat_date))
+
+dataset.dialysis = case(
+    when(dataset.had_dialysis).then(1), otherwise=0
+)
+
+##kidney transplant
+dataset.kidney_transplant0 = had_c_event_ctv3snome_lastdate(codelist=kidney_transplant_codes) #tpp-clinical_events #CTV3ID
+dataset.kidney_transplant_icd10 = had_apcs_diag_icd10_lastdate (codelist=kidney_tx_icd10_codelist)
 #kidney_transplant_procedure 
-dataset.kidney_transplant_procedure = apcs_proc_bf_treat_lastdate(codelist= kidney_tx_opcs4_codelist)
+dataset.kidney_transplant_procedure0 = apcs_proc_bf_treat_lastdate(codelist= kidney_tx_opcs4_codelist)
+
+dataset.had_kidney_transplant =((dataset.kidney_transplant0<treat_date) | (dataset.kidney_transplant_icd10<treat_date) | (dataset.kidney_transplant_procedure0<treat_date))
+
+dataset.kidney_transplant = case(
+    when(dataset.had_kidney_transplant).then(1), otherwise=0
+)
+
 
 ##Solid organ transplant
-dataset.solid_organ_transplant_snomed = had_clinc_event_ctv3snome_lastdate(  ##added 202404-30
+dataset.solid_organ_transplant_snomed = had_c_event_ctv3snome_lastdate(  ##added 202404-30
     codelist = solid_organ_transplant_codes, code_type='snomedct')
 
-dataset.solid_organ_transplant_nhsd_snomed = had_clinc_event_ctv3snome_lastdate(
+dataset.solid_organ_transplant_nhsd_snomed = had_c_event_ctv3snome_lastdate(
     codelist = solid_organ_transplant_nhsd_snomed_codes, code_type='snomedct') #tpp-clinical_events  #snomedct
-dataset.solid_organ_nhsd_snomed_new = had_clinc_event_ctv3snome_lastdate(
+dataset.solid_organ_nhsd_snomed_new = had_c_event_ctv3snome_lastdate(
     codelist = solid_organ_transplant_nhsd_snomed_codes_new, code_type='snomedct') #tpp-clinical_events  #snomedct
 
 dataset.solid_organ_transplant_nhsd_opcs4 =apcs_proc_bf_treat_af01Feb20_lastdate(codelist= solid_organ_transplant_nhsd_opcs4_codes)
-
 dataset.transplant_all_y_codes_opcs4 =apcs_proc_bf_treat_af01Feb20_lastdate(codelist=replacement_of_organ_transplant_nhsd_opcs4_codes)
 
 transplant_all_y_codes_opcs4_df =apcs_proc_bf_treat_af01Feb20_df(codelist=replacement_of_organ_transplant_nhsd_opcs4_codes)
@@ -505,7 +513,7 @@ dataset.solid_organ_transplant_nhsd_new = minimum_of(
 #Haematological diseases-between = ["start_date - 24 months", "start_date"],
 #c_events_bf12m,apcs_diags_bf12m, #c_events_bf24m,apcs_diags_bf24m
 #between = ["start_date - 12 months", "start_date"],
-dataset.haematopoietic_stem_cell_snomed = had_clinc_event_ctv3snome_lastdate (dt = c_events_bf12m, 
+dataset.haematopoietic_stem_cell_snomed = had_c_event_ctv3snome_lastdate (dt = c_events_bf12m, 
     codelist = haematopoietic_stem_cell_transplant_nhsd_snomed_codes, code_type = 'snomedct'
 ) 
 
@@ -527,7 +535,7 @@ dataset.haematopoietic_stem_cell_opcs4 = apcs_proc_12m_bf_treat_af01Feb20_lastda
     codelist=haematopoietic_stem_cell_transplant_nhsd_opcs4_codes) 
 
 # between = ["start_date - 24 months", "start_date"],
-dataset.haematological_malignancies_snomed = had_clinc_event_ctv3snome_lastdate(dt = c_events_bf24m, 
+dataset.haematological_malignancies_snomed = had_c_event_ctv3snome_lastdate(dt = c_events_bf24m, 
     codelist = haematological_malignancies_nhsd_snomed_codes, code_type = 'snomedct') #tpp-clinical_events  #snomedct
 
 # between = ["start_date - 24 months", "start_date"],
@@ -535,13 +543,13 @@ dataset.haematological_malignancies_icd10 = had_apcs_diag_icd10_lastdate(dt = ap
     codelist = haematological_malignancies_nhsd_icd10_codes) ##tpp-apcs
 
 #on_or_before = "start_date",
-dataset.sickle_cell_disease_nhsd_snomed = had_clinc_event_ctv3snome_lastdate(
+dataset.sickle_cell_disease_nhsd_snomed = had_c_event_ctv3snome_lastdate(
     codelist = sickle_cell_disease_nhsd_snomed_codes, code_type = 'snomedct') #tpp-clinical_events  #snomedct
 #on_or_before = "start_date",
 dataset.sickle_cell_disease_nhsd_icd10  = had_apcs_diag_icd10_lastdate(codelist = sickle_cell_disease_nhsd_icd10_codes) 
 
 ## Haematological diseases-ever(on_or_before = "start_date")
-dataset.haematopoietic_stem_cell_snomed_ever = had_clinc_event_ctv3snome_lastdate(
+dataset.haematopoietic_stem_cell_snomed_ever = had_c_event_ctv3snome_lastdate(
     codelist = haematopoietic_stem_cell_transplant_nhsd_snomed_codes, code_type = 'snomedct') #tpp-clinical_events  #snomedct
 #on_or_before = "start_date",
 dataset.haematopoietic_stem_cell_icd10_ever = had_apcs_diag_icd10_lastdate(
@@ -552,7 +560,7 @@ dataset.haematopoietic_stem_cell_opcs4_ever = apcs_proc_bf_treat_af01Feb20_lastd
     codelist=haematopoietic_stem_cell_transplant_nhsd_opcs4_codes)
                           
 #on_or_before = "start_date"
-dataset.haematological_malignancies_snomed_ever = had_clinc_event_ctv3snome_lastdate(
+dataset.haematological_malignancies_snomed_ever = had_c_event_ctv3snome_lastdate(
     codelist = haematological_malignancies_nhsd_snomed_codes, 
     code_type='snomedct') #tpp-clinical_events  #snomedct
 #on_or_before = "start_date"
@@ -571,9 +579,9 @@ dataset.haematological_disease_nhsd_ever = minimum_of(
 
 #on_or_before = "start_date"
 ##Primary immune deficiencies
-dataset.immunosupression_nhsd = had_clinc_event_ctv3snome_lastdate(codelist=immunosupression_nhsd_codes, code_type='snomedct') #tpp-clinical_events  #snomedct
+dataset.immunosupression_nhsd = had_c_event_ctv3snome_lastdate(codelist=immunosupression_nhsd_codes, code_type='snomedct') #tpp-clinical_events  #snomedct
 #on_or_before = "start_date",
-dataset.immunosupression_nhsd_new  = had_clinc_event_ctv3snome_lastdate(codelist=immunosupression_nhsd_codes_new, code_type='snomedct') #tpp-clinical_events  #snomedct
+dataset.immunosupression_nhsd_new  = had_c_event_ctv3snome_lastdate(codelist=immunosupression_nhsd_codes_new, code_type='snomedct') #tpp-clinical_events  #snomedct
 
 ## Solid cancer
 dataset.cancer_opensafely_snomed= c_events_bf6m.where(
@@ -632,10 +640,10 @@ dataset.high_risk_MOL_SOT02_HMAL = case(
     when(dataset.is_high_risk_MOL_SOT02_HMAL).then(1), otherwise=0
 )
 
-#patients with a haematological diseases
-dataset.is_high_risk_MOL_SOT02_HMDs = (therapeutics_df.MOL1_high_risk_cohort.contains("patients with a haematological diseases")) | \
-    (therapeutics_df.MOL1_high_risk_cohort.contains("Patients with a haematological diseases")) | therapeutics_df.SOT02_risk_cohorts.contains("patients with a haematological diseases")| \
-    therapeutics_df.SOT02_risk_cohorts.contains("Patients with a haematological diseases") \
+#patients with a haematological diseases (sic)
+dataset.is_high_risk_MOL_SOT02_HMDs = (therapeutics_df.MOL1_high_risk_cohort.contains("patients with a haematological diseases (sic)")) | \
+    (therapeutics_df.MOL1_high_risk_cohort.contains("Patients with a haematological diseases (sic)")) | therapeutics_df.SOT02_risk_cohorts.contains("patients with a haematological diseases (sic)")| \
+    therapeutics_df.SOT02_risk_cohorts.contains("Patients with a haematological diseases (sic)") \
 
 dataset.high_risk_MOL_SOT02_HMDs = case(
     when(dataset.is_high_risk_MOL_SOT02_HMDs).then(1), otherwise=0
@@ -686,7 +694,8 @@ dataset.high_risk_MOL_SOT02_SOR = case(
 
 #stem cell transplant recipient -SCTR
 dataset.is_high_risk_MOL_SOT02_SCTR = (therapeutics_df.MOL1_high_risk_cohort.contains("stem cell transplant recipient")) | \
-    (therapeutics_df.MOL1_high_risk_cohort.contains("Stem cell transplant recipient")) | therapeutics_df.SOT02_risk_cohorts.contains("stem cell transplant recipient")| \
+    (therapeutics_df.MOL1_high_risk_cohort.contains("Stem cell transplant recipient")) |  \
+    therapeutics_df.SOT02_risk_cohorts.contains("stem cell transplant recipient")| \
     therapeutics_df.SOT02_risk_cohorts.contains("Stem cell transplant recipient") \
     
 dataset.high_risk_MOL_SOT02_SCTR = case(
@@ -809,9 +818,12 @@ dataset.age_treated_group = case(
         otherwise="unknown",
 )
 
-ethnicity_snome = clinical_events.where(
-        clinical_events.snomedct_code.is_in(ethnicity_codelist)
-).sort_by(clinical_events.date).last_for_patient().snomedct_code.to_category(ethnicity_codelist)  # (dummy data-more missing 1879)
+## Ethnicity
+dod_ons = ons_deaths.date
+ethnicity_snome = (
+    clinical_events.where(clinical_events.snomedct_code.is_in(ethnicity_codelist))
+    #.where(clinical_events.date.is_on_or_before(dod_ons))
+    .sort_by(clinical_events.date).last_for_patient().snomedct_code.to_category(ethnicity_codelist)) # (dummy data-more missing 1879)
 
 dataset.ethnicity_snome = ethnicity_snome
 
@@ -821,13 +833,39 @@ dataset.ethnicity_snome_cat = case(
     when (ethnicity_snome == "3").then("South Asian"),
     when (ethnicity_snome == "4").then("Black"),
     when (ethnicity_snome == "5").then("Other"),
-    otherwise = "Unknown",
+    otherwise = "unknown",
 )
+#ethnicity_from_sus
+
+
+dataset.latest_ethnicity_code = (
+    clinical_events.where(clinical_events.snomedct_code.is_in(ethnicity_codelist_with_categories))
+    .where(clinical_events.date.is_on_or_before(dod_ons))
+    .sort_by(clinical_events.date)
+    .last_for_patient().snomedct_code
+)
+
+latest_ethnicity_group = dataset.latest_ethnicity_code.to_category(
+    ethnicity_codelist_with_categories
+)
+
+# Add in code to extract ethnicity from SUS if it isn't present in primary care data. 
+ethnicity_sus = ethnicity_from_sus.code
+
+dataset.ethnicity_combined = case(
+  when((latest_ethnicity_group == "1") | ((latest_ethnicity_group.is_null()) & (ethnicity_sus.is_in(["A", "B", "C"])))).then("White"),
+  when((latest_ethnicity_group == "2") | ((latest_ethnicity_group.is_null()) & (ethnicity_sus.is_in(["D", "E", "F", "G"])))).then("Mixed"),
+  when((latest_ethnicity_group == "3") | ((latest_ethnicity_group.is_null()) & (ethnicity_sus.is_in(["H", "J", "K", "L"])))).then("Asian or Asian British"),
+  when((latest_ethnicity_group == "4") | ((latest_ethnicity_group.is_null()) & (ethnicity_sus.is_in(["M", "N", "P"])))).then("Black or Black British"),
+  when((latest_ethnicity_group == "5") | ((latest_ethnicity_group.is_null()) & (ethnicity_sus.is_in(["R", "S"])))).then("Chinese or Other Ethnic Groups"),
+  otherwise="unknown", 
+) 
  
 ##ethnicity2_ctv3
 dataset.ethnicity_ctv3 = clinical_events.where(
         clinical_events.ctv3_code.is_in(ethnicity)
 ).sort_by(clinical_events.date).last_for_patient().ctv3_code.to_category(ethnicity) #(dummy data-missing 367)
+
 
 spanning_addrs = addresses.where(addresses.start_date <= treat_date).except_where(
     addresses.end_date < treat_date
@@ -879,6 +917,8 @@ dataset.imd = case(
 dataset.imd1 = addresses.for_patient_on(treat_date).imd_rounded
 
 ##registrations
+
+dataset.was_registered_treated = was_registered_treated
 regd = practice_registrations.for_patient_on(treat_date)
 dataset.region = regd.practice_nuts1_region_name
 ##STP
@@ -895,6 +935,11 @@ de_reg = (practice_registrations
 
 dataset.dereg_date1 = de_reg.end_date
 
+
+
+# registered_eligible = patients.registered_as_of("covid_test_positive_date"),
+#   registered_treated = patients.registered_as_of("date_treated"),
+# registered_eligible == 1 | registered_treated == 1,
 ##Rurality
 dataset.rural_urban = addresses.for_patient_on(treat_date).rural_urban_classification
 
@@ -927,3 +972,4 @@ dataset.covid_vacc04 = covid_vacc.where(covid_vacc.date.is_after(dataset.covid_v
 dataset.covid_vacc_last = covid_vacc.last_for_patient().date
 
 #dataset.last_vaccination_date = covid_vacc.last_for_patient().date
+
