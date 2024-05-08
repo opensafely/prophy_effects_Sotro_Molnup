@@ -288,7 +288,7 @@ dataset.oral_steroid_drugs_nhsd = had_meds_lastdate (codelist1 = oral_steroid_dr
 
 dataset.oral_steroid_drug_nhsd_3m_count = had_meds_count (codelist1 = oral_steroid_drugs_dmd_codes, 
     codelist2=oral_steroid_drugs_snomed_codes, dt = pcmeds_bf_3m
-)
+)  #replace oral_steroid_drugs_nhsd=. if oral_steroid_drug_nhsd_3m_count < 2 & oral_steroid_drug_nhsd_12m_count < 4
 
 dataset.oral_steroid_drug_nhsd_12m_count = had_meds_count (codelist1 = oral_steroid_drugs_dmd_codes, 
     codelist2=oral_steroid_drugs_snomed_codes, dt = pcmeds_bf_12m
@@ -300,6 +300,19 @@ dataset.immunosuppresant_drugs_nhsd_ever = had_meds_lastdate (codelist1 = immuno
 
 dataset.oral_steroid_drugs_nhsd_ever = had_meds_lastdate(codelist1 = oral_steroid_drugs_dmd_codes, 
     codelist2=oral_steroid_drugs_snomed_codes, dt = pcmeds_bf_treat
+)
+###minimum_of(
+dataset.imid_nhsd=minimum_of(dataset.oral_steroid_drugs_nhsd, dataset.immunosuppresant_drugs_nhsd)
+dataset.had_imid=(dataset.imid_nhsd <=treat_date)
+dataset.had_imid_ever=((dataset.immunosuppresant_drugs_nhsd_ever <=treat_date)&(dataset.immunosuppresant_drugs_nhsd_ever>treat_date-days(365)))| \
+                   ((dataset.oral_steroid_drugs_nhsd_ever <=treat_date)&(dataset.oral_steroid_drugs_nhsd_ever>treat_date-days(365)))
+
+dataset.imid = case(
+    when(dataset.had_imid).then(1), otherwise=0
+)
+
+dataset.imid_ever = case(
+    when(dataset.had_imid_ever).then(1), otherwise=0
 )
 
 def had_c_event_ctv3snome_lastdate (codelist, dt=c_events_bf_treat, code_type='ctv3', where=True):
@@ -381,7 +394,7 @@ def apcs_proc_bf_treat_af01Feb20_df(codelist=None, where=True): ##get dataframe-
 #on_or_before="start_date"
 dataset.dialysis_procedure = apcs_proc_bf_treat_lastdate(codelist= dialysis_opcs4_codelist) ##use fun:apcs_proc_bf_treat_lastdate
 
-dataset.had_dialysis =((dataset.dialysis0 <treat_date) | (dataset.dialysis_icd10<treat_date) |(dataset.dialysis_procedure<treat_date))
+dataset.had_dialysis =((dataset.dialysis0 <=treat_date) | (dataset.dialysis_icd10<=treat_date) |(dataset.dialysis_procedure<=treat_date))
 
 dataset.dialysis = case(
     when(dataset.had_dialysis).then(1), otherwise=0
@@ -393,12 +406,11 @@ dataset.kidney_transplant_icd10 = had_apcs_diag_icd10_lastdate (codelist=kidney_
 #kidney_transplant_procedure 
 dataset.kidney_transplant_procedure0 = apcs_proc_bf_treat_lastdate(codelist= kidney_tx_opcs4_codelist)
 
-dataset.had_kidney_transplant =((dataset.kidney_transplant0<treat_date) | (dataset.kidney_transplant_icd10<treat_date) | (dataset.kidney_transplant_procedure0<treat_date))
+dataset.had_kidney_transplant =((dataset.kidney_transplant0<=treat_date) | (dataset.kidney_transplant_icd10<=treat_date) | (dataset.kidney_transplant_procedure0<=treat_date))
 
 dataset.kidney_transplant = case(
-    when(dataset.had_kidney_transplant).then(1), otherwise=0
+    when(dataset.had_kidney_transplant).then(1), otherwise = 0
 )
-
 
 ##Solid organ transplant
 dataset.solid_organ_transplant_snomed = had_c_event_ctv3snome_lastdate(  ##added 202404-30
@@ -440,7 +452,7 @@ dataset.transplant_conjunctiva_opcs4_a =dataset.transplant_conjunctiva_opcs4.is_
 # between = ["transplant_all_y_codes_opcs4","transplant_all_y_codes_opcs4"],
 dataset.transplant_stomach_opcs4 = apcs_proc_bf_treat_af01Feb20_lastdate(codelist=stomach_transplant_nhsd_opcs4_codes)
 dataset.transplant_stomach_opcs4_count =apcs_proc_bf_treat_af01Feb20_df(codelist=stomach_transplant_nhsd_opcs4_codes).count_for_patient()
-dataset.transplant_stomach_opcs4_a = dataset.transplant_stomach_opcs4.is_on_or_between(dataset.transplant_all_y_codes_opcs4,dataset.transplant_all_y_codes_opcs4) 
+#dataset.transplant_stomach_opcs4_a = dataset.transplant_stomach_opcs4.is_on_or_between(dataset.transplant_all_y_codes_opcs4,dataset.transplant_all_y_codes_opcs4) 
 
 
 dataset.transplant_ileum_1_Y_codes_opcs4 = apcs_proc_bf_treat_af01Feb20_lastdate(codelist=ileum_1_y_codes_transplant_nhsd_opcs4_codes)
@@ -450,7 +462,7 @@ transplant_ileum_1_Y_codes_opcs4_df = apcs_proc_bf_treat_af01Feb20_df(codelist=i
 #between = ["transplant_ileum_1_Y_codes_opcs4","transplant_ileum_1_Y_codes_opcs4"]
 dataset.transplant_ileum_1_opcs4 = apcs_proc_bf_treat_af01Feb20_lastdate(codelist=ileum_1_transplant_nhsd_opcs4_codes) #not defined by transplant_ileum_1_Y_codes_opcs4
 dataset.transplant_ileum_1_opcs4_count = apcs_proc_bf_treat_af01Feb20_df(codelist=ileum_1_transplant_nhsd_opcs4_codes).count_for_patient() #
-dataset.transplant_ileum_1_opcs4_a = dataset.transplant_ileum_1_opcs4.is_on_or_between(dataset.transplant_ileum_1_Y_codes_opcs4,dataset.transplant_ileum_1_Y_codes_opcs4) 
+#dataset.transplant_ileum_1_opcs4_a = dataset.transplant_ileum_1_opcs4.is_on_or_between(dataset.transplant_ileum_1_Y_codes_opcs4,dataset.transplant_ileum_1_Y_codes_opcs4) 
 
 dataset.transplant_ileum_2_Y_codes_opcs4 = apcs_proc_bf_treat_af01Feb20_lastdate(codelist= ileum_2_y_codes_transplant_nhsd_opcs4_codes)
 dataset.transplant_ileum_2_Y_codes_opcs4_count= apcs_proc_bf_treat_af01Feb20_df(codelist=ileum_2_y_codes_transplant_nhsd_opcs4_codes).count_for_patient()
@@ -460,7 +472,7 @@ transplant_ileum_2_Y_codes_opcs4_df= apcs_proc_bf_treat_af01Feb20_df(codelist=il
 #"date": {"earliest": "2020-02-01"}
 dataset.transplant_ileum_2_opcs4 = apcs_proc_bf_treat_af01Feb20_lastdate(codelist=ileum_2_transplant_nhsd_opcs4_codes)
 dataset.transplant_ileum_2_opcs4_count = apcs_proc_bf_treat_af01Feb20_df(codelist=ileum_2_transplant_nhsd_opcs4_codes).count_for_patient()
-dataset.transplant_ileum_2_opcs4_a = dataset.transplant_ileum_2_opcs4.is_on_or_between(dataset.transplant_ileum_2_Y_codes_opcs4,dataset.transplant_ileum_2_Y_codes_opcs4) 
+#dataset.transplant_ileum_2_opcs4_a = dataset.transplant_ileum_2_opcs4.is_on_or_between(dataset.transplant_ileum_2_Y_codes_opcs4,dataset.transplant_ileum_2_Y_codes_opcs4) 
 
 def proc_match(codelist, dt):
     code_strings = set()
@@ -508,7 +520,19 @@ dataset.solid_organ_transplant_nhsd_new = minimum_of(
     dataset.solid_organ_nhsd_snomed_new, dataset.solid_organ_transplant_nhsd_opcs4,
     dataset.transplant_thymus_opcs4_2 , dataset.transplant_conjunctiva_opcs4_2, dataset.transplant_stomach_opcs4_2,
     dataset.transplant_ileum_1_opcs4_2, dataset.transplant_ileum_2_opcs4_2
-) 
+)
+
+dataset.had_solid_organ_transplant =((dataset.solid_organ_transplant_nhsd<=treat_date) )
+
+dataset.solid_organ_transplant = case(
+    when(dataset.had_solid_organ_transplant).then(1), otherwise = 0
+)
+
+dataset.had_solid_organ_transplant_new =((dataset.solid_organ_transplant_nhsd_new<=treat_date) )
+
+dataset.solid_organ_transplant_new = case(
+    when(dataset.had_solid_organ_transplant_new).then(1), otherwise = 0
+)
 
 #Haematological diseases-between = ["start_date - 24 months", "start_date"],
 #c_events_bf12m,apcs_diags_bf12m, #c_events_bf24m,apcs_diags_bf24m
@@ -568,6 +592,15 @@ dataset.haematological_malignancies_icd10_ever = had_apcs_diag_icd10_lastdate(
     codelist = haematological_malignancies_nhsd_icd10_codes) ##tpp-apcs
 
 ##minimum_of
+dataset.haematological_disease_nhsd = minimum_of(
+    dataset.haematopoietic_stem_cell_snomed, 
+    dataset.haematopoietic_stem_cell_icd10, 
+    dataset.haematopoietic_stem_cell_opcs4, 
+    dataset.haematological_malignancies_snomed, 
+    dataset.haematological_malignancies_icd10,
+    dataset.sickle_cell_disease_nhsd_snomed, 
+    dataset.sickle_cell_disease_nhsd_icd10)
+
 dataset.haematological_disease_nhsd_ever = minimum_of(
     dataset.haematopoietic_stem_cell_snomed_ever, 
     dataset.haematopoietic_stem_cell_icd10_ever, 
@@ -577,11 +610,33 @@ dataset.haematological_disease_nhsd_ever = minimum_of(
     dataset.sickle_cell_disease_nhsd_snomed, 
     dataset.sickle_cell_disease_nhsd_icd10)
 
+dataset.had_haema_disease =((dataset.haematological_disease_nhsd<=treat_date) )
+dataset.haema_disease  = case(
+    when(dataset.had_haema_disease).then(1), otherwise = 0
+)
+
+dataset.had_haema_disease_ever =((dataset.haematological_disease_nhsd_ever<=treat_date) )
+dataset.haema_disease_ever = case(
+    when(dataset.had_haema_disease_ever).then(1), otherwise = 0
+)
+
+
 #on_or_before = "start_date"
 ##Primary immune deficiencies
 dataset.immunosupression_nhsd = had_c_event_ctv3snome_lastdate(codelist=immunosupression_nhsd_codes, code_type='snomedct') #tpp-clinical_events  #snomedct
 #on_or_before = "start_date",
 dataset.immunosupression_nhsd_new  = had_c_event_ctv3snome_lastdate(codelist=immunosupression_nhsd_codes_new, code_type='snomedct') #tpp-clinical_events  #snomedct
+
+dataset.had_immunosupression =((dataset.immunosupression_nhsd<=treat_date) )
+dataset.immunosupression = case(
+    when(dataset.had_immunosupression).then(1), otherwise = 0
+)
+
+dataset.had_immunosupression_new =((dataset.immunosupression_nhsd_new<=treat_date) )
+dataset.immunosupression_new  = case(
+    when(dataset.had_immunosupression_new).then(1), otherwise = 0
+)
+
 
 ## Solid cancer
 dataset.cancer_opensafely_snomed= c_events_bf6m.where(
@@ -602,13 +657,27 @@ dataset.cancer_opensafely_snomed_ever= c_events_bf_treat.where(
         (c_events_bf_treat.snomedct_code.is_in(chemotherapy_radiotherapy_opensafely_snomed_codes))) \
         .sort_by(c_events_bf_treat.date).last_for_patient().date
 
+dataset.had_solid_cancer =((dataset.cancer_opensafely_snomed<=treat_date) )
+dataset.solid_cancer = case(
+    when(dataset.had_solid_cancer).then(1), otherwise = 0
+)
+
+dataset.had_solid_cancer_new =((dataset.cancer_opensafely_snomed_new<=treat_date) )
+dataset.solid_cancer_new = case(
+    when(dataset.had_solid_cancer_new).then(1), otherwise = 0
+)
+
+dataset.had_solid_cancer_ever =((dataset.cancer_opensafely_snomed_ever<=treat_date) )
+dataset.solid_cancer_ever = case(
+    when(dataset.had_solid_cancer_ever).then(1), otherwise = 0
+)
+
+
 ## List of high-risk diseases
 # highrisk_list = ["haematologic malignancy","Patients with a haematological diseases", "immune deficiencies", 
 #     "primary immune deficiencies",  "sickle cell disease",
 #     "solid cancer", "solid organ recipients", "stem cell transplant recipient"
 # ]
-
-
 
 #covid_therapeutics_raw-MOL1_high_risk_cohort-SOT02_risk_cohorts
 therapeutics_df = (covid_therapeutics_raw
@@ -623,64 +692,14 @@ dataset.high_risk_MOL_last = therapeutics_df.MOL1_high_risk_cohort
 dataset.high_risk_SOT02_count = covid_therapeutics_raw.SOT02_risk_cohorts.count_distinct_for_patient() 
 dataset.high_risk_SOT02_last = therapeutics_df.SOT02_risk_cohorts
 
-#IMID
+##### #### ####
+#IMID #Immune Mediated Inflammatory Diseases
 dataset.is_high_risk_MOL_SOT02_IMID = (therapeutics_df.MOL1_high_risk_cohort.contains("imid")) | \
     (therapeutics_df.MOL1_high_risk_cohort.contains("IMID")) | therapeutics_df.SOT02_risk_cohorts.contains("imid")| \
     therapeutics_df.SOT02_risk_cohorts.contains("IMID") \
     
 dataset.high_risk_MOL_SOT02_IMID = case(
-    when(dataset.is_high_risk_MOL_SOT02_IMID).then(1), otherwise=0
-)
-#Haematologic malignancy
-dataset.is_high_risk_MOL_SOT02_HMAL = (therapeutics_df.MOL1_high_risk_cohort.contains("haematologic malignancy")) | \
-    (therapeutics_df.MOL1_high_risk_cohort.contains("Haematologic malignancy")) | therapeutics_df.SOT02_risk_cohorts.contains("haematologic malignancy")| \
-    therapeutics_df.SOT02_risk_cohorts.contains("Haematologic malignancy") \
-    
-dataset.high_risk_MOL_SOT02_HMAL = case(
-    when(dataset.is_high_risk_MOL_SOT02_HMAL).then(1), otherwise=0
-)
-
-#patients with a haematological diseases (sic)
-dataset.is_high_risk_MOL_SOT02_HMDs = (therapeutics_df.MOL1_high_risk_cohort.contains("patients with a haematological diseases (sic)")) | \
-    (therapeutics_df.MOL1_high_risk_cohort.contains("Patients with a haematological diseases (sic)")) | therapeutics_df.SOT02_risk_cohorts.contains("patients with a haematological diseases (sic)")| \
-    therapeutics_df.SOT02_risk_cohorts.contains("Patients with a haematological diseases (sic)") \
-
-dataset.high_risk_MOL_SOT02_HMDs = case(
-    when(dataset.is_high_risk_MOL_SOT02_HMDs).then(1), otherwise=0
-)
-
-#immune deficiencies
-dataset.is_high_risk_MOL_SOT02_IMDs = (therapeutics_df.MOL1_high_risk_cohort.contains("immune deficiencies")) | \
-    (therapeutics_df.MOL1_high_risk_cohort.contains("Immune deficiencies")) | therapeutics_df.SOT02_risk_cohorts.contains("immune deficiencies")| \
-    therapeutics_df.SOT02_risk_cohorts.contains("Immune deficiencies") \
-    
-dataset.high_risk_MOL_SOT02_IMDs = case(
-    when(dataset.is_high_risk_MOL_SOT02_IMDs).then(1), otherwise=0
-)    
-
-#primary immune deficiencies
-dataset.is_high_risk_MOL_SOT02_PIMDs = (therapeutics_df.MOL1_high_risk_cohort.contains("primary immune deficiencies")) | \
-    (therapeutics_df.MOL1_high_risk_cohort.contains("Primary immune deficiencies")) | therapeutics_df.SOT02_risk_cohorts.contains("primary immune deficiencies")| \
-    therapeutics_df.SOT02_risk_cohorts.contains("Primary immune deficiencies") \
-    
-dataset.high_risk_MOL_SOT02_PIMDs = case(
-    when(dataset.is_high_risk_MOL_SOT02_PIMDs).then(1), otherwise=0
-)
-#sickle cell disease-SCD
-dataset.is_high_risk_MOL_SOT02_SCD = (therapeutics_df.MOL1_high_risk_cohort.contains("sickle cell disease")) | \
-    (therapeutics_df.MOL1_high_risk_cohort.contains("Sickle cell disease")) | therapeutics_df.SOT02_risk_cohorts.contains("sickle cell disease")| \
-    therapeutics_df.SOT02_risk_cohorts.contains("Sickle cell disease") \
-    
-dataset.high_risk_MOL_SOT02_SCD = case(
-    when(dataset.is_high_risk_MOL_SOT02_SCD).then(1), otherwise=0
-)
-#Solid cancer
-dataset.is_high_risk_MOL_SOT02_solid_cancer = (therapeutics_df.MOL1_high_risk_cohort.contains("solid cancer")) | \
-    (therapeutics_df.MOL1_high_risk_cohort.contains("Solid cancer")) | therapeutics_df.SOT02_risk_cohorts.contains("solid cancer")| \
-    therapeutics_df.SOT02_risk_cohorts.contains("Solid cancer") \
-  
-dataset.highrisk_MOL_SOT02_solid_cancer = case(
-    when(dataset.is_high_risk_MOL_SOT02_solid_cancer).then(1), otherwise=0
+    when(dataset.is_high_risk_MOL_SOT02_IMID).then(1), otherwise = 0
 )
 
 #solid organ recipients-SOR, 
@@ -689,7 +708,33 @@ dataset.is_high_risk_MOL_SOT02_SOR = (therapeutics_df.MOL1_high_risk_cohort.cont
     therapeutics_df.SOT02_risk_cohorts.contains("Solid organ recipients") \
     
 dataset.high_risk_MOL_SOT02_SOR = case(
-    when(dataset.is_high_risk_MOL_SOT02_SOR).then(1), otherwise=0
+    when(dataset.is_high_risk_MOL_SOT02_SOR).then(1), otherwise = 0
+)
+
+#Haematologic malignancy
+dataset.is_high_risk_MOL_SOT02_HMAL = (therapeutics_df.MOL1_high_risk_cohort.contains("haematologic malignancy")) | \
+    (therapeutics_df.MOL1_high_risk_cohort.contains("Haematologic malignancy")) | therapeutics_df.SOT02_risk_cohorts.contains("haematologic malignancy")| \
+    therapeutics_df.SOT02_risk_cohorts.contains("Haematologic malignancy") \
+    
+dataset.high_risk_MOL_SOT02_HMAL = case(
+    when(dataset.is_high_risk_MOL_SOT02_HMAL).then(1), otherwise = 0
+)
+
+#patients with a haematological diseases (sic)
+dataset.is_high_risk_MOL_SOT02_HMDs = (therapeutics_df.MOL1_high_risk_cohort.contains("patients with a haematological diseases (sic)")) | \
+    (therapeutics_df.MOL1_high_risk_cohort.contains("Patients with a haematological diseases (sic)")) | therapeutics_df.SOT02_risk_cohorts.contains("patients with a haematological diseases (sic)")| \
+    therapeutics_df.SOT02_risk_cohorts.contains("Patients with a haematological diseases (sic)") \
+
+dataset.high_risk_MOL_SOT02_HMDs = case(
+    when(dataset.is_high_risk_MOL_SOT02_HMDs).then(1), otherwise = 0
+)
+#sickle cell disease-SCD
+dataset.is_high_risk_MOL_SOT02_SCD = (therapeutics_df.MOL1_high_risk_cohort.contains("sickle cell disease")) | \
+    (therapeutics_df.MOL1_high_risk_cohort.contains("Sickle cell disease")) | therapeutics_df.SOT02_risk_cohorts.contains("sickle cell disease")| \
+    therapeutics_df.SOT02_risk_cohorts.contains("Sickle cell disease") \
+    
+dataset.high_risk_MOL_SOT02_SCD = case(
+    when(dataset.is_high_risk_MOL_SOT02_SCD).then(1), otherwise = 0
 )
 
 #stem cell transplant recipient -SCTR
@@ -699,7 +744,65 @@ dataset.is_high_risk_MOL_SOT02_SCTR = (therapeutics_df.MOL1_high_risk_cohort.con
     therapeutics_df.SOT02_risk_cohorts.contains("Stem cell transplant recipient") \
     
 dataset.high_risk_MOL_SOT02_SCTR = case(
-    when(dataset.is_high_risk_MOL_SOT02_SCTR).then(1), otherwise=0
+    when(dataset.is_high_risk_MOL_SOT02_SCTR).then(1), otherwise = 0
+)
+
+#immune deficiencies
+dataset.is_high_risk_MOL_SOT02_IMDs = (therapeutics_df.MOL1_high_risk_cohort.contains("immune deficiencies")) | \
+    (therapeutics_df.MOL1_high_risk_cohort.contains("Immune deficiencies")) | therapeutics_df.SOT02_risk_cohorts.contains("immune deficiencies")| \
+    therapeutics_df.SOT02_risk_cohorts.contains("Immune deficiencies") \
+    
+dataset.high_risk_MOL_SOT02_IMDs = case(
+    when(dataset.is_high_risk_MOL_SOT02_IMDs).then(1), otherwise = 0
+)    
+
+#primary immune deficiencies
+dataset.is_high_risk_MOL_SOT02_PIMDs = (therapeutics_df.MOL1_high_risk_cohort.contains("primary immune deficiencies")) | \
+    (therapeutics_df.MOL1_high_risk_cohort.contains("Primary immune deficiencies")) | therapeutics_df.SOT02_risk_cohorts.contains("primary immune deficiencies")| \
+    therapeutics_df.SOT02_risk_cohorts.contains("Primary immune deficiencies") \
+    
+dataset.high_risk_MOL_SOT02_PIMDs = case(
+    when(dataset.is_high_risk_MOL_SOT02_PIMDs).then(1), otherwise = 0
+)
+
+# cancer
+dataset.is_high_risk_MOL_SOT02_solid_cancer = (therapeutics_df.MOL1_high_risk_cohort.contains("solid cancer")) | \
+    (therapeutics_df.MOL1_high_risk_cohort.contains("Solid cancer")) | therapeutics_df.SOT02_risk_cohorts.contains("solid cancer")| \
+    therapeutics_df.SOT02_risk_cohorts.contains("Solid cancer") \
+  
+dataset.highrisk_MOL_SOT02_solid_cancer = case(
+    when(dataset.is_high_risk_MOL_SOT02_solid_cancer).then(1), otherwise = 0
+)
+
+dataset.is_highrisk_therap = (dataset.high_risk_MOL_SOT02_IMID + dataset.high_risk_MOL_SOT02_SOR + dataset.high_risk_MOL_SOT02_HMAL + dataset.high_risk_MOL_SOT02_HMDs + 
+    dataset.high_risk_MOL_SOT02_SCD + dataset.high_risk_MOL_SOT02_SCTR +dataset.high_risk_MOL_SOT02_IMDs +dataset.high_risk_MOL_SOT02_PIMDs + 
+    dataset.highrisk_MOL_SOT02_solid_cancer )
+
+dataset.highrisk_therap = case(
+    when(dataset.is_highrisk_therap >=1).then(1), otherwise = 0
+)
+
+dataset.is_codelist_highrisk = (dataset.imid + dataset.dialysis + dataset.kidney_transplant +dataset.solid_organ_transplant_new +dataset.haema_disease + dataset.immunosupression_new +
+    dataset.solid_cancer_new)
+
+dataset.highrisk_codelist = case(
+    when(dataset.is_codelist_highrisk >=1).then(1), otherwise = 0
+)
+dataset.is_codelist_highrisk_ever = (dataset.imid_ever + dataset.dialysis + dataset.kidney_transplant +dataset.solid_organ_transplant_new +dataset.haema_disease_ever + dataset.immunosupression_new +
+    dataset.solid_cancer_ever)
+
+dataset.highrisk_codelist_ever = case(
+    when(dataset.is_codelist_highrisk_ever >=1).then(1), otherwise = 0
+)
+#is_highrisk,highrisk,is_highrisk_ever,highrisk_ever
+dataset.is_highrisk = (dataset.highrisk_therap + dataset.highrisk_codelist )
+dataset.highrisk = case(
+    when(dataset.is_highrisk >=1).then(1), otherwise = 0
+)
+dataset.is_highrisk_ever = (dataset.highrisk_therap + dataset.highrisk_codelist_ever )
+
+dataset.highrisk_ever = case(
+    when(dataset.is_highrisk_ever >=1).then(1), otherwise = 0
 )
 
 ##Pregnancy
@@ -852,7 +955,8 @@ latest_ethnicity_group = dataset.latest_ethnicity_code.to_category(
 # Add in code to extract ethnicity from SUS if it isn't present in primary care data. 
 ethnicity_sus = ethnicity_from_sus.code
 
-dataset.ethnicity_combined = case(
+#dataset.ethnicity_combined
+dataset.ethnicity = case(
   when((latest_ethnicity_group == "1") | ((latest_ethnicity_group.is_null()) & (ethnicity_sus.is_in(["A", "B", "C"])))).then("White"),
   when((latest_ethnicity_group == "2") | ((latest_ethnicity_group.is_null()) & (ethnicity_sus.is_in(["D", "E", "F", "G"])))).then("Mixed"),
   when((latest_ethnicity_group == "3") | ((latest_ethnicity_group.is_null()) & (ethnicity_sus.is_in(["H", "J", "K", "L"])))).then("Asian or Asian British"),
@@ -872,7 +976,7 @@ spanning_addrs = addresses.where(addresses.start_date <= treat_date).except_wher
 )
 
 ordered_addrs = spanning_addrs.sort_by(
-    case(when(addresses.has_postcode).then(1), otherwise=0),
+    case(when(addresses.has_postcode).then(1), otherwise = 0),
     addresses.start_date,
     addresses.end_date,
     addresses.address_id,
@@ -914,7 +1018,7 @@ dataset.imd = case(
 )
 
 # Index of Multiple Deprevation Rank (rounded down to nearest 100)
-dataset.imd1 = addresses.for_patient_on(treat_date).imd_rounded
+dataset.imd1 = addresses.for_patient_on(treat_date).imd_rounded #
 
 ##registrations
 
@@ -970,6 +1074,4 @@ dataset.covid_vacc04 = covid_vacc.where(covid_vacc.date.is_after(dataset.covid_v
     ).sort_by(covid_vacc.date).first_for_patient().date
 
 dataset.covid_vacc_last = covid_vacc.last_for_patient().date
-
-#dataset.last_vaccination_date = covid_vacc.last_for_patient().date
 
