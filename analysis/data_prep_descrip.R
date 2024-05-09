@@ -33,6 +33,12 @@ df_vars0 <- read_csv(here::here("output", "data", "dataset_table.csv.gz")) %>%
 cat("#oral_steroid_drugs_nhsd_check\n") #
 freq_single(df_vars0$oral_steroid_drugs_nhsd_check)
 
+cat("#high_risk_MOL_last\n") 
+freq_single(df_vars0$high_risk_MOL_last)
+
+cat("#high_risk_SOT02_last\n") 
+freq_single(df_vars0$high_risk_SOT02_last)
+
 df_vars0$highrisk_therap_MOL <- grepl("IMID|solid organ recipients|haematologic malignancy|Patients with a haematological diseases \\(sic\\)|sickle cell disease|stem cell transplant recipient|immune deficiencies|primary immune deficiencies|solid cancer", df_vars0$high_risk_MOL_last, ignore.case = TRUE)
 df_vars0$highrisk_therap_SOT02 <- grepl("IMID|solid organ recipients|haematologic malignancy|Patients with a haematological diseases \\(sic\\)|sickle cell disease|stem cell transplant recipient|immune deficiencies|primary immune deficiencies|solid cancer", df_vars0$high_risk_SOT02_last, ignore.case = TRUE)
 
