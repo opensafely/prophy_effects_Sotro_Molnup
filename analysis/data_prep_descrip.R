@@ -95,9 +95,21 @@ sum(is.na(df_vars0$imd1))
 cat("#stp-missing\n")
 sum(is.na(df_vars0$stp))
 
-cat("# if_old_covid_treat")
+cat("# df_vars0-if_old_covid_treat")
 freq_single(df_vars0$if_old_covid_treat)
-df_vars <- df_vars0 %>% filter(censored== 0 ) %>% filter(old_covid_treat== 0 ) %>% filter(!is.na(imd1)) %>% filter(!is.na(stp))
+
+cat("df_vars0-allcause_death_under60d")
+freq_single(df_vars0$allcause_death_under60d)
+
+cat("df_vars0-allcause_death_under30d")
+freq_single(df_vars0$allcause_death_under30d)
+
+cat("highrisk\n")
+freq_single(df_vars0$highrisk)
+cat("highrisk_ever\n")
+freq_single(df_vars0$highrisk_ever)
+
+df_vars <- df_vars0 %>% filter(censored== 0 ) %>% filter(old_covid_treat== 0 ) %>% filter(!is.na(imd1)) %>% filter(!is.na(stp))%>% filter(!allcause_death_under60d) %>% filter(highrisk ==1 )
 
 cat("#total-dim(df_vars)\n")
 dim(df_vars)
