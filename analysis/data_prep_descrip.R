@@ -22,7 +22,7 @@ df_vars0 <- read_csv(here::here("output", "data", "dataset_table.csv.gz")) %>%
   treat_date, first_molnupiravir_date, first_sotrovimab_date, date_of_first_admis_af_treat, covid_first_admi_af_treat_alldiag_firstdate, apcs_admis_60daf_treat_alldiag_firstdate, ccare_covid_first_af_treat_alldiag_date,
   hosp_covid_date,  hosp_covid_classfic, hosp_covid_pdiag, had_ccare_covid, ccare_covid_date, hosp_allcause_date,
   hosp_allcause_classfic, hosp_allcause_pdiag, hospitalise_disc_covid, hospitalise_disc_allcause, ons_dead_date, underly_deathcause,
-  death_cause_covid, allcause_death_60d_6m,covid_death_60d_6m, allcause_death_under60d, allcause_death_under30d, bmi, is_censored, censored,
+  death_cause_covid, allcause_death_60d_6m,covid_death_60d_6m, was_allcause_death_under60d, allcause_death_under60d, allcause_death_under30d, bmi, is_censored, censored,
   had_dialysis, had_kidney_transplant, transplant_thymus_opcs4,transplant_thymus_opcs4_count,transplant_thymus_opcs4_a, transplant_thymus_opcs4_2,
   transplant_conjunctiva_y_code_opcs4, transplant_conjunctiva_y_code_opcs4_count,transplant_conjunctiva_opcs4, transplant_conjunctiva_opcs4_count,
   transplant_conjunctiva_opcs4_a,transplant_conjunctiva_opcs4_2,high_risk_MOL_last,high_risk_SOT02_last,
@@ -80,6 +80,7 @@ df_vars0$high_risk_therap_solid_cancer= as.integer((grepl("primary immune defici
 # cancer
 df_vars0$high_risk_therap_solid_cancer= as.integer((grepl("solid cancer", df_vars0$high_risk_MOL_last, ignore.case = TRUE))|(grepl("solid cancer", df_vars0$high_risk_SOT02_last, ignore.case = TRUE)))
 
+#df_vars0$allcause_death_under60d = as.integer(df_vars0$allcause_death_under60d)
 cat("#total-df_vars0\n") #old_covid_treat
 dim(df_vars0)
 
@@ -109,7 +110,8 @@ freq_single(df_vars0$highrisk)
 cat("highrisk_ever\n")
 freq_single(df_vars0$highrisk_ever)
 
-df_vars <- df_vars0 %>% filter(censored== 0 ) %>% filter(old_covid_treat== 0 ) %>% filter(!is.na(imd1)) %>% filter(!is.na(stp))%>% filter(!allcause_death_under60d) %>% filter(highrisk ==1 )
+##checking-allcause_death_under60d
+df_vars <- df_vars0 %>% filter(censored== 0 ) %>% filter(old_covid_treat== 0 )  %>% filter(!is.na(stp))%>% filter(allcause_death_under60d!= 1) %>% filter(highrisk ==1 )
 
 cat("#total-dim(df_vars)\n")
 dim(df_vars)
@@ -246,14 +248,11 @@ freq_single(high_risk_cohort$allcause_death_under60d)
 
 cat("allcause_death_under30d-high_risk_cohort")
 freq_single(high_risk_cohort$allcause_death_under30d)
+
 # Save dataset(s) ----
 write.csv(df_vars, here::here("output", "tables", "data4analyse.csv"), row.names = FALSE)
 write_rds(df_vars, here::here("output", "data", "data4analyse.rds"), compress = "gz")
 write_rds(high_risk_cohort, here::here("output", "data", "high_risk_cohort.rds"), compress = "gz")
 write_rds(high_risk_ever_cohort, here::here("output", "data", "high_risk_ever_cohort.rds"), compress = "gz")
-#write.csv(df_vars, ("C:/Users/qw/Documents/Github/prophy_effects_Sotro_Molnup/output/data/cohort_data4analyse.csv"), row.names = FALSE)
-# write_rds(df_vars, ("C:/Users/qw/Documents/Github/prophy_effects_Sotro_Molnup/output/data/df_vars.rds"), compress = "gz")
 
-  # had_dialysis, had_kidney_transplant, transplant_thymus_opcs4,transplant_thymus_opcs4_count,transplant_thymus_opcs4_a, transplant_thymus_opcs4_2,
-  # transplant_conjunctiva_y_code_opcs4, transplant_conjunctiva_y_code_opcs4_count,
-  # transplant_conjunctiva_opcs4, transplant_conjunctiva_opcs4_count, transplant_conjunctiva_opcs4_a,transplant_conjunctiva_opcs4_2) 
+#write.csv(df_vars, ("C:/Users/qw/Documents/Github/prophy_effects_Sotro_Molnup/output/data/cohort_data4analyse.csv"), row.names = FALSE)
