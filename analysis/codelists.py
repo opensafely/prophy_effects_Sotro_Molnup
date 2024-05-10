@@ -1,65 +1,15 @@
-
+###<codelists.py> for repo: <prophy_effects_Sotro_Molnup>
+##Description: This script extracts data for project 91:[Coverage, effectiveness and safety 
+##of neutralising monoclonal antibodies or antivirals for non-hospitalised patients with COVID-19]
+##   Date last updated: 10/05/2024 by  Qing Wen
 
 from ehrql import codelist_from_csv 
 
-
-# ### Require hospitalisation for COVID-19
-# covid_icd10_codes = codelist_from_csv(
-#   "codelists/opensafely-covid-identification.csv",
-#  # system = "icd10",
-#   column = "icd10_code",
-# )
-
+# --- CODELISTS ---
 covid_icd10_codes = ["U071", "U072", "U099","U109"]
 #https://github.com/opensafely/documentation/discussions/1480
 
-
-# --- CODELISTS ---
-# SUS-HES mabs
-#mabs_procedure_codes = ["X891", "X892"]
-
-# mabs_procedure_codes = codelist(
-#   ["X891", "X892"], system="opcs4"
-# )
-
-# # sotrovimab_GP
-# sotrovimab_GP_codes = codelist_from_csv(
-#   "codelists/bangzheng-sotrovimab-dmd.csv", 
-# #  system = "snomed", 
-#   column = "dmd_id"
-# )
-# # paxlovid_GP
-# paxlovid_GP_codes = codelist_from_csv(
-#   "codelists/bangzheng-paxlovid-dmd-0964dee3.csv", 
-# #  system = "snomed", 
-#   column = "dmd_id"
-# )
-# # paxlovid_GP2
-# paxlovid_GP_codes2 = codelist_from_csv(
-#   "codelists/bangzheng-paxlovid-dmd.csv", 
-# #  system = "snomed", 
-#   column = "dmd_id"
-# )
-# # molnupiravir_GP
-# molnupiravir_GP_codes = codelist_from_csv(
-#   "codelists/bangzheng-molnupiravir-06b21eed-dmd.csv", 
-# #  system = "snomed", 
-#   column = "dmd_id"
-# )
-# # molnupiravir_GP2
-# molnupiravir_GP_codes2 = codelist_from_csv(
-#   "codelists/bangzheng-molnupiravir-dmd.csv", 
-# #  system = "snomed", 
-#   column = "dmd_id"
-# )
-# # remdesivir_GP
-# remdesivir_GP_codes = codelist_from_csv(
-#   "codelists/bangzheng-remdesivir-dmd.csv", 
-# #  system = "snomed", 
-#   column = "dmd_id"
-# )
-
-######from here#####
+## HIGH RISK GROUPS ----
 # dialysis
 dialysis_codes = codelist_from_csv(
   "codelists/opensafely-dialysis.csv",
@@ -86,85 +36,6 @@ kidney_tx_opcs4_codelist = codelist_from_csv(
     # system="opcs4",
     column="code"
 )
-
-
-
-# # eGFR
-# eGFR_level_codelist = codelist_from_csv(
-#     "codelists/user-ss808-estimated-glomerular-filtration-rate-egfr-values.csv",
-#     system="snomed",
-#     column="code",
-# )
-# eGFR_short_level_codelist = codelist_from_csv(
-#     "codelists/user-bangzheng-egfr-value-shortlist.csv",
-#     system="snomed",
-#     column="code",
-# )
-
-# drugs_consider_risk_codes = codelist_from_csv(
-#   "codelists/opensafely-nirmatrelvir-drug-interactions-3d3644f8-dmd.csv", 
-#   system = "snomed", 
-#   column = "dmd_id"
-# )
-
-# # Chronic respiratory disease
-# chronic_respiratory_dis_codes = codelist_from_csv(
-#     "codelists/opensafely-chronic-respiratory-disease-snomed.csv",
-#     system="snomed",
-#     column="id"
-# )
-# Diabetes
-# diabetes_codes = codelist_from_csv(
-#     "codelists/opensafely-diabetes-snomed.csv",
-#     #system="snomed",  #
-#     column="id"
-# )
-# # Hypertension
-# hypertension_codes = codelist_from_csv(
-#     "codelists/opensafely-hypertension-snomed.csv",
-#     system="snomed",
-#     column="id"
-# )
-
-# ## ELIGIBILITY CRITERIA VARIABLES ----
-
-# ### Onset of symptoms of COVID-19
-# covid_symptoms_snomed_codes = codelist_from_csv(
-#   "codelists/user-MillieGreen-covid-19-symptoms.csv",
-#   system = "snomed",
-#   column = "code",
-# )
-
-# ### Require hospitalisation for COVID-19
-# covid_icd10_codes = codelist_from_csv(
-#   "codelists/opensafely-covid-identification.csv",
-#   system = "icd10",
-#   column = "icd10_code",
-# )
-
-# ### Pregnancy
-pregnancy_primis_codes = codelist_from_csv(
-  "codelists/primis-covid19-vacc-uptake-preg.csv",
-#   system = "snomed",
-  column = "code",
-)
-
-# ### Pregnancy or delivery
-pregdel_primis_codes = codelist_from_csv(
-  "codelists/primis-covid19-vacc-uptake-pregdel.csv",
-#   system = "snomed",
-  column = "code",
-)
-
-# ### Weight
-# weight_opensafely_snomed_codes  = codelist_from_csv(
-#   "codelists/opensafely-weight-snomed.csv",
-#   system = "snomed",
-#   column = "code",
-# ) 
-
-
-# ## HIGH RISK GROUPS ----
 
 # ### Sickle cell disease
 sickle_cell_disease_nhsd_snomed_codes = codelist_from_csv(
@@ -222,9 +93,8 @@ haematological_malignancies_nhsd_icd10_codes = codelist_from_csv(
   column = "code"
 )
 
-# ### Patients with renal disease
-
-# ### Immune-mediated inflammatory disorders (IMID)
+## Patients with renal disease
+## Immune-mediated inflammatory disorders (IMID)
 immunosuppresant_drugs_dmd_codes = codelist_from_csv(
   "codelists/nhsd-immunosuppresant-drugs-pra-dmd.csv", 
   column = "code"
@@ -245,7 +115,7 @@ oral_steroid_drugs_snomed_codes = codelist_from_csv(
   column = "code"
 )
 
-# ### Primary immune deficiencies
+## Primary immune deficiencies
 immunosupression_nhsd_codes = codelist_from_csv(
   "codelists/nhsd-immunosupression-pcdcluster-snomed-ct.csv",
   column = "code",
@@ -319,19 +189,12 @@ ileum_2_y_codes_transplant_nhsd_opcs4_codes = codelist_from_csv(
   column = "code"
 )
 
-
-# ## CLINICAL/DEMOGRAPHIC COVARIATES ----
-
-### Ethnicity
-# ethnicity_primis_snomed_codes = codelist_from_csv(
-#   "codelists/primis-covid19-vacc-uptake-eth2001.csv",
-#   system = "snomed",
-#   column = "code",
-#   category_column="grouping_6_id",
-# )
+## CLINICAL/DEMOGRAPHIC COVARIATES ----
+#Ethnicity
 #snomedct_code
 ethnicity_codelist = codelist_from_csv(
     "codelists/primis-covid19-vacc-uptake-eth2001.csv",
+#    system = "snomed",
     column="code",
     category_column="grouping_6_id",
 )
@@ -349,16 +212,8 @@ ethnicity_codelist_with_categories = codelist_from_csv(
     category_column = "Grouping_6"
 )
 
-# # OTHER COVARIATES ----
- 
-# ## Autism
-# autism_nhsd_snomed_codes = codelist_from_csv(
-#   "codelists/nhsd-primary-care-domain-refsets-autism_cod.csv",
-#   system = "snomed",
-#   column = "code",
-# )
-
-# ## Care home 
+## OTHER COVARIATES ----
+# Care home 
 care_home_primis_snomed_codes = codelist_from_csv(
     "codelists/primis-covid19-vacc-uptake-longres.csv", 
 #     system = "snomed", 
@@ -370,14 +225,72 @@ care_home_primis_snomed_codes = codelist_from_csv(
 # )
 
 
-# ## Dementia
+## Pregnancy
+pregnancy_primis_codes = codelist_from_csv(
+  "codelists/primis-covid19-vacc-uptake-preg.csv",
+#   system = "snomed",
+  column = "code",
+)
+
+## Pregnancy or delivery
+pregdel_primis_codes = codelist_from_csv(
+  "codelists/primis-covid19-vacc-uptake-pregdel.csv",
+#   system = "snomed",
+  column = "code",
+)
+
+# SUS-HES mabs
+#mabs_procedure_codes = ["X891", "X892"]  #system="opcs4"
+
+# drugs_consider_risk_codes = codelist_from_csv(
+#   "codelists/opensafely-nirmatrelvir-drug-interactions-3d3644f8-dmd.csv", 
+#   system = "snomed", 
+#   column = "dmd_id"
+# )
+
+## Chronic respiratory disease
+# chronic_respiratory_dis_codes = codelist_from_csv(
+#     "codelists/opensafely-chronic-respiratory-disease-snomed.csv",
+#     system="snomed",
+#     column="id"
+# )
+
+# Diabetes
+# diabetes_codes = codelist_from_csv(
+#     "codelists/opensafely-diabetes-snomed.csv",
+#     #system="snomed",  #
+#     column="id"
+# )
+# # Hypertension
+# hypertension_codes = codelist_from_csv(
+#     "codelists/opensafely-hypertension-snomed.csv",
+#     system="snomed",
+#     column="id"
+# )
+
+## ELIGIBILITY CRITERIA VARIABLES ----
+## Onset of symptoms of COVID-19
+# covid_symptoms_snomed_codes = codelist_from_csv(
+#   "codelists/user-MillieGreen-covid-19-symptoms.csv",
+#   system = "snomed",
+#   column = "code",
+# )
+
+## Require hospitalisation for COVID-19
+# covid_icd10_codes = codelist_from_csv(
+#   "codelists/opensafely-covid-identification.csv",
+#   system = "icd10",
+#   column = "icd10_code",
+# )
+
+## Dementia
 # dementia_nhsd_snomed_codes = codelist_from_csv(
 #   "codelists/nhsd-primary-care-domain-refsets-dem_cod.csv", 
 #   system = "snomed", 
 #   column = "code",
 # )
 
-# ## Housebound
+## Housebound
 # housebound_opensafely_snomed_codes = codelist_from_csv(
 #     "codelists/opensafely-housebound.csv", 
 #     system = "snomed", 
@@ -390,40 +303,21 @@ care_home_primis_snomed_codes = codelist_from_csv(
 #     column = "code"
 # )
 
-# ## Learning disabilities
+## Learning disabilities
 # wider_ld_primis_snomed_codes = codelist_from_csv(
 #     "codelists/primis-covid19-vacc-uptake-learndis.csv", 
 #     system = "snomed", 
 #     column = "code"
 # )
 
-# ## Shielded
-# high_risk_primis_snomed_codes = codelist_from_csv(
-#     "codelists/primis-covid19-vacc-uptake-shield.csv", 
-#     system = "snomed", 
-#     column = "code")
-
-# not_high_risk_primis_snomed_codes = codelist_from_csv(
-#     "codelists/primis-covid19-vacc-uptake-nonshield.csv", 
-#     system = "snomed", 
-#     column = "code")
-    
-# ## Serious mental illness
-# serious_mental_illness_nhsd_snomed_codes = codelist_from_csv(
-#   "codelists/nhsd-primary-care-domain-refsets-mh_cod.csv",
-#   system = "snomed",
-#   column = "code",
-# )
-    
-
-# ## Vaccination declined
+## Vaccination declined
 # first_dose_declined = codelist_from_csv(
 #   "codelists/opensafely-covid-19-vaccination-first-dose-declined.csv",
 #   system = "snomed",
 #   column = "code",
 # )
 
-# second_dose_declined = codelist_from_csv(
+## second_dose_declined = codelist_from_csv(
 #   "codelists/opensafely-covid-19-vaccination-second-dose-declined.csv",
 #   system = "snomed",
 #   column = "code",
