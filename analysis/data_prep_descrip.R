@@ -15,20 +15,23 @@ dir_create(here::here("output", "tables"), showWarnings = FALSE, recurse = TRUE)
 dir_create(here::here("output", "data"), showWarnings = FALSE, recurse = TRUE)
 
 ## Read in data 
-
+#transplant_conjunctiva_opcs4_a,
 #df_vars0 <- read_csv("C:/Users/qw/Documents/Github/prophy_effects_Sotro_Molnup/output/data/dataset_table.csv.gz") %>% #,
 df_vars0 <- read_csv(here::here("output", "data", "dataset_table.csv.gz")) %>%
-  select(patient_id,age_treated, sex, age_treated_group, ethnicity_snome,ethnicity_snome_cat,ethnicity, imd1, imd, stp, if_old_covid_treat,old_covid_treat, had_first_covid_treat, first_covid_treat_interve,first_covid_treat_status,
-  treat_date, first_molnupiravir_date, first_sotrovimab_date, date_of_first_admis_af_treat, covid_first_admi_af_treat_alldiag_firstdate, apcs_admis_60daf_treat_alldiag_firstdate, ccare_covid_first_af_treat_alldiag_date,
-  hosp_covid_date,  hosp_covid_classfic, hosp_covid_pdiag, had_ccare_covid, ccare_covid_date, hosp_allcause_date,
-  hosp_allcause_classfic, hosp_allcause_pdiag, hospitalise_disc_covid, hospitalise_disc_allcause, ons_dead_date, underly_deathcause,
-  death_cause_covid, allcause_death_60d_6m,covid_death_60d_6m, was_allcause_death_under60d, allcause_death_under60d, allcause_death_under30d, bmi, is_censored, censored,
-  had_dialysis, had_kidney_transplant, transplant_thymus_opcs4,transplant_thymus_opcs4_count,transplant_thymus_opcs4_a, transplant_thymus_opcs4_2,
-  transplant_conjunctiva_y_code_opcs4, transplant_conjunctiva_y_code_opcs4_count,transplant_conjunctiva_opcs4, transplant_conjunctiva_opcs4_count,
-  transplant_conjunctiva_opcs4_a,transplant_conjunctiva_opcs4_2,high_risk_MOL_last,high_risk_SOT02_last,
-  oral_steroid_drugs_nhsd, oral_steroid_drugs_nhsd_check, oral_steroid_drug_nhsd_3m_count,oral_steroid_drug_nhsd_12m_count, 
-  immunosuppresant_drugs_nhsd,  immunosuppresant_drugs_nhsd_ever, oral_steroid_drugs_nhsd_ever,
-  is_codelist_highrisk, highrisk_codelist,is_codelist_highrisk_ever,highrisk_codelist_ever) 
+  select(patient_id,age_treated, sex, age_treated_group, ethnicity_snome,ethnicity_snome_cat,ethnicity, imd1, imd, stp,region, 
+  if_old_covid_treat,old_covid_treat, had_first_covid_treat, first_covid_treat_interve,drug, first_covid_treat_status,
+  treat_date, first_molnupiravir_date, first_sotrovimab_date, date_of_first_admis_af_treat, covid_first_admi_af_treat_alldiag_firstdate,
+  apcs_admis_60daf_treat_alldiag_firstdate, ccare_covid_first_af_treat_alldiag_date,  hosp_covid_date, hosp_covid_classfic,
+  hosp_covid_pdiag, had_ccare_covid, ccare_covid_date, hosp_allcause_date, hosp_allcause_classfic, hosp_allcause_pdiag, 
+  hospitalise_disc_covid, hospitalise_disc_allcause, ons_dead_date, underly_deathcause, death_cause_covid, allcause_death_60d_6m, 
+  covid_death_60d_6m, was_allcause_death_under60d, allcause_death_under60d, allcause_death_under30d, bmi, is_censored, censored,
+  had_dialysis, had_kidney_transplant, transplant_thymus_opcs4,transplant_thymus_opcs4_count,transplant_thymus_opcs4_a, 
+  transplant_thymus_opcs4_2, transplant_conjunctiva_y_code_opcs4, transplant_conjunctiva_y_code_opcs4_count,transplant_conjunctiva_opcs4,
+  transplant_conjunctiva_opcs4_count, transplant_conjunctiva_opcs4_2, high_risk_MOL_last,high_risk_SOT02_last, oral_steroid_drugs_nhsd, 
+  oral_steroid_drugs_nhsd_check, oral_steroid_drug_nhsd_3m_count,oral_steroid_drug_nhsd_12m_count, immunosuppresant_drugs_nhsd, 
+  immunosuppresant_drugs_nhsd_ever, oral_steroid_drugs_nhsd_ever, is_codelist_highrisk, highrisk_codelist, is_codelist_highrisk_ever, 
+  highrisk_codelist_ever, total_covid_vacc, total_covid_vacc_cat, covid_vacc1_date,covid_vacc2_date,covid_vacc3_date,
+  covid_vacc4_date, covid_vacc_last_date) 
 
 cat("#oral_steroid_drugs_nhsd_check\n") #
 freq_single(df_vars0$oral_steroid_drugs_nhsd_check)
@@ -119,11 +122,11 @@ dim(df_vars)
 cat("#is_censored\n")
 freq_single(df_vars$is_censored)
 
-cat("# str-START#\n")
+cat("#str-START#\n")
 str(df_vars,list.len= ncol(df_vars),give.attr = F)
-cat("# str-END#\n")
+cat("#str-END#\n")
 
-cat("# if_old_covid_treat")
+cat("#if_old_covid_treat")
 freq_single(df_vars$if_old_covid_treat)
 
 cat("#had_first_covid_treat-non_hospitalised,2021-12-16--2022-02-10:")
@@ -132,13 +135,13 @@ freq_single(df_vars$had_first_covid_treat)
 cat("#interventions: Molnupiravir/Sotrovimab")
 freq_single(df_vars$first_covid_treat_interve)
 
-cat("# hosp_covid_date_count#\n")
+cat("#hosp_covid_date_count#\n")
 sum(!is.na(df_vars$hosp_covid_date))
 
-cat("# hosp_allcause_date_count#\n")
+cat("#hosp_allcause_date_count#\n")
 sum(!is.na(df_vars$hosp_allcause_date))
 
-cat("# ons_dead_count#\n")
+cat("#ons_dead_count#\n")
 sum(!is.na(df_vars$ons_dead_date))
 
 cat("#death_cause_covid:\n")
@@ -168,7 +171,7 @@ freq_single(df_vars$sex)
 cat("#imd:")
 freq_single(df_vars$imd)
 
-cat("#ethnicity_combined:")
+cat("#ethnicity:")
 freq_single(df_vars$ethnicity)
 
 cat("#ethnicity_snome:")
@@ -180,6 +183,11 @@ freq_single(as.character(df_vars$ethnicity_snome_cat))
 cat("#ethnicity_ctv3:")
 freq_single(as.character(df_vars$ethnicity_ctv3))
 
+#region
+cat("#region:")
+freq_single(as.character(df_vars$region))
+
+#bmi
 cat("#bmi")
 summary(df_vars$bmi)
 
@@ -225,16 +233,16 @@ dim(high_risk_cohort)
 cat("dim(high_risk_ever_cohort)\n")
 dim(high_risk_ever_cohort)
 
-cat("# hosp_covid_date_count -high_risk_cohort#\n")
+cat("#hosp_covid_date_count-high_risk_cohort- #\n")
 sum(!is.na(high_risk_cohort$hosp_covid_date))
 
-cat("# hosp_allcause_date_count-high_risk_cohort#\n")
+cat("#hosp_allcause_date_count-high_risk_cohort-#\n")
 sum(!is.na(high_risk_cohort$hosp_allcause_date))
 
-cat("# ons_dead_count-high_risk_cohort#\n")
+cat("#ons_dead_count-high_risk_cohort-#\n")
 sum(!is.na(high_risk_cohort$ons_dead_date))
 
-cat("#death_cause_covid:-high_risk_cohort\n")
+cat("#death_cause_covid-high_risk_cohort\n")
 freq_single(high_risk_cohort$death_cause_covid)
 
 cat("all-cause death 60d-6m:-high_risk_cohort\n")
@@ -249,10 +257,96 @@ freq_single(high_risk_cohort$allcause_death_under60d)
 cat("allcause_death_under30d-high_risk_cohort")
 freq_single(high_risk_cohort$allcause_death_under30d)
 
+cat("sex_imd-table-high_risk_cohort")
+dt_sex_imd<-high_risk_cohort %>%
+ dplyr::count(sex,imd) %>%
+ dplyr::group_by(sex) %>% 
+ dplyr::mutate(prop = prop.table(n)) #%>% print(n = nrow(dt))
+print(dt_sex_imd)
+
+##first_covid_treat_interve
+cat("#first_covid_treat_interve-high_risk_cohort-")
+freq_single(high_risk_cohort$first_covid_treat_interve)
+
+#total_covid_vacc_cat#
+cat("#total_covid_vacc_cat-high_risk_cohort-")
+freq_single(high_risk_cohort$total_covid_vacc_cat)
+
+###
+cohort_molnup<-df_vars %>% filter(drug== 0 )
+cat("#age-summary-cohort_molnup:")
+summary(as.numeric(cohort_molnup$age_treated),na.rm=T)
+
+cat("#age-group-cohort_molnup:")
+freq_single(cohort_molnup$age_treated_group)
+
+cat("#sex-cohort_molnup:")
+freq_single(cohort_molnup$sex)
+
+cat("#imd-cohort_molnup:")
+freq_single(cohort_molnup$imd)
+
+cat("#ethnicity-cohort_molnup:")
+freq_single(cohort_molnup$ethnicity)
+
+cat("#ethnicity_snome-cohort_molnup:")
+freq_single(cohort_molnup$ethnicity_snome)
+
+cat("#ethnicity_snome_cat-cohort_molnup:")
+freq_single(as.character(cohort_molnup$ethnicity_snome_cat))
+
+cat("#ethnicity_ctv3-cohort_molnup:")
+freq_single(as.character(cohort_molnup$ethnicity_ctv3))
+
+cat("#region-cohort_molnup:")
+freq_single(as.character(cohort_molnup$region))
+
+cat("#bmi-cohort_molnup")
+summary(cohort_molnup$bmi)
+
+cat("#total_covid_vacc_cat-cohort_molnup")
+freq_single(cohort_molnup$total_covid_vacc_cat)
+
+
+############# #######################
+cohort_sotro<-df_vars %>% filter(drug== 1 )
+cat("#age-summary-cohort_sotro:")
+summary(as.numeric(cohort_sotro$age_treated),na.rm=T)
+
+cat("#age-group-cohort_sotro:")
+freq_single(cohort_sotro$age_treated_group)
+
+cat("#sex-cohort_sotro:")
+freq_single(cohort_sotro$sex)
+
+cat("#imd-cohort_sotro:")
+freq_single(cohort_sotro$imd)
+
+cat("#ethnicity-cohort_sotro:")
+freq_single(cohort_sotro$ethnicity)
+
+cat("#ethnicity_snome-cohort_sotro:")
+freq_single(cohort_sotro$ethnicity_snome)
+
+cat("#ethnicity_snome_cat-cohort_sotro:")
+freq_single(as.character(cohort_sotro$ethnicity_snome_cat))
+
+cat("#ethnicity_ctv3-cohort_sotro:")
+freq_single(as.character(cohort_sotro$ethnicity_ctv3))
+
+cat("#region-cohort_sotro:")
+freq_single(as.character(cohort_sotro$region))
+
+cat("#bmi-cohort_sotro")
+summary(cohort_sotro$bmi)
+
+cat("#total_covid_vacc_cat-cohort_sotro")
+freq_single(cohort_sotro$total_covid_vacc_cat)
+
 # Save dataset(s) ----
 write.csv(df_vars, here::here("output", "tables", "data4analyse.csv"), row.names = FALSE)
 write_rds(df_vars, here::here("output", "data", "data4analyse.rds"), compress = "gz")
 write_rds(high_risk_cohort, here::here("output", "data", "high_risk_cohort.rds"), compress = "gz")
 write_rds(high_risk_ever_cohort, here::here("output", "data", "high_risk_ever_cohort.rds"), compress = "gz")
 
-#write.csv(df_vars, ("C:/Users/qw/Documents/Github/prophy_effects_Sotro_Molnup/output/data/cohort_data4analyse.csv"), row.names = FALSE)
+# write.csv(df_vars, ("C:/Users/qw/Documents/Github/prophy_effects_Sotro_Molnup/output/data/cohort_data4analyse.csv"), row.names = FALSE)
