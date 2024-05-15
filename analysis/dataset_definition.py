@@ -78,6 +78,9 @@ dataset.treat_date = had_covid_m_s_treat_df.treatment_start_date # first_covid_t
 dataset.had_first_covid_treat = had_first_covid_treat
 dataset.first_covid_treat_interve= had_covid_m_s_treat_df.intervention
 dataset.first_covid_treat_status= had_covid_m_s_treat_df.current_status
+dataset.drug = case(
+    when(dataset.first_covid_treat_interve.is_in(["Sotrovimab"])).then(1), otherwise = 0
+)
 
 treat_date = dataset.treat_date  
 
@@ -471,8 +474,8 @@ transplant_conjunctiva_y_code_opcs4_df = apcs_proc_bf_treat_af01Feb20_df(codelis
 #between = ["transplant_conjunctiva_y_code_opcs4","transplant_conjunctiva_y_code_opcs4"],
 dataset.transplant_conjunctiva_opcs4 =apcs_proc_bf_treat_af01Feb20_lastdate(codelist= conjunctiva_transplant_nhsd_opcs4_codes)
 dataset.transplant_conjunctiva_opcs4_count =apcs_proc_bf_treat_af01Feb20_df(codelist= conjunctiva_transplant_nhsd_opcs4_codes).count_for_patient()
-dataset.transplant_conjunctiva_opcs4_a =dataset.transplant_conjunctiva_opcs4.is_on_or_between(
-    dataset.transplant_conjunctiva_y_code_opcs4,dataset.transplant_conjunctiva_y_code_opcs4)
+# dataset.transplant_conjunctiva_opcs4_a =dataset.transplant_conjunctiva_opcs4.is_on_or_between(
+#     dataset.transplant_conjunctiva_y_code_opcs4,dataset.transplant_conjunctiva_y_code_opcs4)
 
 # between = ["transplant_all_y_codes_opcs4","transplant_all_y_codes_opcs4"],
 dataset.transplant_stomach_opcs4 = apcs_proc_bf_treat_af01Feb20_lastdate(codelist=stomach_transplant_nhsd_opcs4_codes)
@@ -715,90 +718,6 @@ dataset.high_risk_MOL_count = covid_therapeutics_raw.MOL1_high_risk_cohort.count
 dataset.high_risk_SOT02_count = covid_therapeutics_raw.SOT02_risk_cohorts.count_distinct_for_patient() 
 
 # ##### #### ####
-# #IMID #Immune Mediated Inflammatory Diseases
-# dataset.is_high_risk_MOL_SOT02_IMID = (therapeutics_df.MOL1_high_risk_cohort.contains("imid")) | \
-#     (therapeutics_df.MOL1_high_risk_cohort.contains("IMID")) | therapeutics_df.SOT02_risk_cohorts.contains("imid")| \
-#     therapeutics_df.SOT02_risk_cohorts.contains("IMID") \
-    
-# dataset.high_risk_MOL_SOT02_IMID = case(
-#     when(dataset.is_high_risk_MOL_SOT02_IMID).then(1), otherwise = 0
-# )
-
-# #solid organ recipients-SOR, 
-# dataset.is_high_risk_MOL_SOT02_SOR = (therapeutics_df.MOL1_high_risk_cohort.contains("solid organ recipients")) | \
-#     (therapeutics_df.MOL1_high_risk_cohort.contains("Solid organ recipients")) | therapeutics_df.SOT02_risk_cohorts.contains("solid organ recipients")| \
-#     therapeutics_df.SOT02_risk_cohorts.contains("Solid organ recipients") \
-    
-# dataset.high_risk_MOL_SOT02_SOR = case(
-#     when(dataset.is_high_risk_MOL_SOT02_SOR).then(1), otherwise = 0
-# )
-
-# #Haematologic malignancy
-# dataset.is_high_risk_MOL_SOT02_HMAL = (therapeutics_df.MOL1_high_risk_cohort.contains("haematologic malignancy")) | \
-#     (therapeutics_df.MOL1_high_risk_cohort.contains("Haematologic malignancy")) | therapeutics_df.SOT02_risk_cohorts.contains("haematologic malignancy")| \
-#     therapeutics_df.SOT02_risk_cohorts.contains("Haematologic malignancy") \
-    
-# dataset.high_risk_MOL_SOT02_HMAL = case(
-#     when(dataset.is_high_risk_MOL_SOT02_HMAL).then(1), otherwise = 0
-# )
-
-# #patients with a haematological diseases (sic)
-# dataset.is_high_risk_MOL_SOT02_HMDs = (therapeutics_df.MOL1_high_risk_cohort.contains("patients with a haematological diseases (sic)")) | \
-#     (therapeutics_df.MOL1_high_risk_cohort.contains("Patients with a haematological diseases (sic)")) | therapeutics_df.SOT02_risk_cohorts.contains("patients with a haematological diseases (sic)")| \
-#     therapeutics_df.SOT02_risk_cohorts.contains("Patients with a haematological diseases (sic)") \
-
-# dataset.high_risk_MOL_SOT02_HMDs = case(
-#     when(dataset.is_high_risk_MOL_SOT02_HMDs).then(1), otherwise = 0
-# )
-# #sickle cell disease-SCD
-# dataset.is_high_risk_MOL_SOT02_SCD = (therapeutics_df.MOL1_high_risk_cohort.contains("sickle cell disease")) | \
-#     (therapeutics_df.MOL1_high_risk_cohort.contains("Sickle cell disease")) | therapeutics_df.SOT02_risk_cohorts.contains("sickle cell disease")| \
-#     therapeutics_df.SOT02_risk_cohorts.contains("Sickle cell disease") \
-    
-# dataset.high_risk_MOL_SOT02_SCD = case(
-#     when(dataset.is_high_risk_MOL_SOT02_SCD).then(1), otherwise = 0
-# )
-
-# #stem cell transplant recipient -SCTR
-# dataset.is_high_risk_MOL_SOT02_SCTR = (therapeutics_df.MOL1_high_risk_cohort.contains("stem cell transplant recipient")) | \
-#     (therapeutics_df.MOL1_high_risk_cohort.contains("Stem cell transplant recipient")) |  \
-#     therapeutics_df.SOT02_risk_cohorts.contains("stem cell transplant recipient")| \
-#     therapeutics_df.SOT02_risk_cohorts.contains("Stem cell transplant recipient") \
-    
-# dataset.high_risk_MOL_SOT02_SCTR = case(
-#     when(dataset.is_high_risk_MOL_SOT02_SCTR).then(1), otherwise = 0
-# )
-
-# #immune deficiencies
-# dataset.is_high_risk_MOL_SOT02_IMDs = (therapeutics_df.MOL1_high_risk_cohort.contains("immune deficiencies")) | \
-#     (therapeutics_df.MOL1_high_risk_cohort.contains("Immune deficiencies")) | therapeutics_df.SOT02_risk_cohorts.contains("immune deficiencies")| \
-#     therapeutics_df.SOT02_risk_cohorts.contains("Immune deficiencies") \
-    
-# dataset.high_risk_MOL_SOT02_IMDs = case(
-#     when(dataset.is_high_risk_MOL_SOT02_IMDs).then(1), otherwise = 0
-# )    
-
-# #primary immune deficiencies
-# dataset.is_high_risk_MOL_SOT02_PIMDs = (therapeutics_df.MOL1_high_risk_cohort.contains("primary immune deficiencies")) | \
-#     (therapeutics_df.MOL1_high_risk_cohort.contains("Primary immune deficiencies")) | therapeutics_df.SOT02_risk_cohorts.contains("primary immune deficiencies")| \
-#     therapeutics_df.SOT02_risk_cohorts.contains("Primary immune deficiencies") \
-    
-# dataset.high_risk_MOL_SOT02_PIMDs = case(
-#     when(dataset.is_high_risk_MOL_SOT02_PIMDs).then(1), otherwise = 0
-# )
-
-# # cancer
-# dataset.is_high_risk_MOL_SOT02_solid_cancer = (therapeutics_df.MOL1_high_risk_cohort.contains("solid cancer")) | \
-#     (therapeutics_df.MOL1_high_risk_cohort.contains("Solid cancer")) | therapeutics_df.SOT02_risk_cohorts.contains("solid cancer")| \
-#     therapeutics_df.SOT02_risk_cohorts.contains("Solid cancer") \
-  
-# dataset.highrisk_MOL_SOT02_solid_cancer = case(
-#     when(dataset.is_high_risk_MOL_SOT02_solid_cancer).then(1), otherwise = 0
-# )
-
-# dataset.is_highrisk_therap = (dataset.high_risk_MOL_SOT02_IMID + dataset.high_risk_MOL_SOT02_SOR + dataset.high_risk_MOL_SOT02_HMAL + dataset.high_risk_MOL_SOT02_HMDs + 
-#     dataset.high_risk_MOL_SOT02_SCD + dataset.high_risk_MOL_SOT02_SCTR +dataset.high_risk_MOL_SOT02_IMDs +dataset.high_risk_MOL_SOT02_PIMDs + 
-#     dataset.highrisk_MOL_SOT02_solid_cancer )
 
 # dataset.highrisk_therap = case(
 #     when(dataset.is_highrisk_therap >=1).then(1), otherwise = 0
@@ -1077,19 +996,27 @@ covid_vacc = (
     .sort_by(vaccinations.date)
 )
 
+
+#total_covid_vacc, covid_vacc1_date,covid_vacc2_date,covid_vacc3_date,covid_vacc4_date,covid_vacc_last_date
 #vaccination count
 dataset.total_covid_vacc = covid_vacc.count_for_patient()
 #first-4 vaccination
-dataset.covid_vacc01 = covid_vacc.first_for_patient().date
+dataset.covid_vacc1_date = covid_vacc.first_for_patient().date
 
-dataset.covid_vacc02 = covid_vacc.where(covid_vacc.date.is_after(dataset.covid_vacc01 + days(19))
+dataset.covid_vacc2_date = covid_vacc.where(covid_vacc.date.is_after(dataset.covid_vacc1_date + days(19))
     ).sort_by(covid_vacc.date).first_for_patient().date
 
-dataset.covid_vacc03 = covid_vacc.where(covid_vacc.date.is_after(dataset.covid_vacc02 + days(56))
+dataset.covid_vacc3_date = covid_vacc.where(covid_vacc.date.is_after(dataset.covid_vacc2_date + days(56))
     ).sort_by(covid_vacc.date).first_for_patient().date
 
-dataset.covid_vacc04 = covid_vacc.where(covid_vacc.date.is_after(dataset.covid_vacc03 + days(56))
+dataset.covid_vacc4_date = covid_vacc.where(covid_vacc.date.is_after(dataset.covid_vacc3_date + days(56))
     ).sort_by(covid_vacc.date).first_for_patient().date
 
-dataset.covid_vacc_last = covid_vacc.last_for_patient().date
+dataset.covid_vacc_last_date= covid_vacc.last_for_patient().date
 
+dataset.total_covid_vacc_cat = case(
+    when (dataset.total_covid_vacc ==1).then("One vaccination"),
+    when (dataset.total_covid_vacc == 2).then("Two vaccinations"),
+    when (dataset.total_covid_vacc >= 3).then("Three or more vaccinations"),
+    otherwise = "unvaccinated",
+)
