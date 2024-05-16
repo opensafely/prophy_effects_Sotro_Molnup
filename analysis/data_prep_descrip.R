@@ -113,123 +113,127 @@ freq_single(df_vars0$highrisk)
 cat("highrisk_ever\n")
 freq_single(df_vars0$highrisk_ever)
 
-##checking-allcause_death_under60d
-df_vars <- df_vars0 %>% filter(censored== 0 ) %>% filter(old_covid_treat== 0 )  %>% filter(!is.na(stp))%>% filter(allcause_death_under60d!= 1) %>% filter(highrisk ==1 )
+cat("#cohort-removed censored/previously treated)\n")
+
+##cohort-
+df_vars <- df_vars0 %>% filter(censored== 0 ) %>% filter(old_covid_treat== 0 )  %>% filter(!is.na(stp))%>% filter(allcause_death_under60d!= 1) #%>% filter(highrisk ==1 )
 
 cat("#total-dim(df_vars)\n")
 dim(df_vars)
 
-cat("#is_censored\n")
-freq_single(df_vars$is_censored)
-
-cat("#str-START#\n")
+cat("#str-START-df_vars#\n")
 str(df_vars,list.len= ncol(df_vars),give.attr = F)
 cat("#str-END#\n")
 
-cat("#if_old_covid_treat")
+cat("#is_censored-df_vars\n")
+freq_single(df_vars$is_censored)
+
+cat("#if_old_covid_treat-df_vars")
 freq_single(df_vars$if_old_covid_treat)
 
-cat("#had_first_covid_treat-non_hospitalised,2021-12-16--2022-02-10:")
+cat("#had_first_covid_treat-non_hospitalised,2021-12-16--2022-02-10: -df_vars")
 freq_single(df_vars$had_first_covid_treat)
 
-cat("#interventions: Molnupiravir/Sotrovimab")
+cat("#interventions: Molnupiravir/Sotrovimab-df_vars")
 freq_single(df_vars$first_covid_treat_interve)
 
-cat("#hosp_covid_date_count#\n")
+cat("#hosp_covid_date60d-6mon_count-df_vars#\n")
 sum(!is.na(df_vars$hosp_covid_date))
 
-cat("#hosp_allcause_date_count#\n")
+cat("#hosp_allcause_date_count-df_vars#\n")
 sum(!is.na(df_vars$hosp_allcause_date))
 
-cat("#ons_dead_count#\n")
+cat("#ons_dead_count-df_vars#\n")
 sum(!is.na(df_vars$ons_dead_date))
 
-cat("#death_cause_covid:\n")
+cat("#death_cause_covid-df_vars:\n")
 freq_single(df_vars$death_cause_covid)
 
-cat("all-cause death 60d-6m:\n")
+cat("all-cause death 60d-6m-df_vars:\n")
 freq_single(df_vars$allcause_death_60d_6m)
 
-cat("covid_death_60d_6m:")
+cat("covid_death_60d_6m-df_vars:")
 freq_single(df_vars$covid_death_60d_6m)
 
-cat("allcause_death_under60d")
+cat("allcause_death_under60d-df_vars")
 freq_single(df_vars$allcause_death_under60d)
 
-cat("allcause_death_under30d")
+cat("allcause_death_under30d-df_vars")
 freq_single(df_vars$allcause_death_under30d)
 
-cat("#age-summary:")
+cat("#age-summary-df_vars:")
 summary(as.numeric(df_vars$age_treated),na.rm=T)
 mean(as.numeric(df_vars$age_treated),na.rm=T)
 sd(as.numeric(df_vars$age_treated),na.rm=T)
 IQR(as.numeric(df_vars$age_treated), na.rm=T)
 
-cat("#age-group:")
+cat("#age-group-df_vars:")
 freq_single(df_vars$age_treated_group)
 
-cat("#sex:")
+cat("#sex-df_vars:")
 freq_single(df_vars$sex)
 
-cat("#imd:")
+cat("#imd-df_vars:")
 freq_single(df_vars$imd)
 
-cat("#ethnicity:")
+cat("#ethnicity-df_vars:")
 freq_single(df_vars$ethnicity)
 
-cat("#ethnicity_snome:")
+cat("#ethnicity_snome-df_vars:")
 freq_single(df_vars$ethnicity_snome)
 
-cat("#ethnicity_snome_cat:")
+cat("#ethnicity_snome_cat-df_vars:")
 freq_single(as.character(df_vars$ethnicity_snome_cat))
 
-cat("#ethnicity_ctv3:")
+cat("#ethnicity_ctv3-df_vars:")
 freq_single(as.character(df_vars$ethnicity_ctv3))
 
 #region
-cat("#region:")
+cat("#region-df_vars:")
 freq_single(as.character(df_vars$region))
 
 #bmi
-cat("#bmi")
+cat("#bmi-df_vars")
 summary(df_vars$bmi)
 mean(as.numeric(df_vars$bmi),na.rm=T)
 sd(as.numeric(df_vars$bmi),na.rm=T)
 IQR(as.numeric(df_vars$bmi), na.rm=T)
 
-cat("had_dialysis")
+cat("had_dialysis-df_vars")
 freq_single(df_vars$had_dialysis)
 
-cat("had_kidney_transplant")
+cat("had_kidney_transplant-df_vars")
 freq_single(df_vars$had_kidney_transplant)
 
-cat("transplant_thymus_opcs4")
+cat("transplant_thymus_opcs4-df_vars")
 sum(!is.na(df_vars$transplant_thymus_opcs4))
 
-cat("transplant_thymus_opcs4_count")
+cat("transplant_thymus_opcs4_count-df_vars")
 freq_single(as.factor(df_vars$transplant_thymus_opcs4_count))
 summary(as.numeric(df_vars$transplant_thymus_opcs4_count))
 
-cat("compare_transplant_thymus_opcs4")
+cat("compare_transplant_thymus_opcs4-df_vars")
 identical(df_vars$transplant_thymus_opcs4_a, df_vars$transplant_thymus_opcs4_2)
 
-cat("transplant_conjunctiva_y_code_opcs4")
+cat("transplant_conjunctiva_y_code_opcs4-df_vars")
 sum(!is.na(df_vars$transplant_conjunctiva_y_code_opcs4))
 
-cat("transplant_conjunctiva_y_code_opcs4_count")
+cat("transplant_conjunctiva_y_code_opcs4_count-df_vars")
 freq_single(as.factor(df_vars$transplant_conjunctiva_y_code_opcs4_count))
 summary(as.numeric(df_vars$transplant_conjunctiva_y_code_opcs4_count))
 
-cat("transplant_conjunctiva_opcs4")
+cat("transplant_conjunctiva_opcs4-df_vars")
 sum(!is.na(df_vars$transplant_conjunctiva_opcs4))
 
-cat("transplant_conjunctiva_opcs4_count")
+cat("transplant_conjunctiva_opcs4_count-df_vars")
 freq_single(as.factor(df_vars$transplant_conjunctiva_opcs4_count))
 summary(as.numeric(df_vars$transplant_conjunctiva_opcs4_count))
 
-cat("compare_transplant_conjunctiva_opcs4")
+cat("compare_transplant_conjunctiva_opcs4-df_vars")
 identical(df_vars$transplant_conjunctiva_opcs4_a, df_vars$transplant_conjunctiva_opcs4_2)
 
+##high_risk_cohort)
+cat("(high_risk_cohort)\n" )
 high_risk_cohort <- df_vars %>% filter(highrisk== 1 ) 
 high_risk_ever_cohort <- df_vars %>% filter(highrisk_ever== 1 ) 
 
@@ -239,13 +243,18 @@ dim(high_risk_cohort)
 cat("dim(high_risk_ever_cohort)\n")
 dim(high_risk_ever_cohort)
 
-cat("#hosp_covid_date_count-high_risk_cohort- #\n")
+cat("#str-START-high_risk_cohort#\n")
+str(high_risk_cohort,list.len= ncol(high_risk_cohort),give.attr = F)
+cat("#str-END#\n")
+
+##outcomes
+cat("#hosp_covid_date60d_6mon_count-high_risk_cohort- #\n")
 sum(!is.na(high_risk_cohort$hosp_covid_date))
 
-cat("#hosp_allcause_date_count-high_risk_cohort-#\n")
+cat("#hosp_allcause_date60d_6mon_count-high_risk_cohort-#\n")
 sum(!is.na(high_risk_cohort$hosp_allcause_date))
 
-cat("#ons_dead_count-high_risk_cohort-#\n")
+cat("#ons_dead_count_anytime-high_risk_cohort-#\n")
 sum(!is.na(high_risk_cohort$ons_dead_date))
 
 cat("#death_cause_covid-high_risk_cohort\n")
@@ -278,12 +287,47 @@ freq_single(high_risk_cohort$first_covid_treat_interve)
 cat("#total_covid_vacc_cat-high_risk_cohort-")
 freq_single(high_risk_cohort$total_covid_vacc_cat)
 
-###
+##cohort_molnup
 cohort_molnup<-df_vars %>% filter(drug== 0 )
+cat("#total-dim(cohort_molnup)\n")
+dim(cohort_molnup)
+
+# cat("#str-START-cohort_molnup#\n")
+# str(cohort_molnup,list.len= ncol(cohort_molnup),give.attr = F)
+# cat("#str-END#\n")
+
+#outcomes
+cat("#hosp_covid_date60d_6mon_count-cohort_molnup- #\n")
+sum(!is.na(cohort_molnup$hosp_covid_date))
+
+cat("#hosp_allcause_date60d_6mon_count-cohort_molnup-#\n")
+sum(!is.na(cohort_molnup$hosp_allcause_date))
+
+cat("#ons_dead_count_anytime-cohort_molnup-#\n")
+sum(!is.na(cohort_molnup$ons_dead_date))
+
+cat("#death_cause_covid-cohort_molnup\n")
+freq_single(cohort_molnup$death_cause_covid)
+
+cat("all-cause death 60d-6m:-cohort_molnup\n")
+freq_single(cohort_molnup$allcause_death_60d_6m)
+
+cat("covid_death_60d_6m:-cohort_molnup")
+freq_single(cohort_molnup$covid_death_60d_6m)
+
+cat("allcause_death_under60d-cohort_molnup")
+freq_single(cohort_molnup$allcause_death_under60d)
+
+cat("allcause_death_under30d-cohort_molnup")
+freq_single(cohort_molnup$allcause_death_under30d)
+
 cat("#age-summary-cohort_molnup:")
 summary(as.numeric(cohort_molnup$age_treated),na.rm=T)
+cat("#age-mean-cohort_molnup:")
 mean(as.numeric(cohort_molnup$age_treated),na.rm=T)
+cat("#age-sd-cohort_molnup:")
 sd(as.numeric(cohort_molnup$age_treated),na.rm=T)
+cat("#age-IQR-cohort_molnup:")
 IQR(as.numeric(cohort_molnup$age_treated), na.rm=T)
 
 cat("#age-group-cohort_molnup:")
@@ -320,15 +364,51 @@ IQR(as.numeric(cohort_molnup$bmi), na.rm=T)
 cat("#total_covid_vacc_cat-cohort_molnup")
 freq_single(cohort_molnup$total_covid_vacc_cat)
 
+##cohort_sotro
 
-############# #######################
 cohort_sotro<-df_vars %>% filter(drug== 1 )
+##outcomes
+
+cat("#total-dim(cohort_sotro)\n")
+dim(cohort_sotro)
+
+cat("#str-START-cohort_sotro#\n")
+str(cohort_sotro,list.len= ncol(cohort_sotro),give.attr = F)
+cat("#str-END#\n")
+
+cat("#hosp_covid_date60d_6mon_count-cohort_sotro- #\n")
+sum(!is.na(cohort_sotro$hosp_covid_date))
+
+cat("#hosp_allcause_date60d_6mon_count-cohort_sotro-#\n")
+sum(!is.na(cohort_sotro$hosp_allcause_date))
+
+cat("#ons_dead_count_anytime-cohort_sotro-#\n")
+sum(!is.na(cohort_sotro$ons_dead_date))
+
+cat("#death_cause_covid-cohort_sotro\n")
+freq_single(cohort_sotro$death_cause_covid)
+
+cat("all-cause death 60d-6m:-cohort_sotro\n")
+freq_single(cohort_sotro$allcause_death_60d_6m)
+
+cat("covid_death_60d_6m:-cohort_sotro")
+freq_single(cohort_sotro$covid_death_60d_6m)
+
+cat("allcause_death_under60d-cohort_sotro")
+freq_single(cohort_sotro$allcause_death_under60d)
+
+cat("allcause_death_under30d-cohort_sotro")
+freq_single(cohort_sotro$allcause_death_under30d)
+
 cat("#age-summary-cohort_sotro:")
 summary(as.numeric(cohort_sotro$age_treated),na.rm=T)
-mean(as.numeric(cohort_sotro$age_treated),na.rm=T)
-sd(as.numeric(cohort_sotro$age_treated),na.rm=T)
-IQR(as.numeric(cohort_sotro$age_treated), na.rm=T)
 
+cat("#age-mean-cohort_sotro:")
+mean(as.numeric(cohort_sotro$age_treated),na.rm=T)
+cat("#age-sd-cohort_sotro:")
+sd(as.numeric(cohort_sotro$age_treated),na.rm=T)
+cat("#age-IQR-cohort_sotro:")
+IQR(as.numeric(cohort_sotro$age_treated), na.rm=T)
 
 cat("#age-group-cohort_sotro:")
 freq_single(cohort_sotro$age_treated_group)
