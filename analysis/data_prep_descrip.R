@@ -288,7 +288,7 @@ cat("#total_covid_vacc_cat-high_risk_cohort-")
 freq_single(high_risk_cohort$total_covid_vacc_cat)
 
 ##cohort_molnup
-cohort_molnup<-df_vars %>% filter(drug== 0 )
+cohort_molnup<-high_risk_cohort %>% filter(drug== 0 )
 cat("#total-dim(cohort_molnup)\n")
 dim(cohort_molnup)
 
@@ -366,7 +366,7 @@ freq_single(cohort_molnup$total_covid_vacc_cat)
 
 ##cohort_sotro
 
-cohort_sotro<-df_vars %>% filter(drug== 1 )
+cohort_sotro<-high_risk_cohort %>% filter(drug== 1 )
 ##outcomes
 
 cat("#total-dim(cohort_sotro)\n")
