@@ -115,8 +115,8 @@ freq_single(df_vars0$highrisk_ever)
 
 cat("#cohort-removed censored/previously treated)\n")
 
-##cohort-
-df_vars <- df_vars0 %>% filter(censored== 0 ) %>% filter(old_covid_treat== 0 )  %>% filter(!is.na(stp))%>% filter(allcause_death_under60d!= 1) #%>% filter(highrisk ==1 )
+##cohort-#(censored== 0 ) 
+df_vars <- df_vars0 %>% filter(old_covid_treat== 0 )  %>% filter(!is.na(stp))%>% filter(allcause_death_under60d!= 1) #%>% filter(highrisk ==1 )
 
 cat("#total-dim(df_vars)\n")
 dim(df_vars)
