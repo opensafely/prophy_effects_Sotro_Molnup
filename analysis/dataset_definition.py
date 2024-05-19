@@ -82,6 +82,9 @@ dataset.drug = case(
     when(dataset.first_covid_treat_interve.is_in(["Sotrovimab"])).then(1), otherwise = 0
 )
 
+#end_date_6mon, start_date_60d
+dataset.end_date_6mon = dataset.treat_date + days(60) + months(6)
+dataset.start_date_60d = dataset.treat_date + days(60)
 treat_date = dataset.treat_date  
 
 #dataset.treat_date = dataset.first_covid_treat_date 
@@ -107,7 +110,7 @@ had_covid_treat_excpt_sotro_df = (
     .where((had_covid_treat_df0.treatment_start_date> treat_date) &  \
         (had_covid_treat_df0.treatment_start_date<=index_enddate) \
     ).sort_by(had_covid_treat_df0.treatment_start_date)) 
-
+#molnu_censored_date, sotro_censored_date
 dataset.molnu_censored_date = had_covid_treat_excpt_molnu_df.first_for_patient().treatment_start_date
 dataset.sotro_censored_date = had_covid_treat_excpt_sotro_df.first_for_patient().treatment_start_date
 dataset.molnu_censore_drug =had_covid_treat_excpt_molnu_df.first_for_patient().intervention
@@ -189,13 +192,21 @@ ccare_af60d_covid_pdiag = (
     (hosp_af60d_covid_pdiag_1stdate_df.days_in_critical_care>0))
 
 ##covid_hospitalisation as per primary_diagnosis
-dataset.hosp_covid_date = hosp_af60d_covid_pdiag_1stdate_df.admission_date #hosp_af60d_covid_pdiag_1stdate_df
-dataset.hosp_covid_classfic = hosp_af60d_covid_pdiag_1stdate_df.patient_classification #hosp_af60d_covid_pdiag_classfic
-dataset.hosp_covid_pdiag = hosp_af60d_covid_pdiag_1stdate_df.primary_diagnosis #hosp_af60d_covid_pdiag
-dataset.had_ccare_covid = ccare_af60d_covid_pdiag #had_ccare_covid_af60d_6mon_pdiag_date
+#hosp_covid_date=hosp_covid60d6m_date
+#hosp_covid_classfic=hosp_covid60d6m_classfic
+#hosp_covid_pdiag=hosp_covid60d6m_pdiag
+#had_ccare_covid = had_ccare_covid60d6m
+#ccare_covid_date =ccare_covid60d6m_date
+
+
+dataset.hosp_covid60d6m_date = hosp_af60d_covid_pdiag_1stdate_df.admission_date #hosp_af60d_covid_pdiag_1stdate_df
+dataset.hosp_covid60d6m_classfic = hosp_af60d_covid_pdiag_1stdate_df.patient_classification #hosp_af60d_covid_pdiag_classfic
+dataset.hosp_covid60d6m_pdiag = hosp_af60d_covid_pdiag_1stdate_df.primary_diagnosis #hosp_af60d_covid_pdiag
+dataset.had_ccare_covid60d6m = ccare_af60d_covid_pdiag #had_ccare_covid_af60d_6mon_pdiag_date
 
 ##covid_critical_care-date
-dataset.ccare_covid_date = (  #primary_diagnosis
+##ccare_covid_date =ccare_covid60d6m_date
+dataset.ccare_covid60d6m_date = (  #primary_diagnosis
     apcs.where((apcs.primary_diagnosis.is_in(covid_icd10_codes)) &     
         (apcs.admission_date.is_after(treat_date + days(60))) & 
         (apcs.admission_date.is_on_or_before(treat_date + days(60) + months(6))) &   #  apcs.snomedct_code.is_in(covid_icd10_codes)
@@ -211,25 +222,28 @@ hosp_allcause_af60d_6mon_df = (
     (apcs.patient_classification.is_in(["1"]))
     ).sort_by(apcs.admission_date).first_for_patient()
 ) 
+#hosp_allcause_date=hosp_allcause60d6m_date
+#hosp_allcause_classfic=hosp_allcause60d6m_classfic
+#hosp_allcause_pdiag = hosp_allcause60d6m_pdiag
+dataset.hosp_allcause60d6m_date = hosp_allcause_af60d_6mon_df.admission_date #hosp_allcause_af60d_6mon_pdiag_date
+dataset.hosp_allcause60d6m_classfic = hosp_allcause_af60d_6mon_df.patient_classification
+dataset.hosp_allcause60d6m_pdiag = hosp_allcause_af60d_6mon_df.primary_diagnosis
 
-dataset.hosp_allcause_date = hosp_allcause_af60d_6mon_df.admission_date #hosp_allcause_af60d_6mon_pdiag_date
-dataset.hosp_allcause_classfic = hosp_allcause_af60d_6mon_df.patient_classification
-dataset.hosp_allcause_pdiag = hosp_allcause_af60d_6mon_df.primary_diagnosis
-
-hosp_covid_date = dataset.hosp_covid_date #first hospitalise after 60days
-hosp_allcause_date = dataset.hosp_allcause_date 
+hosp_covid60d6m_date = dataset.hosp_covid60d6m_date #first hospitalise after 60days
+hosp_allcause60d6m_date = dataset.hosp_allcause60d6m_date 
 
 dataset.hospitalise_disc_covid = ( #covid_first discharge after 60days
-    apcs.where(apcs.discharge_date.is_on_or_before(hosp_covid_date)
+    apcs.where(apcs.discharge_date.is_on_or_before(hosp_covid60d6m_date)
     ).sort_by(apcs.discharge_date).first_for_patient()).discharge_date
 
 dataset.hospitalise_disc_allcause = (      #allcause-first discharge after 60days
-    apcs.where(apcs.discharge_date.is_on_or_before(hosp_allcause_date)
+    apcs.where(apcs.discharge_date.is_on_or_before(hosp_allcause60d6m_date)
     ).sort_by(apcs.discharge_date).first_for_patient()).discharge_date
 
 ##Death_date##
 dataset.ons_dead_date = ons_deaths.date
-dataset.underly_deathcause = ons_deaths.underlying_cause_of_death 
+dataset.underly_deathcause_code = ons_deaths.underlying_cause_of_death
+
 dataset.death_cause_covid = cause_of_death_matches(covid_icd10_codes) #underlying or causes
 
 ##all-cause death 60d-6m #ons_dead_tr60d_6mon_covid_treat
@@ -237,6 +251,7 @@ dataset.was_allcause_death_60d_6m = (ons_deaths.date.is_after(treat_date + days(
     ons_deaths.date.is_on_or_before(treat_date + days(60) + months(6)) 
 )
 
+#was_allcause_death_60d_6m, allcause_death_60d_6m(0,1) ,was_covid_death_60d_6m ,covid_death_60d_6m (0,1) 
 dataset.allcause_death_60d_6m = case(
     when(dataset.was_allcause_death_60d_6m).then(1), otherwise = 0
 )
@@ -249,6 +264,8 @@ dataset.was_covid_death_60d_6m = (ons_deaths.date.is_after(treat_date + days(60)
 dataset.covid_death_60d_6m = case(
     when(dataset.was_covid_death_60d_6m).then(1), otherwise = 0
 )
+
+# dataset.covid_death_60d_6m_date = dataset.was_covid_death_60d_6m.date
 
 #all-cause death <60d #ons_dead_trstart_60d_covid_treat
 dataset.was_allcause_death_under60d = (ons_deaths.date.is_after(treat_date) & 
@@ -700,8 +717,8 @@ dataset.solid_cancer_ever = case(
 
 ## List of high-risk diseases
 # highrisk_list = ["haematologic malignancy","Patients with a haematological diseases", "immune deficiencies", 
-#     "primary immune deficiencies",  "sickle cell disease",
-#     "solid cancer", "solid organ recipients", "stem cell transplant recipient"
+# "primary immune deficiencies",  "sickle cell disease", "solid cancer", "solid organ recipients", 
+#"stem cell transplant recipient"
 # ]
 
 #covid_therapeutics_raw-MOL1_high_risk_cohort-SOT02_risk_cohorts
@@ -813,11 +830,13 @@ def apcs_admis_60daf_treat_alldiag_firstdate(codelist=None, where=True): #60days
 
 ##hospitalisation as per all_diagnosis
 # covid-related admission
-dataset.covid_first_admi_af_treat_alldiag_firstdate = apcs_admis_af_treat_alldiag_firstdate(
+#covid_first_admi_af_treat_alldiag_firstdate-hosp_af_treat_alldiag_date
+dataset.hosp_af_treat_alldiag_date = apcs_admis_af_treat_alldiag_firstdate(
     codelist= covid_icd10_codes,   
 )
 
-dataset.apcs_admis_60daf_treat_alldiag_firstdate = apcs_admis_60daf_treat_alldiag_firstdate(
+##apcs_admis_60daf_treat_alldiag_firstdate -hosp_60daf_treat_alldiag_date
+dataset.hosp_60daf_treat_alldiag_date = apcs_admis_60daf_treat_alldiag_firstdate(
     codelist= covid_icd10_codes,   
 )
 
@@ -995,7 +1014,6 @@ covid_vacc = (
     (vaccinations.date.is_before(treat_date)) & (vaccinations.date.is_after("2020-06-08")))
     .sort_by(vaccinations.date)
 )
-
 
 #total_covid_vacc, covid_vacc1_date,covid_vacc2_date,covid_vacc3_date,covid_vacc4_date,covid_vacc_last_date
 #vaccination count
