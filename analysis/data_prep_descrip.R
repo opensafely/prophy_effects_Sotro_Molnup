@@ -485,7 +485,7 @@ freq_single(cohort_sotro$total_covid_vacc_cat)
 
 cat("#summary(cox_model)")
 #surv_days,surv_event
-cox_model <- coxph(Surv(surv_days, surv_event) ~ drug, data = high_risk_cohort)
+cox_model <- coxph(Surv(surv_days, surv_event) ~ factor(drug), data = high_risk_cohort)
 summary(cox_model)
 
 # Plot the survival curves
