@@ -6,6 +6,9 @@ library('arrow')
 library('dplyr')
 library('readr')
 library('fs')
+library(survival)
+library(survminer)
+
 
 ## import functions
 source(here("analysis", "lib", "r_funs.R"))
@@ -479,6 +482,17 @@ IQR(as.numeric(cohort_sotro$bmi), na.rm=T)
 
 cat("#total_covid_vacc_cat-cohort_sotro")
 freq_single(cohort_sotro$total_covid_vacc_cat)
+
+cat("#summary(cox_model)")
+#surv_days,surv_event
+cox_model <- coxph(Surv(surv_days, surv_event) ~ drug, data = high_risk_cohort)
+summary(cox_model)
+
+# Plot the survival curves
+# ggsurvplot(survfit(cox_model), data = high_risk_cohort, pval = TRUE,
+#            ggtheme = theme_minimal(), risk.table = TRUE,
+#            conf.int = TRUE)
+
 
 # Save dataset(s) ----
 write.csv(df_vars, here::here("output", "tables", "data4analyse.csv"), row.names = FALSE)
