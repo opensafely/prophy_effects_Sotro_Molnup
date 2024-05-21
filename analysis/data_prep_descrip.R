@@ -14,17 +14,19 @@ source(here("analysis", "lib", "r_funs.R"))
 dir_create(here::here("output", "tables"), showWarnings = FALSE, recurse = TRUE)
 dir_create(here::here("output", "data"), showWarnings = FALSE, recurse = TRUE)
 
-## Read in data 
-#transplant_conjunctiva_opcs4_a,
-#df_vars0 <- read_csv("C:/Users/qw/Documents/Github/prophy_effects_Sotro_Molnup/output/data/dataset_table.csv.gz") %>% #,
-df_vars0 <- read_csv(here::here("output", "data", "dataset_table.csv.gz")) %>%
+## Read in data ##end_date_6mon, start_date_60d
+####hosp_covid60d6m_date, hosp_allcause60d6m_date(OUTCOME)
+#death_covid_cause_60d6m_date, death_covid_underly_60d6m_date (OUTCOMEs)
+#df_vars00<- read_csv("C:/Users/qw/Documents/Github/prophy_effects_Sotro_Molnup/output/data/dataset_table.csv.gz") %>% #,
+df_vars00 <- read_csv(here::here("output", "data", "dataset_table.csv.gz")) %>%
   select(patient_id,age_treated, sex, age_treated_group, ethnicity_snome,ethnicity_snome_cat,ethnicity, imd1, imd, stp,region, 
   if_old_covid_treat,old_covid_treat, had_first_covid_treat, first_covid_treat_interve,drug, first_covid_treat_status,
-  treat_date, first_molnupiravir_date, first_sotrovimab_date, date_of_first_admis_af_treat, covid_first_admi_af_treat_alldiag_firstdate,
-  apcs_admis_60daf_treat_alldiag_firstdate, ccare_covid_first_af_treat_alldiag_date,  hosp_covid_date, hosp_covid_classfic,
-  hosp_covid_pdiag, had_ccare_covid, ccare_covid_date, hosp_allcause_date, hosp_allcause_classfic, hosp_allcause_pdiag, 
-  hospitalise_disc_covid, hospitalise_disc_allcause, ons_dead_date, underly_deathcause, death_cause_covid, allcause_death_60d_6m, 
-  covid_death_60d_6m, was_allcause_death_under60d, allcause_death_under60d, allcause_death_under30d, bmi, is_censored, censored,
+  end_date_6mon, start_date_60d, treat_date, first_molnupiravir_date, first_sotrovimab_date, date_of_first_admis_af_treat, hosp_af_treat_alldiag_date,
+  hosp_60daf_treat_alldiag_date, ccare_covid_first_af_treat_alldiag_date, hosp_covid60d6m_date, hosp_covid60d6m_classfic,
+  hosp_covid60d6m_pdiag, had_ccare_covid60d6m, ccare_covid60d6m_date, hosp_allcause60d6m_date, hosp_allcause60d6m_classfic, hosp_allcause60d6m_pdiag, 
+  hospitalise_disc_covid, hospitalise_disc_allcause, ons_dead_date, underly_deathcause_code, death_cause_covid, was_allcause_death_60d_6m,
+  allcause_death_60d_6m, was_covid_death_60d_6m, covid_death_60d_6m, was_allcause_death_under60d, allcause_death_under60d, 
+  allcause_death_under30d, bmi, is_censored,censored, molnu_censored_date, sotro_censored_date,
   had_dialysis, had_kidney_transplant, transplant_thymus_opcs4,transplant_thymus_opcs4_count,transplant_thymus_opcs4_a, 
   transplant_thymus_opcs4_2, transplant_conjunctiva_y_code_opcs4, transplant_conjunctiva_y_code_opcs4_count,transplant_conjunctiva_opcs4,
   transplant_conjunctiva_opcs4_count, transplant_conjunctiva_opcs4_2, high_risk_MOL_last,high_risk_SOT02_last, oral_steroid_drugs_nhsd, 
@@ -32,6 +34,31 @@ df_vars0 <- read_csv(here::here("output", "data", "dataset_table.csv.gz")) %>%
   immunosuppresant_drugs_nhsd_ever, oral_steroid_drugs_nhsd_ever, is_codelist_highrisk, highrisk_codelist, is_codelist_highrisk_ever, 
   highrisk_codelist_ever, total_covid_vacc, total_covid_vacc_cat, covid_vacc1_date,covid_vacc2_date,covid_vacc3_date,
   covid_vacc4_date, covid_vacc_last_date) 
+
+#freq_single(df_vars0$covid_death_60d_6m)
+
+###underly_deathcause_code
+df_vars0<-df_vars00 %>%  # end_date_6mon, start_date_60d,
+    mutate(
+      underly_covid_deathcause0_1 = ifelse(underly_deathcause_code %in% c("U071", "U072", "U099", "U109"), 1, 0),
+      death_cause_covid0_1 = ifelse(death_cause_covid %in% ("TRUE"), 1,0 ), #) %>% 
+      test_date_format = ons_dead_date,
+      death_covid_underly_60d6m_date =as.Date (ifelse(((underly_covid_deathcause0_1 == 1) & (ons_dead_date >start_date_60d) & (ons_dead_date <end_date_6mon)), as.character(ons_dead_date), NA)),
+      death_covid_cause_60d6m_date = as.Date (ifelse(((death_cause_covid0_1 == 1) & (ons_dead_date >start_date_60d) & (ons_dead_date <= end_date_6mon)), as.character(ons_dead_date), NA)), 
+      censored_date_molnu = as.Date (ifelse(((!is.na(molnu_censored_date)) & (molnu_censored_date >start_date_60d) & (molnu_censored_date <= end_date_6mon)), as.character(ons_dead_date), NA)),
+      censored_date_sotro = as.Date (ifelse(((!is.na(sotro_censored_date)) & (sotro_censored_date >start_date_60d) & (sotro_censored_date <= end_date_6mon)), as.character(ons_dead_date), NA)),
+      surv_end_covid_cause_date = as.Date(pmin(hosp_covid60d6m_date,death_covid_cause_60d6m_date, censored_date_molnu, censored_date_sotro, end_date_6mon, na.rm = TRUE)),
+      surv_end_covid_underly_date = as.Date(pmin(hosp_covid60d6m_date,death_covid_underly_60d6m_date, censored_date_molnu, censored_date_sotro, end_date_6mon, na.rm = TRUE)),
+      censored_bf_dead = ifelse(((censored_date_molnu == surv_end_covid_cause_date) |(censored_date_sotro == surv_end_covid_cause_date)),1,0),
+      surv_days = as.numeric(difftime(surv_end_covid_cause_date, start_date_60d, units = "days")),
+      surv_from_treat_days = (as.numeric(difftime(surv_end_covid_cause_date, treat_date, units = "days"))),
+      surv_event = ifelse((((!is.na(death_covid_cause_60d6m_date)) &(censored_bf_dead == 0))|((!is.na(hosp_covid60d6m_date)) & (censored_bf_dead == 0))), 1,0),
+      surv_event_underly = ifelse((((!is.na(death_covid_underly_60d6m_date)) & (censored_bf_dead == 0)) |((!is.na(hosp_covid60d6m_date)) & (censored_bf_dead == 0))),1,0)
+     )
+
+
+cat("#df_vars0$surv_event\n") 
+freq_single(df_vars0$surv_event)
 
 cat("#oral_steroid_drugs_nhsd_check\n") #
 freq_single(df_vars0$oral_steroid_drugs_nhsd_check)
@@ -116,7 +143,7 @@ freq_single(df_vars0$highrisk_ever)
 cat("#cohort-removed censored/previously treated)\n")
 
 ##cohort-#(censored== 0 ) 
-df_vars <- df_vars0 %>% filter(old_covid_treat== 0 )  %>% filter(!is.na(stp))%>% filter(allcause_death_under60d!= 1) #%>% filter(highrisk ==1 )
+df_vars <- df_vars0 %>% filter(old_covid_treat == 0 )  %>% filter(!is.na(stp))%>% filter(allcause_death_under60d != 1) #%>% filter(highrisk ==1 )
 
 cat("#total-dim(df_vars)\n")
 dim(df_vars)
@@ -137,11 +164,14 @@ freq_single(df_vars$had_first_covid_treat)
 cat("#interventions: Molnupiravir/Sotrovimab-df_vars")
 freq_single(df_vars$first_covid_treat_interve)
 
+cat("#df_vars$surv_event-outcome\n") 
+freq_single(df_vars$surv_event)
+
 cat("#hosp_covid_date60d-6mon_count-df_vars#\n")
-sum(!is.na(df_vars$hosp_covid_date))
+sum(!is.na(df_vars$hosp_covid60d6m_date))
 
 cat("#hosp_allcause_date_count-df_vars#\n")
-sum(!is.na(df_vars$hosp_allcause_date))
+sum(!is.na(df_vars$hosp_allcause60d6m_date))
 
 cat("#ons_dead_count-df_vars#\n")
 sum(!is.na(df_vars$ons_dead_date))
@@ -162,10 +192,10 @@ cat("allcause_death_under30d-df_vars")
 freq_single(df_vars$allcause_death_under30d)
 
 cat("#age-summary-df_vars:")
-summary(as.numeric(df_vars$age_treated),na.rm=T)
-mean(as.numeric(df_vars$age_treated),na.rm=T)
-sd(as.numeric(df_vars$age_treated),na.rm=T)
-IQR(as.numeric(df_vars$age_treated), na.rm=T)
+summary(as.numeric(df_vars$age_treated),na.rm=T )
+mean(as.numeric(df_vars$age_treated),na.rm=T )
+sd(as.numeric(df_vars$age_treated),na.rm=T )
+IQR(as.numeric(df_vars$age_treated), na.rm=T )
 
 cat("#age-group-df_vars:")
 freq_single(df_vars$age_treated_group)
@@ -248,11 +278,15 @@ str(high_risk_cohort,list.len= ncol(high_risk_cohort),give.attr = F)
 cat("#str-END#\n")
 
 ##outcomes
+
+cat("#high_risk_cohort$surv_event-total-outcome\n") 
+freq_single(high_risk_cohort$surv_event)
+
 cat("#hosp_covid_date60d_6mon_count-high_risk_cohort- #\n")
-sum(!is.na(high_risk_cohort$hosp_covid_date))
+sum(!is.na(high_risk_cohort$hosp_covid60d6m_date))
 
 cat("#hosp_allcause_date60d_6mon_count-high_risk_cohort-#\n")
-sum(!is.na(high_risk_cohort$hosp_allcause_date))
+sum(!is.na(high_risk_cohort$hosp_allcause60d6m_date))
 
 cat("#ons_dead_count_anytime-high_risk_cohort-#\n")
 sum(!is.na(high_risk_cohort$ons_dead_date))
@@ -297,11 +331,14 @@ dim(cohort_molnup)
 # cat("#str-END#\n")
 
 #outcomes
+cat("#cohort_molnup$surv_event-total-outcome\n") 
+freq_single(cohort_molnup$surv_event)
+
 cat("#hosp_covid_date60d_6mon_count-cohort_molnup- #\n")
-sum(!is.na(cohort_molnup$hosp_covid_date))
+sum(!is.na(cohort_molnup$hosp_covid60d6m_date))
 
 cat("#hosp_allcause_date60d_6mon_count-cohort_molnup-#\n")
-sum(!is.na(cohort_molnup$hosp_allcause_date))
+sum(!is.na(cohort_molnup$hosp_allcause60d6m_date))
 
 cat("#ons_dead_count_anytime-cohort_molnup-#\n")
 sum(!is.na(cohort_molnup$ons_dead_date))
@@ -364,10 +401,11 @@ IQR(as.numeric(cohort_molnup$bmi), na.rm=T)
 cat("#total_covid_vacc_cat-cohort_molnup")
 freq_single(cohort_molnup$total_covid_vacc_cat)
 
-##cohort_sotro
-
+###cohort_sotro
 cohort_sotro<-high_risk_cohort %>% filter(drug== 1 )
 ##outcomes
+cat("#cohort_sotro$surv_event-total-outcome\n") 
+freq_single(cohort_sotro$surv_event)
 
 cat("#total-dim(cohort_sotro)\n")
 dim(cohort_sotro)
@@ -377,10 +415,10 @@ str(cohort_sotro,list.len= ncol(cohort_sotro),give.attr = F)
 cat("#str-END#\n")
 
 cat("#hosp_covid_date60d_6mon_count-cohort_sotro- #\n")
-sum(!is.na(cohort_sotro$hosp_covid_date))
+sum(!is.na(cohort_sotro$hosp_covid60d6m_date))
 
 cat("#hosp_allcause_date60d_6mon_count-cohort_sotro-#\n")
-sum(!is.na(cohort_sotro$hosp_allcause_date))
+sum(!is.na(cohort_sotro$hosp_allcause60d6m_date))
 
 cat("#ons_dead_count_anytime-cohort_sotro-#\n")
 sum(!is.na(cohort_sotro$ons_dead_date))
