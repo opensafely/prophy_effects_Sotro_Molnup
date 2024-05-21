@@ -6,8 +6,8 @@ library('arrow')
 library('dplyr')
 library('readr')
 library('fs')
-library(survival)
-library(survminer)
+library('survival')
+library('survminer')
 
 
 ## import functions
