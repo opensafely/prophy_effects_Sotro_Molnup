@@ -36,7 +36,7 @@ df_vars00 <- read_csv(here::here("output", "data", "dataset_table.csv.gz")) %>%
   covid_vacc4_date, covid_vacc_last_date) 
 
 
-df_vars0<-df_vars00 %>%  # end_date_6mon, start_date_60d,
+df_vars0<-df_vars00 %>%  
     mutate(
       underly_covid_deathcause0_1 = ifelse(underly_deathcause_code %in% c("U071", "U072", "U099", "U109"), 1, 0),
       death_cause_covid0_1 = ifelse(death_cause_covid %in% ("TRUE"), 1,0 ), #) %>% 
