@@ -2,7 +2,7 @@
 ##<dadaset_definition.py> for repo: <prophy_effects_Sotro_Molnup>
 ##Description: This script extracts data for project 91:[Coverage, effectiveness and safety 
 ##of neutralising monoclonal antibodies or antivirals for non-hospitalised patients with COVID-19]
-##Author(s): Qing Wen   Date last updated: 10/05/2024
+##Author(s): Qing Wen   Date last updated: 20/05/2024
 ########################################################################################################
 from ehrql import(
     months,
@@ -366,7 +366,7 @@ def had_c_event_ctv3snome_lastdate(codelist, dt=c_events_bf_treat, code_type='ct
         code_field = dt.ctv3_code
     return (
         dt.where(where)
-        .where(code_field.is_in(codelist)& (dt.date.is_on_or_before(treat_date)))
+        .where(code_field.is_in(codelist) & (dt.date.is_on_or_before(treat_date)))
         .sort_by(dt.date)
         .last_for_patient().date
 )
@@ -887,7 +887,6 @@ ethnicity_snome = (
     .sort_by(clinical_events.date).last_for_patient().snomedct_code.to_category(ethnicity_codelist)) # (dummy data-more missing 1879)
 
 dataset.ethnicity_snome = ethnicity_snome
-
 dataset.ethnicity_snome_cat = case(
     when (ethnicity_snome == "1").then("White"),
     when (ethnicity_snome == "2").then("Mixed"),
@@ -896,9 +895,8 @@ dataset.ethnicity_snome_cat = case(
     when (ethnicity_snome == "5").then("Other"),
     otherwise = "unknown",
 )
+
 #ethnicity_from_sus
-
-
 dataset.latest_ethnicity_code = (
     clinical_events.where(clinical_events.snomedct_code.is_in(ethnicity_codelist_with_categories))
     .where(clinical_events.date.is_on_or_before(dod_ons))
