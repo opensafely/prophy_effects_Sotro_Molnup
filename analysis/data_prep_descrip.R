@@ -35,9 +35,7 @@ df_vars00 <- read_csv(here::here("output", "data", "dataset_table.csv.gz")) %>%
   highrisk_codelist_ever, total_covid_vacc, total_covid_vacc_cat, covid_vacc1_date,covid_vacc2_date,covid_vacc3_date,
   covid_vacc4_date, covid_vacc_last_date) 
 
-#freq_single(df_vars0$covid_death_60d_6m)
 
-###underly_deathcause_code
 df_vars0<-df_vars00 %>%  # end_date_6mon, start_date_60d,
     mutate(
       underly_covid_deathcause0_1 = ifelse(underly_deathcause_code %in% c("U071", "U072", "U099", "U109"), 1, 0),
