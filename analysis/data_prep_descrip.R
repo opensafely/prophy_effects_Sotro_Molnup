@@ -340,7 +340,6 @@ IQR(as.numeric(high_risk_cohort$bmi), na.rm=T)
 cat("#total_covid_vacc_cat-high_risk_cohort")
 freq_single(high_risk_cohort$total_covid_vacc_cat)
 
-
 ##################################################
 ##cohort_molnup
 cohort_molnup<-high_risk_cohort %>% filter(drug== 0 )
@@ -395,7 +394,6 @@ freq_single(cohort_molnup$imd)
 
 cat("#ethnicity-cohort_molnup:")
 freq_single(cohort_molnup$ethnicity)
-
 
 cat("#region-cohort_molnup:")
 freq_single(as.character(cohort_molnup$region))
