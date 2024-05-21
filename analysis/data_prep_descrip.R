@@ -47,11 +47,11 @@ df_vars0<-df_vars00 %>%
       censored_date_sotro = as.Date (ifelse(((!is.na(sotro_censored_date)) & (sotro_censored_date >start_date_60d) & (sotro_censored_date <= end_date_6mon)), as.character(ons_dead_date), NA)),
       surv_end_covid_cause_date = as.Date(pmin(hosp_covid60d6m_date,death_covid_cause_60d6m_date, censored_date_molnu, censored_date_sotro, end_date_6mon, na.rm = TRUE)),
       surv_end_covid_underly_date = as.Date(pmin(hosp_covid60d6m_date,death_covid_underly_60d6m_date, censored_date_molnu, censored_date_sotro, end_date_6mon, na.rm = TRUE)),
-      censored_bf_dead = ifelse(((censored_date_molnu == surv_end_covid_cause_date) |(censored_date_sotro == surv_end_covid_cause_date)),1,0),
+      censored_bf_dead_hosp = ifelse(((!is.na(censored_date_molnu)&(censored_date_molnu == surv_end_covid_cause_date)) |((!is.na(censored_date_sotro))&censored_date_sotro == surv_end_covid_cause_date)),1,0),
       surv_days = as.numeric(difftime(surv_end_covid_cause_date, start_date_60d, units = "days")),
       surv_from_treat_days = (as.numeric(difftime(surv_end_covid_cause_date, treat_date, units = "days"))),
-      surv_event = ifelse((((!is.na(death_covid_cause_60d6m_date)) &(censored_bf_dead == 0))|((!is.na(hosp_covid60d6m_date)) & (censored_bf_dead == 0))), 1,0),
-      surv_event_underly = ifelse((((!is.na(death_covid_underly_60d6m_date)) & (censored_bf_dead == 0)) |((!is.na(hosp_covid60d6m_date)) & (censored_bf_dead == 0))),1,0)
+      surv_event = ifelse((((!is.na(death_covid_cause_60d6m_date)) &(censored_bf_dead_hosp == 0))|((!is.na(hosp_covid60d6m_date)) & (censored_bf_dead_hosp == 0))), 1,0),
+      surv_event_underly = ifelse((((!is.na(death_covid_underly_60d6m_date)) & (censored_bf_dead_hosp == 0)) |((!is.na(hosp_covid60d6m_date)) & (censored_bf_dead_hosp == 0))),1,0)
      )
 
 
@@ -207,15 +207,6 @@ freq_single(df_vars$imd)
 cat("#ethnicity-df_vars:")
 freq_single(df_vars$ethnicity)
 
-cat("#ethnicity_snome-df_vars:")
-freq_single(df_vars$ethnicity_snome)
-
-cat("#ethnicity_snome_cat-df_vars:")
-freq_single(as.character(df_vars$ethnicity_snome_cat))
-
-cat("#ethnicity_ctv3-df_vars:")
-freq_single(as.character(df_vars$ethnicity_ctv3))
-
 #region
 cat("#region-df_vars:")
 freq_single(as.character(df_vars$region))
@@ -260,7 +251,7 @@ summary(as.numeric(df_vars$transplant_conjunctiva_opcs4_count))
 cat("compare_transplant_conjunctiva_opcs4-df_vars")
 identical(df_vars$transplant_conjunctiva_opcs4_a, df_vars$transplant_conjunctiva_opcs4_2)
 
-##high_risk_cohort)
+##high_risk_cohort
 cat("(high_risk_cohort)\n" )
 high_risk_cohort <- df_vars %>% filter(highrisk== 1 ) 
 high_risk_ever_cohort <- df_vars %>% filter(highrisk_ever== 1 ) 
@@ -276,17 +267,28 @@ str(high_risk_cohort,list.len= ncol(high_risk_cohort),give.attr = F)
 cat("#str-END#\n")
 
 ##outcomes
+# cat("sex_imd-table-high_risk_cohort")
+# dt_sex_imd<-high_risk_cohort %>%
+#  dplyr::count(sex,imd) %>%
+#  dplyr::group_by(sex) %>% 
+#  dplyr::mutate(prop = prop.table(n)) #%>% print(n = nrow(dt))
+# print(dt_sex_imd)
 
+##first_covid_treat_interve
+cat("#first_covid_treat_interve-high_risk_cohort")
+freq_single(high_risk_cohort$first_covid_treat_interve)
+
+#outcomes
 cat("#high_risk_cohort$surv_event-total-outcome\n") 
 freq_single(high_risk_cohort$surv_event)
 
-cat("#hosp_covid_date60d_6mon_count-high_risk_cohort- #\n")
+cat("#hosp_covid_date60d_6mon_count-high_risk_cohort #\n")
 sum(!is.na(high_risk_cohort$hosp_covid60d6m_date))
 
-cat("#hosp_allcause_date60d_6mon_count-high_risk_cohort-#\n")
+cat("#hosp_allcause_date60d_6mon_count-high_risk_cohort#\n")
 sum(!is.na(high_risk_cohort$hosp_allcause60d6m_date))
 
-cat("#ons_dead_count_anytime-high_risk_cohort-#\n")
+cat("#ons_dead_count_anytime-high_risk_cohort#\n")
 sum(!is.na(high_risk_cohort$ons_dead_date))
 
 cat("#death_cause_covid-high_risk_cohort\n")
@@ -304,29 +306,46 @@ freq_single(high_risk_cohort$allcause_death_under60d)
 cat("allcause_death_under30d-high_risk_cohort")
 freq_single(high_risk_cohort$allcause_death_under30d)
 
-cat("sex_imd-table-high_risk_cohort")
-dt_sex_imd<-high_risk_cohort %>%
- dplyr::count(sex,imd) %>%
- dplyr::group_by(sex) %>% 
- dplyr::mutate(prop = prop.table(n)) #%>% print(n = nrow(dt))
-print(dt_sex_imd)
+cat("#age-summary-high_risk_cohort:")
+summary(as.numeric(high_risk_cohort$age_treated),na.rm=T)
+cat("#age-mean-high_risk_cohort:")
+mean(as.numeric(high_risk_cohort$age_treated),na.rm=T)
+cat("#age-sd-high_risk_cohort:")
+sd(as.numeric(high_risk_cohort$age_treated),na.rm=T)
+cat("#age-IQR-high_risk_cohort:")
+IQR(as.numeric(high_risk_cohort$age_treated), na.rm=T)
 
-##first_covid_treat_interve
-cat("#first_covid_treat_interve-high_risk_cohort-")
-freq_single(high_risk_cohort$first_covid_treat_interve)
+cat("#age-group-high_risk_cohort:")
+freq_single(high_risk_cohort$age_treated_group)
 
-#total_covid_vacc_cat#
-cat("#total_covid_vacc_cat-high_risk_cohort-")
+cat("#sex-high_risk_cohort:")
+freq_single(high_risk_cohort$sex)
+
+cat("#imd-high_risk_cohort:")
+freq_single(high_risk_cohort$imd)
+
+cat("#ethnicity-high_risk_cohort:")
+freq_single(high_risk_cohort$ethnicity)
+
+cat("#region-high_risk_cohort:")
+freq_single(as.character(high_risk_cohort$region))
+
+cat("#bmi-high_risk_cohort")
+#summary(high_risk_cohort$bmi)
+summary(as.numeric(high_risk_cohort$bmi),na.rm=T)
+mean(as.numeric(high_risk_cohort$bmi),na.rm=T)
+sd(as.numeric(high_risk_cohort$bmi),na.rm=T)
+IQR(as.numeric(high_risk_cohort$bmi), na.rm=T)
+
+cat("#total_covid_vacc_cat-high_risk_cohort")
 freq_single(high_risk_cohort$total_covid_vacc_cat)
 
+
+##################################################
 ##cohort_molnup
 cohort_molnup<-high_risk_cohort %>% filter(drug== 0 )
 cat("#total-dim(cohort_molnup)\n")
 dim(cohort_molnup)
-
-# cat("#str-START-cohort_molnup#\n")
-# str(cohort_molnup,list.len= ncol(cohort_molnup),give.attr = F)
-# cat("#str-END#\n")
 
 #outcomes
 cat("#cohort_molnup$surv_event-total-outcome\n") 
@@ -377,14 +396,6 @@ freq_single(cohort_molnup$imd)
 cat("#ethnicity-cohort_molnup:")
 freq_single(cohort_molnup$ethnicity)
 
-cat("#ethnicity_snome-cohort_molnup:")
-freq_single(cohort_molnup$ethnicity_snome)
-
-cat("#ethnicity_snome_cat-cohort_molnup:")
-freq_single(as.character(cohort_molnup$ethnicity_snome_cat))
-
-cat("#ethnicity_ctv3-cohort_molnup:")
-freq_single(as.character(cohort_molnup$ethnicity_ctv3))
 
 cat("#region-cohort_molnup:")
 freq_single(as.character(cohort_molnup$region))
@@ -399,6 +410,7 @@ IQR(as.numeric(cohort_molnup$bmi), na.rm=T)
 cat("#total_covid_vacc_cat-cohort_molnup")
 freq_single(cohort_molnup$total_covid_vacc_cat)
 
+################
 ###cohort_sotro
 cohort_sotro<-high_risk_cohort %>% filter(drug== 1 )
 ##outcomes
@@ -457,15 +469,6 @@ freq_single(cohort_sotro$imd)
 
 cat("#ethnicity-cohort_sotro:")
 freq_single(cohort_sotro$ethnicity)
-
-cat("#ethnicity_snome-cohort_sotro:")
-freq_single(cohort_sotro$ethnicity_snome)
-
-cat("#ethnicity_snome_cat-cohort_sotro:")
-freq_single(as.character(cohort_sotro$ethnicity_snome_cat))
-
-cat("#ethnicity_ctv3-cohort_sotro:")
-freq_single(as.character(cohort_sotro$ethnicity_ctv3))
 
 cat("#region-cohort_sotro:")
 freq_single(as.character(cohort_sotro$region))
