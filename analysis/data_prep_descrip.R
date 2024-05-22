@@ -51,10 +51,10 @@ df_vars0<-df_vars00 %>%
       censored_date_sotro = as.Date (ifelse(((!is.na(sotro_censored_date)) & (sotro_censored_date >start_date_60d) & (sotro_censored_date <= end_date_6mon)), as.character(ons_dead_date), NA)),
       surv_end_covid_cause_date = as.Date(pmin(hosp_covid60d6m_date,death_covid_cause_60d6m_date, censored_date_molnu, censored_date_sotro, end_date_6mon, na.rm = TRUE)),
       surv_end_covid_underly_date = as.Date(pmin(hosp_covid60d6m_date,death_covid_underly_60d6m_date, censored_date_molnu, censored_date_sotro, end_date_6mon, na.rm = TRUE)),
-      censored_bf_dead_hosp = ifelse(((!is.na(censored_date_molnu)&(censored_date_molnu == surv_end_covid_cause_date)) |((!is.na(censored_date_sotro))&censored_date_sotro == surv_end_covid_cause_date)),1,0),
+      censored_bf_dead_hosp = ifelse(((!is.na(censored_date_molnu) & (censored_date_molnu == surv_end_covid_cause_date)) |((!is.na(censored_date_sotro)) & censored_date_sotro == surv_end_covid_cause_date)),1,0),
       surv_days = as.numeric(difftime(surv_end_covid_cause_date, start_date_60d, units = "days")),
       surv_from_treat_days = (as.numeric(difftime(surv_end_covid_cause_date, treat_date, units = "days"))),
-      surv_event = ifelse((((!is.na(death_covid_cause_60d6m_date)) &(censored_bf_dead_hosp == 0))|((!is.na(hosp_covid60d6m_date)) & (censored_bf_dead_hosp == 0))), 1,0),
+      surv_event = ifelse((((!is.na(death_covid_cause_60d6m_date)) & (censored_bf_dead_hosp == 0))|((!is.na(hosp_covid60d6m_date)) & (censored_bf_dead_hosp == 0))), 1,0),
       surv_event_underly = ifelse((((!is.na(death_covid_underly_60d6m_date)) & (censored_bf_dead_hosp == 0)) |((!is.na(hosp_covid60d6m_date)) & (censored_bf_dead_hosp == 0))),1,0)
      )
 
