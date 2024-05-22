@@ -41,6 +41,7 @@ df_vars00 <- read_csv(here::here("output", "data", "dataset_table.csv.gz")) %>%
 
 df_vars0<-df_vars00 %>%  
     mutate(
+      sex01 = ifelse(sex %in% ("female"), 1, 0),
       underly_covid_deathcause0_1 = ifelse(underly_deathcause_code %in% c("U071", "U072", "U099", "U109"), 1, 0),
       death_cause_covid0_1 = ifelse(death_cause_covid %in% ("TRUE"), 1,0 ), #) %>% 
       test_date_format = ons_dead_date,
@@ -488,11 +489,14 @@ cat("#summary(cox_model)")
 cox_model <- coxph(Surv(surv_days, surv_event) ~ factor(drug), data = high_risk_cohort)
 summary(cox_model)
 
+#age_treated, sex01
+cox_model1_age_sex <- coxph(Surv(surv_days, surv_event) ~ factor(drug) + age_treated + sex01, data = high_risk_cohort)
+summary(cox_model1_age_sex)
+
 # Plot the survival curves
 # ggsurvplot(survfit(cox_model), data = high_risk_cohort, pval = TRUE,
 #            ggtheme = theme_minimal(), risk.table = TRUE,
 #            conf.int = TRUE)
-
 
 # Save dataset(s) ----
 write.csv(df_vars, here::here("output", "tables", "data4analyse.csv"), row.names = FALSE)
