@@ -22,11 +22,12 @@ from ehrql.tables.tpp import(
     ons_deaths,
     vaccinations,
     ethnicity_from_sus,
+    covid_therapeutics,
 )
 
-from ehrql.tables.raw.tpp import(
-    covid_therapeutics_raw,
-)
+# from ehrql.tables.raw.tpp import(
+#     covid_therapeutics_raw,
+# )
 
 from ehrql.codes import *
 #from ehrql.codes import CTV3Code, ICD10Code
@@ -57,12 +58,12 @@ index_enddate = "2022-02-10"
 dataset = create_dataset()
 dataset.configure_dummy_data(population_size = 3000)
 
-##covid_therapeutics_raw
+##covid_therapeutics
 had_covid_treat_df0 = (
-    covid_therapeutics_raw.where(covid_therapeutics_raw.covid_indication.is_in(["non_hospitalised"])) \
-    .where(covid_therapeutics_raw.intervention.is_in(["Molnupiravir","Sotrovimab","Paxlovid" ,"Remdesivir","Casirivimab and imdevimab"]) & \
-    (covid_therapeutics_raw.current_status.is_in(["Approved", "Treatment Complete"]))) \
-    .sort_by(covid_therapeutics_raw.treatment_start_date) \
+    covid_therapeutics.where(covid_therapeutics.covid_indication.is_in(["non_hospitalised"])) \
+    .where(covid_therapeutics.intervention.is_in(["Molnupiravir","Sotrovimab","Paxlovid" ,"Remdesivir","Casirivimab and imdevimab"]) & \
+    (covid_therapeutics.current_status.is_in(["Approved", "Treatment Complete"]))) \
+    .sort_by(covid_therapeutics.treatment_start_date) \
 )
 
 had_covid_m_s_treat_df = (
@@ -154,22 +155,21 @@ dataset.define_population(
 )
 
 ##covid_therapeutics
-non_hospital_df = (  # #.where(covid_therapeutics_raw.diagnosis.is_in(["Covid-19"]))
-    covid_therapeutics_raw.where(covid_therapeutics_raw.covid_indication.is_in(["non_hospitalised"])) 
-    .sort_by(covid_therapeutics_raw.treatment_start_date) #current_status
+non_hospital_df = (  # #.where(covid_therapeutics.diagnosis.is_in(["Covid-19"]))
+    covid_therapeutics.where(covid_therapeutics.covid_indication.is_in(["non_hospitalised"])) 
+    .sort_by(covid_therapeutics.treatment_start_date) #current_status
 )
 
 first_molnupiravir = first_covid_therap_date(pre_df = non_hospital_df, covid_drug = "Molnupiravir")
 dataset.first_molnupiravir_date = first_molnupiravir.treatment_start_date
 dataset.first_molnupiravir_status = first_molnupiravir.current_status  
 dataset.first_molnupiravir_interve= first_molnupiravir.intervention
-dataset.first_molnupiravir_diag = first_molnupiravir.diagnosis
+#dataset.first_molnupiravir_diag = first_molnupiravir.diagnosis
 
 first_sotrovimab = first_covid_therap_date(pre_df = non_hospital_df,covid_drug = "Sotrovimab")
 dataset.first_sotrovimab_date = first_sotrovimab.treatment_start_date
 dataset.first_sotrovimab_status = first_sotrovimab.current_status
 dataset.first_sotrovimab_interve= first_sotrovimab.intervention
-dataset.first_sotrovimab_diag = first_sotrovimab.diagnosis
 
 ##main outcome variables-Any causes -hospital admission per primary_diagnosis
 dataset.date_of_first_admis_af_treat = (
@@ -721,21 +721,24 @@ dataset.solid_cancer_ever = case(
 #"stem cell transplant recipient"
 # ]
 
-#covid_therapeutics_raw-MOL1_high_risk_cohort-SOT02_risk_cohorts
-therapeutics_df = (covid_therapeutics_raw
-    .where(covid_therapeutics_raw.intervention.is_in(["Molnupiravir","Sotrovimab"])) #, "Paxlovid" ,"Remdesivir","Casirivimab and imdevimab"
-    .sort_by(covid_therapeutics_raw.treatment_start_date).last_for_patient()
+#covid_therapeutics-MOL1_high_risk_cohort-SOT02_risk_cohorts
+therapeutics_df = (covid_therapeutics
+    .where(covid_therapeutics.intervention.is_in(["Molnupiravir","Sotrovimab"])) #, "Paxlovid" ,"Remdesivir","Casirivimab and imdevimab"
+    .sort_by(covid_therapeutics.treatment_start_date).last_for_patient()
     )
 
-dataset.high_risk_MOL_last = therapeutics_df.MOL1_high_risk_cohort
-dataset.high_risk_SOT02_last = therapeutics_df.SOT02_risk_cohorts
+#high_risk_MOL_last(=risk_cohort),high_risk_SOT02_last,high_risk_MOL_count,high_risk_SOT02_count
+dataset.risk_cohort = therapeutics_df.risk_cohort  #risk_cohort 
 
-dataset.high_risk_MOL_count = covid_therapeutics_raw.MOL1_high_risk_cohort.count_distinct_for_patient()  #exists_for_patient()  
-#SOT02_risk_cohorts
-dataset.high_risk_SOT02_count = covid_therapeutics_raw.SOT02_risk_cohorts.count_distinct_for_patient() 
+# dataset.high_risk_MOL_last = therapeutics_df.risk_cohort 
+
+# dataset.high_risk_SOT02_last = therapeutics_df.SOT02_risk_cohorts
+
+# dataset.high_risk_MOL_count = covid_therapeutics.risk_cohort.count_distinct_for_patient()  #exists_for_patient()  
+# #SOT02_risk_cohorts
+# dataset.high_risk_SOT02_count = covid_therapeutics.SOT02_risk_cohorts.count_distinct_for_patient() 
 
 # ##### #### ####
-
 # dataset.highrisk_therap = case(
 #     when(dataset.is_highrisk_therap >=1).then(1), otherwise = 0
 # )
