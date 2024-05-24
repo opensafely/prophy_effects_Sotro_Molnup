@@ -310,28 +310,28 @@ freq_single_nrst5(high_risk_cohort$allcause_death_under60d)
 cat("allcause_death_under30d-high_risk_cohort")
 freq_single_nrst5(high_risk_cohort$allcause_death_under30d)
 
-cat("#age-summary-high_risk_cohort:")
+cat("#age-summary-high_risk_cohort")
 summary(as.numeric(high_risk_cohort$age_treated),na.rm=T)
-cat("#age-mean-high_risk_cohort:")
+cat("#age-mean-high_risk_cohort")
 mean(as.numeric(high_risk_cohort$age_treated),na.rm=T)
-cat("#age-sd-high_risk_cohort:")
+cat("#age-sd-high_risk_cohort")
 sd(as.numeric(high_risk_cohort$age_treated),na.rm=T)
-cat("#age-IQR-high_risk_cohort:")
+cat("#age-IQR-high_risk_cohort")
 IQR(as.numeric(high_risk_cohort$age_treated), na.rm=T)
 
-cat("#age-group-high_risk_cohort:")
+cat("#age-group-high_risk_cohort")
 freq_single_nrst5(high_risk_cohort$age_treated_group)
 
-cat("#sex-high_risk_cohort:")
+cat("#sex-high_risk_cohort")
 freq_single_nrst5(high_risk_cohort$sex)
 
-cat("#imd-high_risk_cohort:")
+cat("#imd-high_risk_cohort")
 freq_single_nrst5(high_risk_cohort$imd)
 
-cat("#ethnicity-high_risk_cohort:")
+cat("#ethnicity-high_risk_cohort")
 freq_single_nrst5(high_risk_cohort$ethnicity)
 
-cat("#region-high_risk_cohort:")
+cat("#region-high_risk_cohort")
 freq_single_nrst5(as.character(high_risk_cohort$region))
 
 cat("#bmi-high_risk_cohort")
@@ -343,6 +343,16 @@ IQR(as.numeric(high_risk_cohort$bmi), na.rm=T)
 
 cat("#total_covid_vacc_cat-high_risk_cohort")
 freq_single_nrst5(high_risk_cohort$total_covid_vacc_cat)
+
+cat("#high_risk_cohort$stp")
+freq_single_nrst5(high_risk_cohort$stp)
+
+cat("#length_unique_high_risk_cohort$stp")
+length(unique(high_risk_cohort$stp))
+
+#censored_bf_dead_hosp
+cat("#censored_bf_dead_hosp$stp")
+freq_single_nrst5(high_risk_cohort$censored_bf_dead_hosp)
 
 ##################################################
 ##cohort_molnup
@@ -486,11 +496,11 @@ freq_single_nrst5(cohort_sotro$total_covid_vacc_cat)
 
 cat("#summary(cox_model)")
 #surv_days,surv_event
-cox_model <- coxph(Surv(surv_days, surv_event) ~ factor(drug), data = high_risk_cohort)
+cox_model <- coxph(Surv(surv_days, surv_event) ~ factor(drug)+ strata(stp), data = high_risk_cohort)
 summary(cox_model)
 
 #age_treated, sex01
-cox_model1_age_sex <- coxph(Surv(surv_days, surv_event) ~ factor(drug) + age_treated + sex01, data = high_risk_cohort)
+cox_model1_age_sex <- coxph(Surv(surv_days, surv_event) ~ factor(drug) + age_treated + sex01+ strata(stp), data = high_risk_cohort)
 summary(cox_model1_age_sex)
 
 # Plot the survival curves
