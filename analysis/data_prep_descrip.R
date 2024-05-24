@@ -8,7 +8,7 @@ library('readr')
 library('fs')
 library('survival')
 library('survminer')
-
+library('splines')
 
 ## import functions
 source(here("analysis", "lib", "r_funs.R"))
@@ -17,6 +17,10 @@ source(here("analysis", "lib", "r_funs.R"))
 dir_create(here::here("output", "tables"), showWarnings = FALSE, recurse = TRUE)
 dir_create(here::here("output", "data"), showWarnings = FALSE, recurse = TRUE)
 
+#high_risk_MOL_last,#####,
+#high_risk_MOL_last(=risk_cohort),high_risk_SOT02_last,high_risk_MOL_count,high_risk_SOT02_count
+
+##high_riskrisk_cohort_MOL_last(=),high_risk_SOT02_last,high_risk_MOL_count,high_risk_SOT02_count
 ## Read in data ##end_date_6mon, start_date_60d
 ####hosp_covid60d6m_date, hosp_allcause60d6m_date(OUTCOME)
 #death_covid_cause_60d6m_date, death_covid_underly_60d6m_date (OUTCOMEs)
@@ -29,10 +33,10 @@ df_vars00 <- read_csv(here::here("output", "data", "dataset_table.csv.gz")) %>%
   hosp_covid60d6m_pdiag, had_ccare_covid60d6m, ccare_covid60d6m_date, hosp_allcause60d6m_date, hosp_allcause60d6m_classfic, hosp_allcause60d6m_pdiag, 
   hospitalise_disc_covid, hospitalise_disc_allcause, ons_dead_date, underly_deathcause_code, death_cause_covid, was_allcause_death_60d_6m,
   allcause_death_60d_6m, was_covid_death_60d_6m, covid_death_60d_6m, was_allcause_death_under60d, allcause_death_under60d, 
-  allcause_death_under30d, bmi, is_censored,censored, molnu_censored_date, sotro_censored_date,
+  allcause_death_under30d, bmi, is_censored,censored, molnu_censored_date, sotro_censored_date,risk_cohort,
   had_dialysis, had_kidney_transplant, transplant_thymus_opcs4,transplant_thymus_opcs4_count,transplant_thymus_opcs4_a, 
   transplant_thymus_opcs4_2, transplant_conjunctiva_y_code_opcs4, transplant_conjunctiva_y_code_opcs4_count,transplant_conjunctiva_opcs4,
-  transplant_conjunctiva_opcs4_count, transplant_conjunctiva_opcs4_2, high_risk_MOL_last,high_risk_SOT02_last, oral_steroid_drugs_nhsd, 
+  transplant_conjunctiva_opcs4_count, transplant_conjunctiva_opcs4_2,  oral_steroid_drugs_nhsd, 
   oral_steroid_drugs_nhsd_check, oral_steroid_drug_nhsd_3m_count,oral_steroid_drug_nhsd_12m_count, immunosuppresant_drugs_nhsd, 
   immunosuppresant_drugs_nhsd_ever, oral_steroid_drugs_nhsd_ever, is_codelist_highrisk, highrisk_codelist, is_codelist_highrisk_ever, 
   highrisk_codelist_ever, total_covid_vacc, total_covid_vacc_cat, covid_vacc1_date,covid_vacc2_date,covid_vacc3_date,
@@ -53,10 +57,15 @@ df_vars0<-df_vars00 %>%
       surv_end_covid_underly_date = as.Date(pmin(hosp_covid60d6m_date,death_covid_underly_60d6m_date, censored_date_molnu, censored_date_sotro, end_date_6mon, na.rm = TRUE)),
       censored_bf_dead_hosp = ifelse(((!is.na(censored_date_molnu) & (censored_date_molnu == surv_end_covid_cause_date)) |((!is.na(censored_date_sotro)) & censored_date_sotro == surv_end_covid_cause_date)),1,0),
       surv_days = as.numeric(difftime(surv_end_covid_cause_date, start_date_60d, units = "days")),
-      surv_from_treat_days = (as.numeric(difftime(surv_end_covid_cause_date, treat_date, units = "days"))),
+      surv_from_treat_days = as.numeric(difftime(surv_end_covid_cause_date, treat_date, units = "days")),
       surv_event = ifelse((((!is.na(death_covid_cause_60d6m_date)) & (censored_bf_dead_hosp == 0))|((!is.na(hosp_covid60d6m_date)) & (censored_bf_dead_hosp == 0))), 1,0),
-      surv_event_underly = ifelse((((!is.na(death_covid_underly_60d6m_date)) & (censored_bf_dead_hosp == 0)) |((!is.na(hosp_covid60d6m_date)) & (censored_bf_dead_hosp == 0))),1,0)
+      surv_event_underly = ifelse((((!is.na(death_covid_underly_60d6m_date)) & (censored_bf_dead_hosp == 0))|((!is.na(hosp_covid60d6m_date)) & (censored_bf_dead_hosp == 0))),1,0),
+      calendar_day =as.numeric(difftime(start_date_60d, as.Date("2021-12-16"),units = "days")),
+      calendar_wk =as.numeric(difftime(start_date_60d, as.Date("2021-12-16"),units = "weeks")),
+      age_treated_spline = ns(age_treated, df = 4),
+      calendar_day_spline = ns(calendar_day, df = 4)
      )
+
 
 
 cat("#df_vars0$surv_event\n") 
@@ -65,16 +74,13 @@ freq_single_nrst5(df_vars0$surv_event)
 cat("#oral_steroid_drugs_nhsd_check\n") #
 freq_single_nrst5(df_vars0$oral_steroid_drugs_nhsd_check)
 
-cat("#high_risk_MOL_last\n") 
-freq_single_nrst5(df_vars0$high_risk_MOL_last)
+cat("#risk_cohort\n") 
+freq_single_nrst5(df_vars0$risk_cohort)
 
-cat("#high_risk_SOT02_last\n") 
-freq_single_nrst5(df_vars0$high_risk_SOT02_last)
 
-df_vars0$highrisk_therap_MOL <- grepl("IMID|solid organ recipients|haematologic malignancy|Patients with a haematological diseases \\(sic\\)|sickle cell disease|stem cell transplant recipient|immune deficiencies|primary immune deficiencies|solid cancer", df_vars0$high_risk_MOL_last, ignore.case = TRUE)
-df_vars0$highrisk_therap_SOT02 <- grepl("IMID|solid organ recipients|haematologic malignancy|Patients with a haematological diseases \\(sic\\)|sickle cell disease|stem cell transplant recipient|immune deficiencies|primary immune deficiencies|solid cancer", df_vars0$high_risk_SOT02_last, ignore.case = TRUE)
+df_vars0$highrisk_therap_cohort <- grepl("IMID|solid organ recipients|haematologic malignancy|Patients with a haematological diseases \\(sic\\)|sickle cell disease|stem cell transplant recipient|immune deficiencies|primary immune deficiencies|solid cancer", df_vars0$risk_cohort, ignore.case = TRUE)
 
-df_vars0$had_highrisk_therap<-(df_vars0$highrisk_therap_MOL|df_vars0$highrisk_therap_SOT02)
+df_vars0$had_highrisk_therap<-(df_vars0$highrisk_therap_cohort)
 df_vars0<-df_vars0 %>% mutate(highrisk_therap = as.integer(had_highrisk_therap))
 
 #is_highrisk,highrisk,is_highrisk_ever,highrisk_ever
@@ -85,32 +91,32 @@ df_vars0$highrisk = as.integer(df_vars0$is_highrisk)
 df_vars0$highrisk_ever = as.integer(df_vars0$is_highrisk_ever)
 
 ##IMID #Immune Mediated Inflammatory Diseases
-df_vars0$high_risk_therap_IMID = as.integer((grepl("IMID", df_vars0$high_risk_MOL_last, ignore.case = TRUE))|(grepl("IMID", df_vars0$high_risk_SOT02_last, ignore.case = TRUE)))
+df_vars0$high_risk_therap_IMID = as.integer((grepl("IMID", df_vars0$risk_cohort, ignore.case = TRUE)))
 freq_single_nrst5(df_vars0$high_risk_therap_IMID)
 
 #solid organ recipients-SOR,
-df_vars0$high_risk_therap_SOR = as.integer((grepl("solid organ recipients", df_vars0$high_risk_MOL_last, ignore.case = TRUE))|(grepl("solid organ recipients", df_vars0$high_risk_SOT02_last, ignore.case = TRUE)))
+df_vars0$high_risk_therap_SOR = as.integer((grepl("solid organ recipients", df_vars0$risk_cohort, ignore.case = TRUE)))
 
 #Haematologic malignancy
-df_vars0$high_risk_therap_HMAL = as.integer((grepl("haematologic malignancy", df_vars0$high_risk_MOL_last, ignore.case = TRUE))|(grepl("haematologic malignancy", df_vars0$high_risk_SOT02_last, ignore.case = TRUE)))
+df_vars0$high_risk_therap_HMAL = as.integer((grepl("haematologic malignancy", df_vars0$risk_cohort, ignore.case = TRUE)))
 
 #patients with a haematological diseases (sic)
-df_vars0$high_risk_therap_HMDs = as.integer((grepl("Patients with a haematological diseases \\(sic\\)", df_vars0$high_risk_MOL_last, ignore.case = TRUE))|(grepl("Patients with a haematological diseases \\(sic\\)", df_vars0$high_risk_SOT02_last, ignore.case = TRUE)))
+df_vars0$high_risk_therap_HMDs = as.integer((grepl("Patients with a haematological diseases \\(sic\\)", df_vars0$risk_cohort, ignore.case = TRUE)))
 
 #sickle cell disease-SCD
-df_vars0$high_risk_therap_SCD = as.integer((grepl("sickle cell disease", df_vars0$high_risk_MOL_last, ignore.case = TRUE))|(grepl("sickle cell disease", df_vars0$high_risk_SOT02_last, ignore.case = TRUE)))
+df_vars0$high_risk_therap_SCD = as.integer((grepl("sickle cell disease", df_vars0$risk_cohort, ignore.case = TRUE)))
 
 #stem cell transplant recipient -SCTR
-df_vars0$high_risk_therap_SCTR= as.integer((grepl("stem cell transplant recipient", df_vars0$high_risk_MOL_last, ignore.case = TRUE))|(grepl("stem cell transplant recipient", df_vars0$high_risk_SOT02_last, ignore.case = TRUE)))
+df_vars0$high_risk_therap_SCTR= as.integer((grepl("stem cell transplant recipient", df_vars0$risk_cohort, ignore.case = TRUE)))
 
 #immune deficiencies
-df_vars0$high_risk_therap_IMDs = as.integer((grepl("immune deficiencies", df_vars0$high_risk_MOL_last, ignore.case = TRUE))|(grepl("immune deficiencies", df_vars0$high_risk_SOT02_last, ignore.case = TRUE)))
+df_vars0$high_risk_therap_IMDs = as.integer((grepl("immune deficiencies", df_vars0$risk_cohort, ignore.case = TRUE)))
 
-#primary immune deficiencies
-df_vars0$high_risk_therap_solid_cancer= as.integer((grepl("primary immune deficiencies", df_vars0$high_risk_MOL_last, ignore.case = TRUE))|(grepl("primary immune deficiencies", df_vars0$high_risk_SOT02_last, ignore.case = TRUE)))
+#primary immune deficiencies (PID)
+df_vars0$high_risk_therap_PID= as.integer((grepl("primary immune deficiencies", df_vars0$risk_cohort, ignore.case = TRUE)))
 
 # cancer
-df_vars0$high_risk_therap_solid_cancer= as.integer((grepl("solid cancer", df_vars0$high_risk_MOL_last, ignore.case = TRUE))|(grepl("solid cancer", df_vars0$high_risk_SOT02_last, ignore.case = TRUE)))
+df_vars0$high_risk_therap_solid_cancer= as.integer((grepl("solid cancer", df_vars0$risk_cohort, ignore.case = TRUE)))
 
 #df_vars0$allcause_death_under60d = as.integer(df_vars0$allcause_death_under60d)
 cat("#total-df_vars0\n") #old_covid_treat
@@ -255,6 +261,10 @@ summary(as.numeric(df_vars$transplant_conjunctiva_opcs4_count))
 cat("compare_transplant_conjunctiva_opcs4-df_vars")
 identical(df_vars$transplant_conjunctiva_opcs4_a, df_vars$transplant_conjunctiva_opcs4_2)
 
+#censored_bf_dead_hosp#df_vars
+cat("#df_vars$censored_bf_dead_hosp")
+freq_single_nrst5(df_vars$censored_bf_dead_hosp)
+
 ##high_risk_cohort
 cat("(high_risk_cohort)\n" )
 high_risk_cohort <- df_vars %>% filter(highrisk== 1 ) 
@@ -269,6 +279,8 @@ dim(high_risk_ever_cohort)
 cat("#str-START-high_risk_cohort#\n")
 str(high_risk_cohort,list.len= ncol(high_risk_cohort),give.attr = F)
 cat("#str-END#\n")
+
+
 
 ##outcomes
 # cat("sex_imd-table-high_risk_cohort")
@@ -351,7 +363,7 @@ cat("#length_unique_high_risk_cohort$stp")
 length(unique(high_risk_cohort$stp))
 
 #censored_bf_dead_hosp
-cat("#censored_bf_dead_hosp$stp")
+cat("#high_risk_cohort$censored_bf_dead_hosp")
 freq_single_nrst5(high_risk_cohort$censored_bf_dead_hosp)
 
 ##################################################
@@ -494,13 +506,17 @@ IQR(as.numeric(cohort_sotro$bmi), na.rm=T)
 cat("#total_covid_vacc_cat-cohort_sotro")
 freq_single_nrst5(cohort_sotro$total_covid_vacc_cat)
 
+high_risk_cohort$surv_days <- as.numeric(high_risk_cohort$surv_days)
+high_risk_cohort$surv_event <- as.numeric(high_risk_cohort$surv_event)
+
+
 cat("#summary(cox_model)")
 #surv_days,surv_event
-cox_model <- coxph(Surv(surv_days, surv_event) ~ factor(drug)+ strata(stp), data = high_risk_cohort)
+cox_model <- coxph(Surv(surv_days, surv_event) ~ factor(drug)+ strata(factor(stp)), data = high_risk_cohort)
 summary(cox_model)
 
 #age_treated, sex01
-cox_model1_age_sex <- coxph(Surv(surv_days, surv_event) ~ factor(drug) + age_treated + sex01+ strata(stp), data = high_risk_cohort)
+cox_model1_age_sex <- coxph(Surv(surv_days, surv_event) ~ factor(drug) + age_treated + sex01+ strata(factor(stp)), data = high_risk_cohort)
 summary(cox_model1_age_sex)
 
 # Plot the survival curves
