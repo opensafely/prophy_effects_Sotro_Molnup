@@ -2,7 +2,7 @@
 ##<dadaset_definition.py> for repo: <prophy_effects_Sotro_Molnup>
 ##Description: This script extracts data for project 91:[Coverage, effectiveness and safety 
 ##of neutralising monoclonal antibodies or antivirals for non-hospitalised patients with COVID-19]
-##Author(s): Qing Wen   Date last updated: 20/05/2024
+##Author(s): Qing Wen   Date last updated: 25/05/2024
 ########################################################################################################
 from ehrql import(
     months,
@@ -95,41 +95,8 @@ dataset.if_old_covid_treat = (
     .where(had_covid_treat_df0.treatment_start_date.is_before(treat_date))).exists_for_patient()
 
 dataset.old_covid_treat = case(
-     when(dataset.if_old_covid_treat).then(1), otherwise = 0
+    when(dataset.if_old_covid_treat).then(1), otherwise = 0
 )
-##censored
-had_covid_treat_excpt_molnu_df = (
-    had_covid_treat_df0
-    .except_where(had_covid_treat_df0.intervention.is_in(["Molnupiravir"])) \
-    .where((had_covid_treat_df0.treatment_start_date> treat_date) &  \
-        (had_covid_treat_df0.treatment_start_date<=index_enddate) \
-    ).sort_by(had_covid_treat_df0.treatment_start_date)) 
-
-had_covid_treat_excpt_sotro_df = (
-    had_covid_treat_df0
-    .except_where(had_covid_treat_df0.intervention.is_in(["Sotrovimab"])) \
-    .where((had_covid_treat_df0.treatment_start_date> treat_date) &  \
-        (had_covid_treat_df0.treatment_start_date<=index_enddate) \
-    ).sort_by(had_covid_treat_df0.treatment_start_date)) 
-#molnu_censored_date, sotro_censored_date
-dataset.molnu_censored_date = had_covid_treat_excpt_molnu_df.first_for_patient().treatment_start_date
-dataset.sotro_censored_date = had_covid_treat_excpt_sotro_df.first_for_patient().treatment_start_date
-dataset.molnu_censore_drug =had_covid_treat_excpt_molnu_df.first_for_patient().intervention
-dataset.sotro_censore_drug =had_covid_treat_excpt_sotro_df.first_for_patient().intervention
-
-dataset.molnu_censore_exist =had_covid_treat_excpt_molnu_df.exists_for_patient() 
-dataset.sotro_censore_exist =had_covid_treat_excpt_sotro_df.exists_for_patient() 
-
-dataset.is_censored =  ((dataset.molnu_censore_exist ) &  (dataset.first_covid_treat_interve.is_in(["Molnupiravir"])))| \
-    ((dataset.sotro_censore_exist ) &  (dataset.first_covid_treat_interve.is_in(["Sotrovimab"])))
-
-dataset.censored = case(
-     when(dataset.is_censored).then(1), otherwise = 0
-)
-
-#dataset.if_old_covid_treat = dataset.prev_covid_treat_date < dataset.first_covid_treat_date
-#treat_date = dataset.first_covid_treat_date
-#dataset.date_treated = treat_date
 
 was_registered_treated = (
     practice_registrations.where(practice_registrations.start_date <= treat_date)
@@ -192,13 +159,6 @@ ccare_af60d_covid_pdiag = (
     (hosp_af60d_covid_pdiag_1stdate_df.days_in_critical_care>0))
 
 ##covid_hospitalisation as per primary_diagnosis
-#hosp_covid_date=hosp_covid60d6m_date
-#hosp_covid_classfic=hosp_covid60d6m_classfic
-#hosp_covid_pdiag=hosp_covid60d6m_pdiag
-#had_ccare_covid = had_ccare_covid60d6m
-#ccare_covid_date =ccare_covid60d6m_date
-
-
 dataset.hosp_covid60d6m_date = hosp_af60d_covid_pdiag_1stdate_df.admission_date #hosp_af60d_covid_pdiag_1stdate_df
 dataset.hosp_covid60d6m_classfic = hosp_af60d_covid_pdiag_1stdate_df.patient_classification #hosp_af60d_covid_pdiag_classfic
 dataset.hosp_covid60d6m_pdiag = hosp_af60d_covid_pdiag_1stdate_df.primary_diagnosis #hosp_af60d_covid_pdiag
@@ -222,9 +182,7 @@ hosp_allcause_af60d_6mon_df = (
     (apcs.patient_classification.is_in(["1"]))
     ).sort_by(apcs.admission_date).first_for_patient()
 ) 
-#hosp_allcause_date=hosp_allcause60d6m_date
-#hosp_allcause_classfic=hosp_allcause60d6m_classfic
-#hosp_allcause_pdiag = hosp_allcause60d6m_pdiag
+
 dataset.hosp_allcause60d6m_date = hosp_allcause_af60d_6mon_df.admission_date #hosp_allcause_af60d_6mon_pdiag_date
 dataset.hosp_allcause60d6m_classfic = hosp_allcause_af60d_6mon_df.patient_classification
 dataset.hosp_allcause60d6m_pdiag = hosp_allcause_af60d_6mon_df.primary_diagnosis
@@ -243,7 +201,6 @@ dataset.hospitalise_disc_allcause = (      #allcause-first discharge after 60day
 ##Death_date##
 dataset.ons_dead_date = ons_deaths.date
 dataset.underly_deathcause_code = ons_deaths.underlying_cause_of_death
-
 dataset.death_cause_covid = cause_of_death_matches(covid_icd10_codes) #underlying or causes
 
 ##all-cause death 60d-6m #ons_dead_tr60d_6mon_covid_treat
@@ -265,8 +222,6 @@ dataset.covid_death_60d_6m = case(
     when(dataset.was_covid_death_60d_6m).then(1), otherwise = 0
 )
 
-# dataset.covid_death_60d_6m_date = dataset.was_covid_death_60d_6m.date
-
 #all-cause death <60d #ons_dead_trstart_60d_covid_treat
 dataset.was_allcause_death_under60d = (ons_deaths.date.is_after(treat_date) & 
     ons_deaths.date.is_on_or_before(treat_date + days(60)))
@@ -281,6 +236,41 @@ dataset.was_allcause_death_under30d = (ons_deaths.date.is_after(treat_date) &
 
 dataset.allcause_death_under30d = case(
     when(dataset.was_allcause_death_under30d).then(1), otherwise = 0
+)
+
+##censored
+had_covid_treat_excpt_molnu_df = (
+    had_covid_treat_df0
+    .except_where(had_covid_treat_df0.intervention.is_in(["Molnupiravir"])) \
+    .where((had_covid_treat_df0.treatment_start_date > treat_date) &  \
+    (had_covid_treat_df0.treatment_start_date <= (treat_date + days(60) + months(6))))  \
+    ).sort_by(had_covid_treat_df0.treatment_start_date)
+
+had_covid_treat_excpt_sotro_df = (
+    had_covid_treat_df0
+    .except_where(had_covid_treat_df0.intervention.is_in(["Sotrovimab"])) \
+    .where((had_covid_treat_df0.treatment_start_date > treat_date) &  \
+    (had_covid_treat_df0.treatment_start_date <= (treat_date + days(60) + months(6))))  \
+    ).sort_by(had_covid_treat_df0.treatment_start_date)
+
+
+dataset.molnu_pt_censored_date = had_covid_treat_excpt_molnu_df.first_for_patient().treatment_start_date ##potential
+dataset.sotro_pt_censored_date = had_covid_treat_excpt_sotro_df.first_for_patient().treatment_start_date
+dataset.molnu_pt_censored_drug =had_covid_treat_excpt_molnu_df.first_for_patient().intervention
+dataset.sotro_pt_censored_drug =had_covid_treat_excpt_sotro_df.first_for_patient().intervention
+
+dataset.molnu_pt_censored_exist =had_covid_treat_excpt_molnu_df.exists_for_patient() 
+dataset.sotro_pt_censored_exist =had_covid_treat_excpt_sotro_df.exists_for_patient() 
+
+dataset.is_molnu_pt_censored =  ((dataset.molnu_pt_censored_exist ) & (dataset.first_covid_treat_interve.is_in(["Molnupiravir"])))
+dataset.is_sotro_pt_censored =  ((dataset.sotro_pt_censored_exist ) & (dataset.first_covid_treat_interve.is_in(["Sotrovimab"])))
+
+dataset.molnu_pt_censored = case(
+     when(dataset.is_molnu_pt_censored).then(1), otherwise = 0
+)
+
+dataset.sotro_pt_censored = case(
+     when(dataset.is_sotro_pt_censored).then(1), otherwise = 0
 )
 
 ####### comorbidities ####### 
@@ -730,19 +720,6 @@ therapeutics_df = (covid_therapeutics
 #high_risk_MOL_last(=risk_cohort),high_risk_SOT02_last,high_risk_MOL_count,high_risk_SOT02_count
 dataset.risk_cohort = therapeutics_df.risk_cohort  #risk_cohort 
 
-# dataset.high_risk_MOL_last = therapeutics_df.risk_cohort 
-
-# dataset.high_risk_SOT02_last = therapeutics_df.SOT02_risk_cohorts
-
-# dataset.high_risk_MOL_count = covid_therapeutics.risk_cohort.count_distinct_for_patient()  #exists_for_patient()  
-# #SOT02_risk_cohorts
-# dataset.high_risk_SOT02_count = covid_therapeutics.SOT02_risk_cohorts.count_distinct_for_patient() 
-
-# ##### #### ####
-# dataset.highrisk_therap = case(
-#     when(dataset.is_highrisk_therap >=1).then(1), otherwise = 0
-# )
-
 dataset.is_codelist_highrisk = (dataset.imid + dataset.dialysis + dataset.kidney_transplant +dataset.solid_organ_transplant_new +dataset.haema_disease + dataset.immunosupression_new +
     dataset.solid_cancer_new)
 
@@ -755,16 +732,6 @@ dataset.is_codelist_highrisk_ever = (dataset.imid_ever + dataset.dialysis + data
 dataset.highrisk_codelist_ever = case(
     when(dataset.is_codelist_highrisk_ever >=1).then(1), otherwise = 0
 )
-# #is_highrisk,highrisk,is_highrisk_ever,highrisk_ever
-# dataset.is_highrisk = (dataset.highrisk_therap + dataset.highrisk_codelist )
-# dataset.highrisk = case(
-#     when(dataset.is_highrisk >=1).then(1), otherwise = 0
-# )
-# dataset.is_highrisk_ever = (dataset.highrisk_therap + dataset.highrisk_codelist_ever )
-
-# dataset.highrisk_ever = case(
-#     when(dataset.is_highrisk_ever >=1).then(1), otherwise = 0
-# )
 
 ##Pregnancy
 #pregnancy record in last 36 weeks
