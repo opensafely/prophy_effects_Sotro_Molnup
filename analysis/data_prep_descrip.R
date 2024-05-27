@@ -34,35 +34,37 @@ df_vars00 <- read_csv(here::here("output", "data", "dataset_table.csv.gz")) %>%
   immunosuppresant_drugs_nhsd_ever, oral_steroid_drugs_nhsd_ever, is_codelist_highrisk, highrisk_codelist, is_codelist_highrisk_ever, 
   highrisk_codelist_ever, total_covid_vacc, total_covid_vacc_cat, covid_vacc1_date,covid_vacc2_date,covid_vacc3_date,
   covid_vacc4_date, covid_vacc_last_date, imid, imid_ever,dialysis,kidney_transplant,solid_organ_transplant_new,haema_disease,
-  haema_disease_ever, immunosupression_new,solid_cancer_new,solid_cancer_ever) 
+  haema_disease_ever, immunosupression_new,solid_cancer_new,solid_cancer_ever,
+  had_imid,had_imid_ever,had_dialysis,had_kidney_transplant,had_solid_organ_transplant_new,had_haema_disease,had_immunosupression_new,
+  had_solid_cancer_new,had_solid_cancer_ever) 
 
 df_vars0<-df_vars00 %>%  
     mutate(
-      sex01 = ifelse(sex %in% ("female"), 1, 0),
-      underly_covid_deathcause0_1 = ifelse(underly_deathcause_code %in% c("U071", "U072", "U099", "U109"), 1, 0),
-      death_cause_covid0_1 = ifelse(death_cause_covid %in% ("TRUE"), 1,0 ), #) %>% 
-      test_date_format = ons_dead_date,
-      death_covid_underly_60d6m_date =as.Date(ifelse(((underly_covid_deathcause0_1 == 1) & (ons_dead_date >start_date_60d) & (ons_dead_date <end_date_6mon)), as.character(ons_dead_date), NA)),
-      death_covid_cause_60d6m_date = as.Date (ifelse(((death_cause_covid0_1 == 1) & (ons_dead_date >start_date_60d) & (ons_dead_date <= end_date_6mon)), as.character(ons_dead_date), NA)), 
-      censored_date_molnu = as.Date(ifelse(((molnu_pt_censored== 1) & (molnu_pt_censored_date <death_covid_cause_60d6m_date))
-      |((molnu_pt_censored== 1) & (molnu_pt_censored_date <hosp_covid60d6m_date)), as.character(molnu_pt_censored_date), NA)),
-      censored_date_sotro= as.Date (ifelse(((sotro_pt_censored== 1) & (sotro_pt_censored_date <death_covid_cause_60d6m_date))
-      |((sotro_pt_censored== 1) & (sotro_pt_censored_date <hosp_covid60d6m_date)), as.character(molnu_pt_censored_date), NA)),
-      surv_end_covid_cause_date = as.Date(pmin(hosp_covid60d6m_date,death_covid_cause_60d6m_date, censored_date_molnu, censored_date_sotro, end_date_6mon, na.rm = TRUE)),
-      surv_end_covid_underly_date = as.Date(pmin(hosp_covid60d6m_date,death_covid_underly_60d6m_date, censored_date_molnu, censored_date_sotro, end_date_6mon, na.rm = TRUE)),
-      censored_bf_dead_hosp = ifelse(((!is.na(censored_date_molnu) & (censored_date_molnu == surv_end_covid_cause_date)) 
-      |((!is.na(censored_date_sotro)) & censored_date_sotro == surv_end_covid_cause_date)),1,0),
-      surv_days = as.numeric(difftime(surv_end_covid_cause_date, start_date_60d, units = "days")),
-      surv_from_treat_days = as.numeric(difftime(surv_end_covid_cause_date, treat_date, units = "days")),
-      surv_event = ifelse((((!is.na(death_covid_cause_60d6m_date)) & (censored_bf_dead_hosp == 0))
-      |((!is.na(hosp_covid60d6m_date)) & (censored_bf_dead_hosp == 0))), 1,0),
-      surv_event_underly = ifelse((((!is.na(death_covid_underly_60d6m_date)) & (censored_bf_dead_hosp == 0))
-      |((!is.na(hosp_covid60d6m_date)) & (censored_bf_dead_hosp == 0))),1,0),
-      calendar_day =as.numeric(difftime(start_date_60d, as.Date("2021-12-16"),units = "days")),
-      calendar_wk =as.numeric(difftime(start_date_60d, as.Date("2021-12-16"),units = "weeks")),
-      age_treated_spline = ns(age_treated, df = 4),
-      calendar_day_spline = ns(calendar_day, df = 4)
-     )
+    sex01 = ifelse(sex %in% ("female"), 1, 0),
+    underly_covid_deathcause0_1 = ifelse(underly_deathcause_code %in% c("U071", "U072", "U099", "U109"), 1, 0),
+    death_cause_covid0_1 = ifelse(death_cause_covid %in% ("TRUE"), 1,0 ), #) %>% 
+    test_date_format = ons_dead_date,
+    death_covid_underly_60d6m_date =as.Date(ifelse(((underly_covid_deathcause0_1 == 1) & (ons_dead_date >start_date_60d) & (ons_dead_date <end_date_6mon)), as.character(ons_dead_date), NA)),
+    death_covid_cause_60d6m_date = as.Date (ifelse(((death_cause_covid0_1 == 1) & (ons_dead_date >start_date_60d) & (ons_dead_date <= end_date_6mon)), as.character(ons_dead_date), NA)), 
+    censored_date_molnu = as.Date(ifelse(((molnu_pt_censored== 1) & (molnu_pt_censored_date <death_covid_cause_60d6m_date))
+    |((molnu_pt_censored== 1) & (molnu_pt_censored_date <hosp_covid60d6m_date)), as.character(molnu_pt_censored_date), NA)),
+    censored_date_sotro= as.Date (ifelse(((sotro_pt_censored== 1) & (sotro_pt_censored_date <death_covid_cause_60d6m_date))
+    |((sotro_pt_censored== 1) & (sotro_pt_censored_date <hosp_covid60d6m_date)), as.character(molnu_pt_censored_date), NA)),
+    surv_end_covid_cause_date = as.Date(pmin(hosp_covid60d6m_date,death_covid_cause_60d6m_date, censored_date_molnu, censored_date_sotro, end_date_6mon, na.rm = TRUE)),
+    surv_end_covid_underly_date = as.Date(pmin(hosp_covid60d6m_date,death_covid_underly_60d6m_date, censored_date_molnu, censored_date_sotro, end_date_6mon, na.rm = TRUE)),
+    censored_bf_dead_hosp = ifelse(((!is.na(censored_date_molnu) & (censored_date_molnu == surv_end_covid_cause_date)) 
+    |((!is.na(censored_date_sotro)) & censored_date_sotro == surv_end_covid_cause_date)),1,0),
+    surv_days = as.numeric(difftime(surv_end_covid_cause_date, start_date_60d, units = "days")),
+    surv_from_treat_days = as.numeric(difftime(surv_end_covid_cause_date, treat_date, units = "days")),
+    surv_event = ifelse((((!is.na(death_covid_cause_60d6m_date)) & (censored_bf_dead_hosp == 0))
+    |((!is.na(hosp_covid60d6m_date)) & (censored_bf_dead_hosp == 0))), 1,0),
+    surv_event_underly = ifelse((((!is.na(death_covid_underly_60d6m_date)) & (censored_bf_dead_hosp == 0))
+    |((!is.na(hosp_covid60d6m_date)) & (censored_bf_dead_hosp == 0))),1,0),
+    calendar_day =as.numeric(difftime(start_date_60d, as.Date("2021-12-16"),units = "days")),
+    calendar_wk =as.numeric(difftime(start_date_60d, as.Date("2021-12-16"),units = "weeks")),
+    age_treated_spline = ns(age_treated, df = 4),
+    calendar_day_spline = ns(calendar_day, df = 4)
+)
 
 #r2nrst5
 cat("#df_vars0$surv_event\n") 
@@ -121,12 +123,14 @@ cat("#therap_HMDs\n")
 freq_single(df_vars0$therap_HMDs)
 cat("#therap_HMDs-round5\n") 
 freq_single_nrst5(df_vars0$therap_HMDs)
+
 #sickle cell disease-SCD
 df_vars0$therap_SCD = as.integer((grepl("sickle cell disease", df_vars0$risk_cohort, ignore.case = TRUE)))
 cat("#therap_SCD\n") 
 freq_single(df_vars0$therap_SCD)
 cat("#therap_SCD-round5\n") 
 freq_single_nrst5(df_vars0$therap_SCD)
+
 #stem cell transplant recipient -SCTR
 df_vars0$therap_SCTR= as.integer((grepl("stem cell transplant recipient", df_vars0$risk_cohort, ignore.case = TRUE)))
 cat("#therap_SCTR\n") 
@@ -147,6 +151,7 @@ cat("#therap_PID\n")
 freq_single(df_vars0$therap_PID)
 cat("#therap_PID-round5\n") 
 freq_single_nrst5(df_vars0$therap_PID)
+
 # solid_cancer
 df_vars0$therap_solid_cancer= as.integer((grepl("solid cancer", df_vars0$risk_cohort, ignore.case = TRUE)))
 cat("#therap_solid_cancer\n") 
@@ -154,7 +159,58 @@ freq_single(df_vars0$therap_solid_cancer)
 cat("#therap_solid_cancer-round5\n") 
 freq_single_nrst5(df_vars0$therap_solid_cancer)
 
-#df_vars0$allcause_death_under60d = as.integer(df_vars0$allcause_death_under60d)
+##high-risk-cohort-therap-codelist
+df_vars0 <-df_vars0 %>% mutate(imid_therap_code = ifelse(rowSums(cbind(imid,therap_IMID),na.rm = TRUE)>= 1, 1, 0),
+  dialysis_therap_code = dialysis, kidney_transplant_therap_code = kidney_transplant,
+  solid_organ_transplant_therap_code = ifelse(rowSums(cbind(solid_organ_transplant_new,therap_SOR),na.rm = TRUE)>= 1, 1, 0),
+  haema_disease_therap_code = ifelse(rowSums(cbind(haema_disease,therap_HMDs,therap_HMAL,therap_SCD,therap_SCTR),na.rm = TRUE)>= 1, 1, 0),
+  immunosupression_therap_code =ifelse(rowSums(cbind(immunosupression_new,therap_IMDs,therap_PID),na.rm = TRUE)>= 1, 1, 0),
+  solid_cancer_therap_code = ifelse(rowSums(cbind(solid_cancer_new,therap_solid_cancer),na.rm = TRUE)>= 1, 1, 0),
+  imid_ever_therap_code = ifelse(rowSums(cbind(imid_ever,therap_IMID),na.rm = TRUE)>= 1, 1, 0),
+  solid_cancer_ever_therap_code =ifelse(rowSums(cbind(solid_cancer_ever,therap_solid_cancer),na.rm = TRUE)>= 1, 1, 0)
+)
+
+
+cat("#imid_therap_code\n") 
+freq_single(df_vars0$imid_therap_code)
+cat("#imid_therap_code-round5\n") 
+freq_single_nrst5(df_vars0$imid_therap_code)
+
+cat("#imid_ever_therap_code\n") 
+freq_single(df_vars0$imid_ever_therap_code)
+cat("#imid_ever_therap_code-round5\n") 
+freq_single_nrst5(df_vars0$imid_ever_therap_code)
+
+cat("#dialysis_therap_code\n") 
+freq_single(df_vars0$dialysis_therap_code)
+cat("#dialysis_therap_code-round5\n") 
+freq_single_nrst5(df_vars0$dialysis_therap_code)
+
+cat("#solid_organ_transplant_therap_code\n") 
+freq_single(df_vars0$solid_organ_transplant_therap_code)
+cat("#solid_organ_transplant_therap_code-round5\n") 
+freq_single_nrst5(df_vars0$solid_organ_transplant_therap_code)
+
+cat("#haema_disease_therap_code\n") 
+freq_single(df_vars0$haema_disease_therap_code)
+cat("#haema_disease_therap_code-round5\n") 
+freq_single_nrst5(df_vars0$haema_disease_therap_code)
+
+cat("#immunosupression_therap_code\n") 
+freq_single(df_vars0$immunosupression_therap_code)
+cat("#immunosupression_therap_code-round5\n") 
+freq_single_nrst5(df_vars0$immunosupression_therap_code)
+
+cat("#solid_cancer_therap_code\n") 
+freq_single(df_vars0$solid_cancer_therap_code)
+cat("#solid_cancer_therap_code-round5\n") 
+freq_single_nrst5(df_vars0$solid_cancer_therap_code)
+
+cat("#solid_cancer_ever_therap_code\n") 
+freq_single(df_vars0$solid_cancer_ever_therap_code)
+cat("#solid_cancer_ever_therap_code-round5\n") 
+freq_single_nrst5(df_vars0$solid_cancer_ever_therap_code)
+
 cat("#total-df_vars0\n") #old_covid_treat
 dim(df_vars0)
 
@@ -492,7 +548,49 @@ freq_single(high_risk_cohort$censored_bf_dead_hosp)
 cat("#high_risk_cohort$censored_bf_dead_hosp-round5")
 freq_single_nrst5(high_risk_cohort$censored_bf_dead_hosp)
 
+##high-risk-cohort-therap-codelist#high_risk_cohort
+cat("#imid_therap_code\n") 
+freq_single(high_risk_cohort$imid_therap_code)
+cat("#imid_therap_code-round5\n") 
+freq_single_nrst5(high_risk_cohort$imid_therap_code)
+
+cat("#imid_ever_therap_code\n") 
+freq_single(high_risk_cohort$imid_ever_therap_code)
+cat("#imid_ever_therap_code-round5\n") 
+freq_single_nrst5(high_risk_cohort$imid_ever_therap_code)
+
+cat("#dialysis_therap_code\n") 
+freq_single(high_risk_cohort$dialysis_therap_code)
+cat("#dialysis_therap_code-round5\n") 
+freq_single_nrst5(high_risk_cohort$dialysis_therap_code)
+
+cat("#solid_organ_transplant_therap_code\n") 
+freq_single(high_risk_cohort$solid_organ_transplant_therap_code)
+cat("#solid_organ_transplant_therap_code-round5\n") 
+freq_single_nrst5(high_risk_cohort$solid_organ_transplant_therap_code)
+
+cat("#haema_disease_therap_code\n") 
+freq_single(high_risk_cohort$haema_disease_therap_code)
+cat("#haema_disease_therap_code-round5\n") 
+freq_single_nrst5(high_risk_cohort$haema_disease_therap_code)
+
+cat("#immunosupression_therap_code\n") 
+freq_single(high_risk_cohort$immunosupression_therap_code)
+cat("#immunosupression_therap_code-round5\n") 
+freq_single_nrst5(high_risk_cohort$immunosupression_therap_code)
+
+cat("#solid_cancer_therap_code\n") 
+freq_single(high_risk_cohort$solid_cancer_therap_code)
+cat("#solid_cancer_therap_code-round5\n") 
+freq_single_nrst5(high_risk_cohort$solid_cancer_therap_code)
+
+cat("#solid_cancer_ever_therap_code\n") 
+freq_single(high_risk_cohort$solid_cancer_ever_therap_code)
+cat("#solid_cancer_ever_therap_code-round5\n") 
+freq_single_nrst5(high_risk_cohort$solid_cancer_ever_therap_code)
 ##################################################
+
+
 ##cohort_molnup
 cohort_molnup<-high_risk_cohort %>% filter(drug== 0 )
 cat("#total-dim(cohort_molnup)\n")
@@ -513,7 +611,6 @@ cat("#hosp_allcause_date60d_6mon_count-cohort_molnup#\n")
 (sum(!is.na(cohort_molnup$hosp_allcause60d6m_date)))
 cat("#hosp_allcause_date60d_6mon_count-cohort_molnup-round5#\n")
 r2nrst5(sum(!is.na(cohort_molnup$hosp_allcause60d6m_date)))
-
 
 cat("#ons_dead_count_anytime-cohort_molnup-#\n")
 sum(!is.na(cohort_molnup$ons_dead_date))
@@ -590,6 +687,47 @@ cat("#total_covid_vacc_cat-cohort_molnup")
 freq_single(cohort_molnup$total_covid_vacc_cat)
 cat("#total_covid_vacc_cat-cohort_molnup-round5")
 freq_single_nrst5(cohort_molnup$total_covid_vacc_cat)
+
+##high-risk-cohort-therap-codelist#cohort_molnup
+cat("#imid_therap_code\n") 
+freq_single(cohort_molnup$imid_therap_code)
+cat("#imid_therap_code-round5\n") 
+freq_single_nrst5(cohort_molnup$imid_therap_code)
+
+cat("#imid_ever_therap_code\n") 
+freq_single(cohort_molnup$imid_ever_therap_code)
+cat("#imid_ever_therap_code-round5\n") 
+freq_single_nrst5(cohort_molnup$imid_ever_therap_code)
+
+cat("#dialysis_therap_code\n") 
+freq_single(cohort_molnup$dialysis_therap_code)
+cat("#dialysis_therap_code-round5\n") 
+freq_single_nrst5(cohort_molnup$dialysis_therap_code)
+
+cat("#solid_organ_transplant_therap_code\n") 
+freq_single(cohort_molnup$solid_organ_transplant_therap_code)
+cat("#solid_organ_transplant_therap_code-round5\n") 
+freq_single_nrst5(cohort_molnup$solid_organ_transplant_therap_code)
+
+cat("#haema_disease_therap_code\n") 
+freq_single(cohort_molnup$haema_disease_therap_code)
+cat("#haema_disease_therap_code-round5\n") 
+freq_single_nrst5(cohort_molnup$haema_disease_therap_code)
+
+cat("#immunosupression_therap_code\n") 
+freq_single(cohort_molnup$immunosupression_therap_code)
+cat("#immunosupression_therap_code-round5\n") 
+freq_single_nrst5(cohort_molnup$immunosupression_therap_code)
+
+cat("#solid_cancer_therap_code\n") 
+freq_single(cohort_molnup$solid_cancer_therap_code)
+cat("#solid_cancer_therap_code-round5\n") 
+freq_single_nrst5(cohort_molnup$solid_cancer_therap_code)
+
+cat("#solid_cancer_ever_therap_code\n") 
+freq_single(cohort_molnup$solid_cancer_ever_therap_code)
+cat("#solid_cancer_ever_therap_code-round5\n") 
+freq_single_nrst5(cohort_molnup$solid_cancer_ever_therap_code)
 
 ################
 ###cohort_sotro
@@ -693,10 +831,50 @@ freq_single(cohort_sotro$total_covid_vacc_cat)
 cat("#total_covid_vacc_cat-cohort_sotro-round5")
 freq_single_nrst5(cohort_sotro$total_covid_vacc_cat)
 
+##high-risk-cohort-therap-codelist#cohort_sotro
+cat("#imid_therap_code\n") 
+freq_single(cohort_sotro$imid_therap_code)
+cat("#imid_therap_code-round5\n") 
+freq_single_nrst5(cohort_sotro$imid_therap_code)
+
+cat("#imid_ever_therap_code\n") 
+freq_single(cohort_sotro$imid_ever_therap_code)
+cat("#imid_ever_therap_code-round5\n") 
+freq_single_nrst5(cohort_sotro$imid_ever_therap_code)
+
+cat("#dialysis_therap_code\n") 
+freq_single(cohort_sotro$dialysis_therap_code)
+cat("#dialysis_therap_code-round5\n") 
+freq_single_nrst5(cohort_sotro$dialysis_therap_code)
+
+cat("#solid_organ_transplant_therap_code\n") 
+freq_single(cohort_sotro$solid_organ_transplant_therap_code)
+cat("#solid_organ_transplant_therap_code-round5\n") 
+freq_single_nrst5(cohort_sotro$solid_organ_transplant_therap_code)
+
+cat("#haema_disease_therap_code\n") 
+freq_single(cohort_sotro$haema_disease_therap_code)
+cat("#haema_disease_therap_code-round5\n") 
+freq_single_nrst5(cohort_sotro$haema_disease_therap_code)
+
+cat("#immunosupression_therap_code\n") 
+freq_single(cohort_sotro$immunosupression_therap_code)
+cat("#immunosupression_therap_code-round5\n") 
+freq_single_nrst5(cohort_sotro$immunosupression_therap_code)
+
+cat("#solid_cancer_therap_code\n") 
+freq_single(cohort_sotro$solid_cancer_therap_code)
+cat("#solid_cancer_therap_code-round5\n") 
+freq_single_nrst5(cohort_sotro$solid_cancer_therap_code)
+
+cat("#solid_cancer_ever_therap_code\n") 
+freq_single(cohort_sotro$solid_cancer_ever_therap_code)
+cat("#solid_cancer_ever_therap_code-round5\n") 
+freq_single_nrst5(cohort_sotro$solid_cancer_ever_therap_code)
+
 
 high_risk_cohort$surv_days <- as.numeric(high_risk_cohort$surv_days)
 high_risk_cohort$surv_event <- as.numeric(high_risk_cohort$surv_event)
-
 
 cat("#summary(cox_model)")
 #surv_days,surv_event
