@@ -9,6 +9,7 @@ library('fs')
 library('survival')
 library('survminer')
 library('splines')
+library('gtsummary')# for tbl_summary()
 
 ## import functions
 source(here("analysis", "lib", "r_funs.R"))
@@ -169,7 +170,6 @@ df_vars0 <-df_vars0 %>% mutate(imid_therap_code = ifelse(rowSums(cbind(imid,ther
   imid_ever_therap_code = ifelse(rowSums(cbind(imid_ever,therap_IMID),na.rm = TRUE)>= 1, 1, 0),
   solid_cancer_ever_therap_code =ifelse(rowSums(cbind(solid_cancer_ever,therap_solid_cancer),na.rm = TRUE)>= 1, 1, 0)
 )
-
 
 cat("#imid_therap_code\n") 
 freq_single(df_vars0$imid_therap_code)
@@ -890,10 +890,40 @@ summary(cox_model1_age_sex)
 #            ggtheme = theme_minimal(), risk.table = TRUE,
 #            conf.int = TRUE)
 
+
+## Clinical and demographics table
+variables <- c("age_treated", "age_treated_group", "sex", "ethnicity", "region", "total_covid_vacc_cat", "first_covid_treat_interve")
+# Preprocess data, handling categorical variables with stratification
+high_risk_cohort_tb1 <- high_risk_cohort %>%
+  select(all_of(variables)) %>%
+  mutate(
+    across(where(is.character), as.factor), 
+    across(where(is.numeric), as.numeric)   
+  ) %>%
+  group_by(first_covid_treat_interve) %>%
+  mutate(
+    across(where(is.factor), ~ {
+      # Calculate frequencies within each first_covid_treat_interve group
+      freq <- table(.x)  
+      levels_to_replace <- names(freq[freq < 8])  
+      .x <- factor(.x, levels = levels(.x))
+      .x[.x %in% levels_to_replace] <- NA
+      .x
+    })
+  ) %>%
+  ungroup() %>%
+  tbl_summary(
+    by = "first_covid_treat_interve",  # Summarize by treatment 
+    missing = "no"  # Exclude missing data from the percentage calculations
+  )
+
+
+high_risk_cohort_tb1_df <- as_tibble(high_risk_cohort_tb1)
 # Save dataset(s) ----
+write_csv(high_risk_cohort_tb1_df, here::here("output", "tables", "table1_redacted.csv"))
 write.csv(df_vars, here::here("output", "tables", "data4analyse.csv"), row.names = FALSE)
 write_rds(df_vars, here::here("output", "data", "data4analyse.rds"), compress = "gz")
 write_rds(high_risk_cohort, here::here("output", "data", "high_risk_cohort.rds"), compress = "gz")
 write_rds(high_risk_ever_cohort, here::here("output", "data", "high_risk_ever_cohort.rds"), compress = "gz")
-
+#write.csv(high_risk_cohort_tb1_df, ("C:/Users/qw/Documents/Github/prophy_effects_Sotro_Molnup/output/data/high_risk_cohort_tb1.csv"), row.names = FALSE)
 # write.csv(df_vars, ("C:/Users/qw/Documents/Github/prophy_effects_Sotro_Molnup/output/data/cohort_data4analyse.csv"), row.names = FALSE)
