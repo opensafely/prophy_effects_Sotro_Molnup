@@ -15,8 +15,10 @@ actions:
     run: r:latest analysis/data_prep_descrip.R
     needs: [gen_dataset_table]
     outputs:
+      moderately_sensitive:
+        data2: output/tables/table1_redacted.csv
       highly_sensitive:
-        data: output/tables/data4analyse.csv
+        data1: output/tables/data4analyse.csv
         rds: output/data/data4analyse.rds
 
   prep_descrip_stata:
