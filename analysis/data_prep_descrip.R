@@ -43,7 +43,7 @@ df_vars0<-df_vars00 %>%
     mutate(
     sex01 = ifelse(sex %in% ("female"), 1, 0),
     underly_covid_deathcause0_1 = ifelse(underly_deathcause_code %in% c("U071", "U072", "U099", "U109"), 1, 0),
-    death_cause_covid0_1 = ifelse(death_cause_covid %in% ("TRUE"), 1,0 ), #) %>% 
+    death_cause_covid0_1 = ifelse(death_cause_covid %in% ("TRUE"), 1,0 ), 
     test_date_format = ons_dead_date,
     death_covid_underly_60d6m_date =as.Date(ifelse(((underly_covid_deathcause0_1 == 1) & (ons_dead_date >start_date_60d) & (ons_dead_date <end_date_6mon)), as.character(ons_dead_date), NA)),
     death_covid_cause_60d6m_date = as.Date (ifelse(((death_cause_covid0_1 == 1) & (ons_dead_date >start_date_60d) & (ons_dead_date <= end_date_6mon)), as.character(ons_dead_date), NA)), 
@@ -57,16 +57,25 @@ df_vars0<-df_vars00 %>%
     |((!is.na(censored_date_sotro)) & censored_date_sotro == surv_end_covid_cause_date)),1,0),
     surv_days = as.numeric(difftime(surv_end_covid_cause_date, start_date_60d, units = "days")),
     surv_from_treat_days = as.numeric(difftime(surv_end_covid_cause_date, treat_date, units = "days")),
-    surv_event = ifelse((((!is.na(death_covid_cause_60d6m_date)) & (censored_bf_dead_hosp == 0))
-    |((!is.na(hosp_covid60d6m_date)) & (censored_bf_dead_hosp == 0))), 1,0),
-    surv_event_underly = ifelse((((!is.na(death_covid_underly_60d6m_date)) & (censored_bf_dead_hosp == 0))
-    |((!is.na(hosp_covid60d6m_date)) & (censored_bf_dead_hosp == 0))),1,0),
+    surv_event =as.factor(ifelse((((!is.na(death_covid_cause_60d6m_date)) & (censored_bf_dead_hosp == 0))
+    |((!is.na(hosp_covid60d6m_date)) & (censored_bf_dead_hosp == 0))), 1,0)),
+    surv_event_underly =as.factor(ifelse((((!is.na(death_covid_underly_60d6m_date)) & (censored_bf_dead_hosp == 0))
+    |((!is.na(hosp_covid60d6m_date)) & (censored_bf_dead_hosp == 0))),1,0)),
     calendar_day =as.numeric(difftime(start_date_60d, as.Date("2021-12-16"),units = "days")),
     calendar_wk =as.numeric(difftime(start_date_60d, as.Date("2021-12-16"),units = "weeks")),
     age_treated_spline = ns(age_treated, df = 4),
-    calendar_day_spline = ns(calendar_day, df = 4)
+    calendar_day_spline = ns(calendar_day, df = 4),
+    age_treat_gp_rc =ifelse(age_treated_group=="90+","80-89",age_treated_group),
+    had_hosp_covid60d6m=ifelse(!is.na(hosp_covid60d6m_date),"yes","no"),
+    had_hosp_covid60d6m_01=ifelse(!is.na(hosp_covid60d6m_date),1,0),
+    had_hosp_allcause60d6m=ifelse(!is.na(hosp_allcause60d6m_date),"yes","no"),
+    had__hosp_allcause60d6m_01=ifelse(!is.na(hosp_allcause60d6m_date),1,0),
+    had_ons_dead_date=ifelse(!is.na(ons_dead_date),"yes","no"),
+    had__ons_dead_date_01=ifelse(!is.na(ons_dead_date),1,0),
 )
 
+#cat#death_cause_covid,allcause_death_60d_6m, covid_death_60d_6m,allcause_death_under60d,allcause_death_under30d
+#sum(hosp_covid60d6m_date,hosp_allcause60d6m_date,ons_dead_date)
 #r2nrst5
 cat("#df_vars0$surv_event\n") 
 freq_single_nrst5(df_vars0$surv_event)
@@ -329,10 +338,10 @@ sd(as.numeric(df_vars$age_treated),na.rm=T )
 IQR(as.numeric(df_vars$age_treated), na.rm=T )
 
 cat("#age-group-df_vars")
-freq_single(df_vars$age_treated_group)
+freq_single(df_vars$age_treat_gp_rc)
 
 cat("#age-group-df_vars-round5")
-freq_single_nrst5(df_vars$age_treated_group)
+freq_single_nrst5(df_vars$age_treat_gp_rc)
 
 cat("#sex-df_vars")
 freq_single(df_vars$sex)
@@ -498,9 +507,9 @@ cat("#age-IQR-high_risk_cohort")
 IQR(as.numeric(high_risk_cohort$age_treated), na.rm=T)
 
 cat("#age-group-high_risk_cohort")
-freq_single(high_risk_cohort$age_treated_group)
+freq_single(high_risk_cohort$age_treat_gp_rc)
 cat("#age-group-high_risk_cohort-round5\n")
-freq_single_nrst5(high_risk_cohort$age_treated_group)
+freq_single_nrst5(high_risk_cohort$age_treat_gp_rc)
 
 cat("#sex-high_risk_cohort")
 freq_single(high_risk_cohort$sex)
@@ -589,8 +598,6 @@ freq_single(high_risk_cohort$solid_cancer_ever_therap_code)
 cat("#solid_cancer_ever_therap_code-round5\n") 
 freq_single_nrst5(high_risk_cohort$solid_cancer_ever_therap_code)
 ##################################################
-
-
 ##cohort_molnup
 cohort_molnup<-high_risk_cohort %>% filter(drug== 0 )
 cat("#total-dim(cohort_molnup)\n")
@@ -652,9 +659,9 @@ cat("#age-IQR-cohort_molnup:")
 IQR(as.numeric(cohort_molnup$age_treated), na.rm=T)
 
 cat("#age-group-cohort_molnup:")
-freq_single(cohort_molnup$age_treated_group)
+freq_single(cohort_molnup$age_treat_gp_rc)
 cat("#age-group-cohort_molnup-round5")
-freq_single_nrst5(cohort_molnup$age_treated_group)
+freq_single_nrst5(cohort_molnup$age_treat_gp_rc)
 
 cat("#sex-cohort_molnup:")
 freq_single(cohort_molnup$sex)
@@ -729,8 +736,11 @@ freq_single(cohort_molnup$solid_cancer_ever_therap_code)
 cat("#solid_cancer_ever_therap_code-round5\n") 
 freq_single_nrst5(cohort_molnup$solid_cancer_ever_therap_code)
 
-################
+################ high_risk_cohort cohort_molnup cohort_sotro
+##surv_event 
 ###cohort_sotro
+##(sum(!is.na(cohort_sotro$hosp_covid60d6m_date)))
+
 cohort_sotro<-high_risk_cohort %>% filter(drug== 1 )
 ##outcomes
 cat("#cohort_sotro$surv_event-total-outcome\n") 
@@ -796,9 +806,9 @@ cat("#age-IQR-cohort_sotro:")
 IQR(as.numeric(cohort_sotro$age_treated), na.rm=T)
 
 cat("#age-group-cohort_sotro:")
-freq_single(cohort_sotro$age_treated_group)
+freq_single(cohort_sotro$age_treat_gp_rc)
 cat("#age-group-cohort_sotro-round5")
-freq_single_nrst5(cohort_sotro$age_treated_group)
+freq_single_nrst5(cohort_sotro$age_treat_gp_rc)
 
 cat("#sex-cohort_sotro:")
 freq_single(cohort_sotro$sex)
@@ -890,17 +900,36 @@ summary(cox_model1_age_sex)
 #            ggtheme = theme_minimal(), risk.table = TRUE,
 #            conf.int = TRUE)
 
-
 ## Clinical and demographics table
-variables <- c("age_treated", "age_treated_group", "sex", "ethnicity", "region", "total_covid_vacc_cat", "first_covid_treat_interve")
-# Preprocess data, handling categorical variables with stratification
-high_risk_cohort_tb1 <- high_risk_cohort %>%
+variables <- c("age_treat_gp_rc", "sex","surv_event","surv_event_underly", "ethnicity", "region", "total_covid_vacc_cat", "first_covid_treat_interve")
+high_risk_cohort_data <- high_risk_cohort %>%
   select(all_of(variables)) %>%
-  mutate(
-    across(where(is.character), as.factor), 
-    across(where(is.numeric), as.numeric)   
-  ) %>%
-  group_by(first_covid_treat_interve) %>%
+    mutate(
+    across(where(is.character), as.factor)
+    ) 
+
+proc_rm_b8 <- function(data) {
+  result <- data %>%
+    select(all_of(variables)) %>%
+    mutate(
+      across(where(is.factor), ~ {
+        freq <- table(.x)
+        levels_to_replace <- names(freq[freq < 8])
+        .x <- factor(.x, levels = levels(.x))
+        .x[.x %in% levels_to_replace] <- NA
+        .x
+      })
+    ) %>%
+    ungroup()
+
+  result %>%
+    tbl_summary(
+    missing = "no"
+    )
+}
+
+proc_rm_b8_str <- function(data, group_var = first_covid_treat_interve) {
+  data %>% group_by(first_covid_treat_interve) %>%
   mutate(
     across(where(is.factor), ~ {
       # Calculate frequencies within each first_covid_treat_interve group
@@ -913,17 +942,24 @@ high_risk_cohort_tb1 <- high_risk_cohort %>%
   ) %>%
   ungroup() %>%
   tbl_summary(
-    by = "first_covid_treat_interve",  # Summarize by treatment 
-    missing = "no"  # Exclude missing data from the percentage calculations
+    by = group_var,  
+    missing = "no"  
   )
+}
 
+high_risk_cohort_tb1b <- proc_rm_b8(high_risk_cohort_data)
+high_risk_cohort_tb1 <- proc_rm_b8_str(high_risk_cohort_data, "first_covid_treat_interve")
 
-high_risk_cohort_tb1_df <- as_tibble(high_risk_cohort_tb1)
+# Merge the tibbles
+high_risk_cohort_tb1_all <- left_join((as_tibble(high_risk_cohort_tb1b)),(as_tibble(high_risk_cohort_tb1)), by = "**Characteristic**")
+print(high_risk_cohort_tb1_all)
+
 # Save dataset(s) ----
-write_csv(high_risk_cohort_tb1_df, here::here("output", "tables", "table1_redacted.csv"))
+write_csv(high_risk_cohort_tb1_all, here::here("output", "tables", "table1_redacted_8b.csv"))
 write.csv(df_vars, here::here("output", "tables", "data4analyse.csv"), row.names = FALSE)
 write_rds(df_vars, here::here("output", "data", "data4analyse.rds"), compress = "gz")
 write_rds(high_risk_cohort, here::here("output", "data", "high_risk_cohort.rds"), compress = "gz")
 write_rds(high_risk_ever_cohort, here::here("output", "data", "high_risk_ever_cohort.rds"), compress = "gz")
 #write.csv(high_risk_cohort_tb1_df, ("C:/Users/qw/Documents/Github/prophy_effects_Sotro_Molnup/output/data/high_risk_cohort_tb1.csv"), row.names = FALSE)
 # write.csv(df_vars, ("C:/Users/qw/Documents/Github/prophy_effects_Sotro_Molnup/output/data/cohort_data4analyse.csv"), row.names = FALSE)
+
