@@ -57,10 +57,10 @@ df_vars0<-df_vars00 %>%
     |((!is.na(censored_date_sotro)) & censored_date_sotro == surv_end_covid_cause_date)),1,0),
     surv_days = as.numeric(difftime(surv_end_covid_cause_date, start_date_60d, units = "days")),
     surv_from_treat_days = as.numeric(difftime(surv_end_covid_cause_date, treat_date, units = "days")),
-    surv_event =as.factor(ifelse((((!is.na(death_covid_cause_60d6m_date)) & (censored_bf_dead_hosp == 0))
-    |((!is.na(hosp_covid60d6m_date)) & (censored_bf_dead_hosp == 0))), 1,0)),
-    surv_event_underly =as.factor(ifelse((((!is.na(death_covid_underly_60d6m_date)) & (censored_bf_dead_hosp == 0))
-    |((!is.na(hosp_covid60d6m_date)) & (censored_bf_dead_hosp == 0))),1,0)),
+    surv_event =as.character(ifelse((((!is.na(death_covid_cause_60d6m_date)) & (censored_bf_dead_hosp == 0))
+    |((!is.na(hosp_covid60d6m_date)) & (censored_bf_dead_hosp == 0))), "yes","no")),
+    surv_event_underly =as.character(ifelse((((!is.na(death_covid_underly_60d6m_date)) & (censored_bf_dead_hosp == 0))
+    |((!is.na(hosp_covid60d6m_date)) & (censored_bf_dead_hosp == 0))),"yes","no")),
     calendar_day =as.numeric(difftime(start_date_60d, as.Date("2021-12-16"),units = "days")),
     calendar_wk =as.numeric(difftime(start_date_60d, as.Date("2021-12-16"),units = "weeks")),
     age_treated_spline = ns(age_treated, df = 4),
@@ -883,17 +883,17 @@ cat("#solid_cancer_ever_therap_code-round5\n")
 freq_single_nrst5(cohort_sotro$solid_cancer_ever_therap_code)
 
 
-high_risk_cohort$surv_days <- as.numeric(high_risk_cohort$surv_days)
-high_risk_cohort$surv_event <- as.numeric(high_risk_cohort$surv_event)
+# high_risk_cohort$surv_days <- as.numeric(high_risk_cohort$surv_days)
+# high_risk_cohort$surv_event <- as.numeric(high_risk_cohort$surv_event)
 
-cat("#summary(cox_model)")
-#surv_days,surv_event
-cox_model <- coxph(Surv(surv_days, surv_event) ~ factor(drug)+ strata(factor(stp)), data = high_risk_cohort)
-summary(cox_model)
+# cat("#summary(cox_model)")
+# #surv_days,surv_event
+# cox_model <- coxph(Surv(surv_days, surv_event) ~ factor(drug)+ strata(factor(stp)), data = high_risk_cohort)
+# summary(cox_model)
 
-#age_treated, sex01
-cox_model1_age_sex <- coxph(Surv(surv_days, surv_event) ~ factor(drug) + age_treated + sex01+ strata(factor(stp)), data = high_risk_cohort)
-summary(cox_model1_age_sex)
+# #age_treated, sex01
+# cox_model1_age_sex <- coxph(Surv(surv_days, surv_event) ~ factor(drug) + age_treated + sex01+ strata(factor(stp)), data = high_risk_cohort)
+# summary(cox_model1_age_sex)
 
 # Plot the survival curves
 # ggsurvplot(survfit(cox_model), data = high_risk_cohort, pval = TRUE,
@@ -907,6 +907,10 @@ high_risk_cohort_data <- high_risk_cohort %>%
     mutate(
     across(where(is.character), as.factor)
     ) 
+
+high_risk_cohort_data_sum <-high_risk_cohort_data %>%
+  select(all_of(variables)) %>%
+  tbl_summary()
 
 proc_rm_b8 <- function(data) {
   result <- data %>%
