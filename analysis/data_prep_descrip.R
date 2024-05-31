@@ -921,7 +921,6 @@ proc_rm_b8 <- function(data) {
       })
     ) %>%
     ungroup()
-
   result %>%
     tbl_summary(
     missing = "no"
