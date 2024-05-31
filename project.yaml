@@ -16,7 +16,7 @@ actions:
     needs: [gen_dataset_table]
     outputs:
       moderately_sensitive:
-        data2: output/tables/table1_redacted.csv
+        data2: output/tables/table1_redacted_8b.csv
       highly_sensitive:
         data1: output/tables/data4analyse.csv
         rds: output/data/data4analyse.rds
