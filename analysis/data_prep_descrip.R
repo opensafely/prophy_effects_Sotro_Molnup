@@ -901,7 +901,7 @@ freq_single_nrst5(cohort_sotro$solid_cancer_ever_therap_code)
 #            conf.int = TRUE)
 
 ## Clinical and demographics table
-variables <- c("age_treat_gp_rc", "sex","surv_event","surv_event_underly", "ethnicity", "region", "total_covid_vacc_cat", "first_covid_treat_interve")
+variables <- c("age_treat_gp_rc", "sex","surv_event", "ethnicity", "region", "total_covid_vacc_cat", "first_covid_treat_interve")
 high_risk_cohort_data <- high_risk_cohort %>%
   select(all_of(variables)) %>%
     mutate(
