@@ -9,7 +9,7 @@ library('fs')
 library('survival')
 library('survminer')
 library('splines')
-library('gtsummary')# for tbl_summary()
+library('gtsummary')
 
 ## import functions
 source(here("analysis", "lib", "r_funs.R"))
@@ -75,19 +75,12 @@ df_vars0<-df_vars00 %>%
     imd = as.character(imd)
 )
 
-#cat#death_cause_covid,allcause_death_60d_6m, covid_death_60d_6m,allcause_death_under60d,allcause_death_under30d
-#sum(hosp_covid60d6m_date,hosp_allcause60d6m_date,ons_dead_date)
-#r2nrst5
+
 cat("#df_vars0$surv_event\n") 
 freq_single_nrst5(df_vars0$surv_event)
-
-cat("#oral_steroid_drugs_nhsd_check\n") #
-freq_single_nrst5(df_vars0$oral_steroid_drugs_nhsd_check)
-
 cat("#risk_cohort\n") 
 freq_single_nrst5(df_vars0$risk_cohort)
 
-#df_vars0$highrisk_therap_cohort <- grepl("IMID|solid organ recipients|haematologic malignancy|Patients with a haematological diseases \\(sic\\)|sickle cell disease|stem cell transplant recipient|immune deficiencies|primary immune deficiencies|solid cancer", df_vars0$risk_cohort, ignore.case = TRUE)
 df_vars0 <- df_vars0 %>%
   mutate(had_highrisk_therap = grepl("IMID|solid organ recipients|haematologic malignancy|primary immune deficiencies|solid cancer", risk_cohort, ignore.case = TRUE),
   highrisk_therap = as.integer(had_highrisk_therap),
