@@ -33,7 +33,6 @@ opensafely/lung-cancer-snomed/2020-04-15
 opensafely/solid-organ-transplantation-snomed/2020-04-10
 opensafely/chronic-cardiac-disease-snomed/2020-04-08/
 opensafely/chronic-respiratory-disease-snomed/2020-04-10/
-opensafely/diabetes-snomed/2020-04-15/
 opensafely/housebound/5bc77310
 opensafely/no-longer-housebound/29a88ca6 
 opensafely/hypertension-snomed/2020-04-28/
