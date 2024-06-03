@@ -47,7 +47,9 @@ from codelists import(ethnicity_codelist, covid_icd10_codes, ethnicity,dialysis_
     haematopoietic_stem_cell_transplant_nhsd_opcs4_codes, pregnancy_primis_codes,pregdel_primis_codes, 
     non_haematological_cancer_opensafely_snomed_codes, non_haematological_cancer_opensafely_snomed_codes_new, 
     lung_cancer_opensafely_snomed_codes, chemotherapy_radiotherapy_opensafely_snomed_codes, care_home_primis_snomed_codes,
-    ethnicity_codelist_with_categories)
+    ethnicity_codelist_with_categories,diabetes_codes,hypertension_codes,chronic_cardiac_dis_codes,chronic_respiratory_dis_codes,
+    autism_nhsd_snomed_codes,wider_ld_primis_snomed_codes,serious_mental_illness_nhsd_snomed_codes, dementia_nhsd_snomed_codes,
+    housebound_opensafely_snomed_codes,no_longer_housebound_opensafely_snomed_codes)
 
 ## def_funs files
 from def_funs import(is_fem_male, bmi_record, first_covid_therap_date, cause_of_death_matches, any_of) 
@@ -428,7 +430,6 @@ dataset.dialysis_procedure = apcs_proc_bf_treat_lastdate(codelist= dialysis_opcs
 #dataset.dialysis_procedure0 = apcs_proc_bf_treat_df(codelist= dialysis_opcs4_codelist).sort_by(apcs.admission_date).last_for_patient().admission_date ##use fun:apcs_proc_bf_treat_lastdate
 
 dataset.had_dialysis =((dataset.dialysis_ctv3 <=treat_date) | (dataset.dialysis_icd10<=treat_date) | (dataset.dialysis_procedure<=treat_date))
-
 dataset.dialysis = case(
     when(dataset.had_dialysis).then(1), otherwise=0
 )
@@ -1006,3 +1007,58 @@ dataset.total_covid_vacc_cat = case(
     when (dataset.total_covid_vacc >= 3).then("Three or more vaccinations"),
     otherwise = "unvaccinated",
 )
+
+##diabetes_codes,hypertension_codes,chronic_cardiac_dis_codes,chronic_respiratory_dis_codes,
+##autism_nhsd_snomed_codes,wider_ld_primis_snomed_codes,serious_mental_illness_nhsd_snomed_codes, dementia_nhsd_snomed_codes 
+def had_c_event_snome_exist(codelist, dt=c_events_bf_treat, code_type='snomedct', where=True):
+    return (
+        dt.where(where)
+        .where(dt.snomedct_code.is_in(codelist) & (dt.date.is_on_or_before(treat_date)))
+        .sort_by(dt.date)
+        .exists_for_patient()
+)
+
+# Diabetes
+dataset.had_diabetes = had_c_event_snome_exist(codelist = diabetes_codes)
+# Hypertension
+dataset.had_hypertension = had_c_event_snome_exist(codelist = hypertension_codes)
+# Chronic cardiac disease
+dataset.had_chronic_cardiac_disease = had_c_event_snome_exist(codelist = chronic_cardiac_dis_codes)
+
+# Chronic respiratory disease
+dataset.had_chronic_respiratory_disease = had_c_event_snome_exist(codelist = chronic_respiratory_dis_codes)
+ ## Autism
+dataset.had_autism = had_c_event_snome_exist(codelist = autism_nhsd_snomed_codes)
+
+# Learning disability
+dataset.had_learning_disability = had_c_event_snome_exist(codelist = wider_ld_primis_snomed_codes)#, code_type='snomedct')#.exists_for_patient()
+
+# Serious Mental Illness
+dataset.had_serious_mental_illness = had_c_event_snome_exist(codelist = serious_mental_illness_nhsd_snomed_codes)#, code_type='snomedct')#.exists_for_patient()
+
+## Dementia
+dataset.had_dementia_poten = had_c_event_snome_exist(codelist = dementia_nhsd_snomed_codes)
+
+dataset.had_dementia = ((dataset.had_dementia_poten) & ( dataset.age_treated > 39))
+
+## Housebound
+#housebound_opensafely_snomed_codes,no_longer_housebound_opensafely_snomed_codes,care_home_primis_snomed_codes
+dataset.had_housebound_poten = had_c_event_snome_exist(codelist = housebound_opensafely_snomed_codes)
+dataset.housebound_date = had_c_event_ctv3snome_lastdate(
+    codelist = housebound_opensafely_snomed_codes, code_type='snomedct')
+
+dataset.had_no_longer_housebound = had_c_event_snome_exist(codelist = no_longer_housebound_opensafely_snomed_codes)
+dataset.no_longer_housebound_date = had_c_event_ctv3snome_lastdate(
+    codelist = no_longer_housebound_opensafely_snomed_codes, code_type='snomedct')
+
+dataset.had_moved_into_care_home = had_c_event_snome_exist(codelist = care_home_primis_snomed_codes)
+dataset.moved_into_care_home_date = had_c_event_ctv3snome_lastdate(
+    codelist = care_home_primis_snomed_codes, code_type='snomedct')
+
+dataset.had_housebound=(dataset.housebound_date > dataset.no_longer_housebound_date ) & (dataset.housebound_date>dataset.moved_into_care_home_date)
+
+
+  
+
+
+
