@@ -32,13 +32,12 @@ is_alive = (
     | patients.date_of_death.is_null()
 )
 
-is_registered = practice_registrations.spanning (  
-    index_startdate, index_enddate
-).exists_for_patient()
+# is_registered = practice_registrations.spanning (  
+#     index_startdate, index_enddate
+# ).exists_for_patient()
 
-
-def get_registration_status(index_startdate):
-    return practice_registration_as_of(index_startdate).exists_for_patient() 
+# def get_registration_status(index_startdate):
+#     return practice_registration_as_of(index_startdate).exists_for_patient() 
 
 
 bmi_record = (
@@ -85,22 +84,3 @@ def cause_of_death_matches(codelist):
 
     return any_of(conditions) 
 
-# def has_prev_event(codelist, where=True):
-#     return (
-#         prev_events.where(where)
-#         .where(prev_events.ctv3_code.is_in(codelist))
-#         .sort_by(prev_events.date)
-#         .last_for_patient().date
-#     )
-
-
-# def has_prev_event_numeric(codelist, where=True):
-#     prev_events_exists = prev_events.where(where) \
-#         .where(prev_events.ctv3_code.is_in(codelist)) \
-#         .exists_for_patient()
-#     return (
-#         case(
-#             when(prev_events_exists).then(1),
-#             when(~prev_events_exists).then(0)
-#             )
-#     )
