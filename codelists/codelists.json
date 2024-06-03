@@ -138,6 +138,24 @@
       "downloaded_at": "2024-04-29 20:32:54.057328Z",
       "sha": "f67d10329e95a519692fb2d6724495178c3665dd"
     },
+    "nhsd-primary-care-domain-refsets-autism_cod.csv": {
+      "id": "nhsd-primary-care-domain-refsets/autism_cod/20210127",
+      "url": "https://www.opencodelists.org/codelist/nhsd-primary-care-domain-refsets/autism_cod/20210127/",
+      "downloaded_at": "2024-06-03 21:26:05.961195Z",
+      "sha": "5e1a00fd89401955f0ebd09af105cf9748dbcc73"
+    },
+    "nhsd-primary-care-domain-refsets-mh_cod.csv": {
+      "id": "nhsd-primary-care-domain-refsets/mh_cod/20210127",
+      "url": "https://www.opencodelists.org/codelist/nhsd-primary-care-domain-refsets/mh_cod/20210127/",
+      "downloaded_at": "2024-06-03 21:26:06.566868Z",
+      "sha": "6e98da3c8765354b47ab74d1bef4679966a337f3"
+    },
+    "nhsd-primary-care-domain-refsets-dem_cod.csv": {
+      "id": "nhsd-primary-care-domain-refsets/dem_cod/20210127",
+      "url": "https://www.opencodelists.org/codelist/nhsd-primary-care-domain-refsets/dem_cod/20210127/",
+      "downloaded_at": "2024-06-03 21:26:07.136237Z",
+      "sha": "96defdd5b5345aaed6c6e2e71188c966288e4731"
+    },
     "opensafely-chemotherapy-or-radiotherapy-snomed.csv": {
       "id": "opensafely/chemotherapy-or-radiotherapy-snomed/2020-04-15",
       "url": "https://www.opencodelists.org/codelist/opensafely/chemotherapy-or-radiotherapy-snomed/2020-04-15/",
@@ -180,6 +198,36 @@
       "downloaded_at": "2024-05-01 07:24:10.153789Z",
       "sha": "cdb61aa51b4400c1aba2f8e4728c1b8130c4fd40"
     },
+    "opensafely-chronic-cardiac-disease-snomed.csv": {
+      "id": "opensafely/chronic-cardiac-disease-snomed/2020-04-08",
+      "url": "https://www.opencodelists.org/codelist/opensafely/chronic-cardiac-disease-snomed/2020-04-08/",
+      "downloaded_at": "2024-06-03 21:26:11.806816Z",
+      "sha": "9af634a364f09123c83d6da9a694642ccd3075be"
+    },
+    "opensafely-chronic-respiratory-disease-snomed.csv": {
+      "id": "opensafely/chronic-respiratory-disease-snomed/2020-04-10",
+      "url": "https://www.opencodelists.org/codelist/opensafely/chronic-respiratory-disease-snomed/2020-04-10/",
+      "downloaded_at": "2024-06-03 21:26:12.676831Z",
+      "sha": "ee3ce0c4fd016cbfc4a253f6e3678b430c472e02"
+    },
+    "opensafely-housebound.csv": {
+      "id": "opensafely/housebound/5bc77310",
+      "url": "https://www.opencodelists.org/codelist/opensafely/housebound/5bc77310/",
+      "downloaded_at": "2024-06-03 21:26:13.211441Z",
+      "sha": "4408752ee525151741ce050f1a20c51cd5c0116a"
+    },
+    "opensafely-no-longer-housebound.csv": {
+      "id": "opensafely/no-longer-housebound/29a88ca6",
+      "url": "https://www.opencodelists.org/codelist/opensafely/no-longer-housebound/29a88ca6/",
+      "downloaded_at": "2024-06-03 21:26:13.785312Z",
+      "sha": "cedcdcc0354885c1aa08224072718ff6bdae7450"
+    },
+    "opensafely-hypertension-snomed.csv": {
+      "id": "opensafely/hypertension-snomed/2020-04-28",
+      "url": "https://www.opencodelists.org/codelist/opensafely/hypertension-snomed/2020-04-28/",
+      "downloaded_at": "2024-06-03 21:26:14.374031Z",
+      "sha": "5d5471bb6a8a01e362b191b3eb8e80c2febeb1da"
+    },
     "primis-covid19-vacc-uptake-eth2001.csv": {
       "id": "primis-covid19-vacc-uptake/eth2001/v1",
       "url": "https://www.opencodelists.org/codelist/primis-covid19-vacc-uptake/eth2001/v1/",
@@ -203,6 +251,12 @@
       "url": "https://www.opencodelists.org/codelist/primis-covid19-vacc-uptake/pregdel/v1/",
       "downloaded_at": "2024-04-29 20:32:59.988704Z",
       "sha": "cc80ae0d636a46cf09990f4262c1edc044614835"
+    },
+    "primis-covid19-vacc-uptake-learndis.csv": {
+      "id": "primis-covid19-vacc-uptake/learndis/v1",
+      "url": "https://www.opencodelists.org/codelist/primis-covid19-vacc-uptake/learndis/v1/",
+      "downloaded_at": "2024-06-03 21:26:17.710473Z",
+      "sha": "41f81fcb9fadb082a77cadd6cf60614d7c8d860f"
     },
     "ukrr-dialysis-icd10.csv": {
       "id": "ukrr/dialysis-icd10/2a5cf9a2",
