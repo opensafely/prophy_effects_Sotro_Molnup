@@ -18,8 +18,8 @@ source(here("analysis", "lib", "r_funs.R"))
 dir_create(here::here("output", "tables"), showWarnings = FALSE, recurse = TRUE)
 dir_create(here::here("output", "data"), showWarnings = FALSE, recurse = TRUE)
 
-#df_vars00<- read_csv("C:/Users/qw/Documents/Github/prophy_effects_Sotro_Molnup/output/data/dataset_table.csv.gz") %>% #,
-df_vars00 <- read_csv(here::here("output", "data", "dataset_table.csv.gz")) %>%
+df_vars00<- read_csv("C:/Users/qw/Documents/Github/prophy_effects_Sotro_Molnup/output/data/dataset_table.csv.gz") %>% #,
+#df_vars00 <- read_csv(here::here("output", "data", "dataset_table.csv.gz")) %>%
   select(patient_id,age_treated, sex, age_treated_group, ethnicity_snome,ethnicity_snome_cat,ethnicity, imd1, imd, stp,region, 
   if_old_covid_treat,old_covid_treat, had_first_covid_treat, first_covid_treat_interve,drug, first_covid_treat_status,
   end_date_6mon, start_date_60d, treat_date, first_molnupiravir_date, first_sotrovimab_date, date_of_first_admis_af_treat, hosp_af_treat_alldiag_date,
@@ -58,19 +58,19 @@ df_vars0<-df_vars00 %>%
     surv_days = as.numeric(difftime(surv_end_covid_cause_date, start_date_60d, units = "days")),
     surv_from_treat_days = as.numeric(difftime(surv_end_covid_cause_date, treat_date, units = "days")),
     surv_event =as.character(ifelse((((!is.na(death_covid_cause_60d6m_date)) & (censored_bf_dead_hosp == 0))
-    |((!is.na(hosp_covid60d6m_date)) & (censored_bf_dead_hosp == 0))), "yes","no")),
+    |((!is.na(hosp_covid60d6m_date)) & (censored_bf_dead_hosp == 0))), "1yes","2no")),
     surv_event_underly = as.character(ifelse((((!is.na(death_covid_underly_60d6m_date)) & (censored_bf_dead_hosp == 0))
-    |((!is.na(hosp_covid60d6m_date)) & (censored_bf_dead_hosp == 0))),"yes","no")),
+    |((!is.na(hosp_covid60d6m_date)) & (censored_bf_dead_hosp == 0))),"1yes","2no")),
     calendar_day = as.numeric(difftime(start_date_60d, as.Date("2021-12-16"),units = "days")),
     calendar_wk = as.numeric(difftime(start_date_60d, as.Date("2021-12-16"),units = "weeks")),
     age_treated_spline = ns(age_treated, df = 4),
     calendar_day_spline = ns(calendar_day, df = 4),
     age_treat_gp_rc = ifelse(age_treated_group=="90+","80-89",age_treated_group),
-    had_hosp_covid60d6m = ifelse(!is.na(hosp_covid60d6m_date),"yes","no"),
+    had_hosp_covid60d6m = ifelse(!is.na(hosp_covid60d6m_date),"1yes","2no"),
     had_hosp_covid60d6m_01 = ifelse(!is.na(hosp_covid60d6m_date),1,0),
-    had_hosp_allcause60d6m = ifelse(!is.na(hosp_allcause60d6m_date),"yes","no"),
+    had_hosp_allcause60d6m = ifelse(!is.na(hosp_allcause60d6m_date),"1yes","2no"),
     had__hosp_allcause60d6m_01 = ifelse(!is.na(hosp_allcause60d6m_date),1,0),
-    had_ons_dead_date = ifelse(!is.na(ons_dead_date),"yes","no"),
+    had_ons_dead_date = ifelse(!is.na(ons_dead_date),"1yes","2no"),
     had__ons_dead_date_01 = ifelse(!is.na(ons_dead_date),1,0),
     imd = as.character(imd)
 )
@@ -81,6 +81,7 @@ freq_single_nrst5(df_vars0$surv_event)
 cat("#risk_cohort\n") 
 freq_single_nrst5(df_vars0$risk_cohort)
 
+#df_vars0$highrisk_therap_cohort <- grepl("IMID|solid organ recipients|haematologic malignancy|Patients with a haematological diseases \\(sic\\)|sickle cell disease|stem cell transplant recipient|immune deficiencies|primary immune deficiencies|solid cancer", df_vars0$risk_cohort, ignore.case = TRUE)
 df_vars0 <- df_vars0 %>%
   mutate(had_highrisk_therap = grepl("IMID|solid organ recipients|haematologic malignancy|primary immune deficiencies|solid cancer", risk_cohort, ignore.case = TRUE),
   highrisk_therap = as.integer(had_highrisk_therap),
@@ -107,6 +108,9 @@ df_vars0 <- df_vars0 %>%
   imid_ever_therap_code = ifelse(rowSums(cbind(imid_ever,therap_IMID),na.rm = TRUE)>= 1, 1, 0),
   solid_cancer_ever_therap_code = ifelse(rowSums(cbind(solid_cancer_ever,therap_solid_cancer),na.rm = TRUE)>= 1, 1, 0)
 )
+#imid_therap_code,dialysis_therap_code,solid_organ_transplant_therap_code,haema_disease_therap_code
+#immunosupression_therap_code,solid_cancer_therap_code,imid_ever_therap_code,solid_cancer_ever_therap_code
+
 
 df_vars <- df_vars0 %>% filter(old_covid_treat == 0 )  %>% filter(!is.na(stp))%>% filter(allcause_death_under60d != 1) 
 high_risk_cohort <- df_vars %>% filter(highrisk == 1 ) 
@@ -206,6 +210,17 @@ high_risk_cohort_tb1 <- proc_rm_b8_str(high_risk_cohort_data, "first_covid_treat
 # Merge the tibbles
 high_risk_cohort_tb1_all <- left_join((as_tibble(high_risk_cohort_tb1b)),(as_tibble(high_risk_cohort_tb1)), by = "**Characteristic**")
 print(high_risk_cohort_tb1_all)
+
+#imid_therap_code,dialysis_therap_code,solid_organ_transplant_therap_code,haema_disease_therap_code
+#immunosupression_therap_code,solid_cancer_therap_code,imid_ever_therap_code,solid_cancer_ever_therap_code
+variables2 <- c("imd", "first_covid_treat_interve","imid_therap_code","dialysis_therap_code","solid_organ_transplant_therap_code","haema_disease_therap_code",
+"immunosupression_therap_code","solid_cancer_therap_code","imid_ever_therap_code","solid_cancer_ever_therap_code")
+high_risk_cohort_data <- high_risk_cohort %>%
+  select(all_of(variables2)) %>%
+    mutate(
+    across(where(is.character), as.factor)
+    ) 
+
 
 # Save dataset(s) ----
 write_csv(high_risk_cohort_tb1_all, here::here("output", "tables", "table1_redacted_8b.csv"))
