@@ -27,7 +27,6 @@ nhsd-primary-care-domain-refsets/dem_cod/20210127
 opensafely/chemotherapy-or-radiotherapy-snomed/2020-04-15
 opensafely/diabetes-snomed/2020-04-15/
 opensafely/dialysis/3ce108ac
-opensafely/ethnicity/2020-04-27
 opensafely/kidney-transplant/2020-07-15
 opensafely/lung-cancer-snomed/2020-04-15
 opensafely/solid-organ-transplantation-snomed/2020-04-10
@@ -36,7 +35,6 @@ opensafely/chronic-respiratory-disease-snomed/2020-04-10/
 opensafely/housebound/5bc77310
 opensafely/no-longer-housebound/29a88ca6 
 opensafely/hypertension-snomed/2020-04-28/
-primis-covid19-vacc-uptake/eth2001/v1
 primis-covid19-vacc-uptake/longres/v1
 primis-covid19-vacc-uptake/preg/v1
 primis-covid19-vacc-uptake/pregdel/v1
