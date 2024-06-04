@@ -32,8 +32,8 @@ from ehrql.tables.tpp import(
 from ehrql.codes import *
 #from ehrql.codes import CTV3Code, ICD10Code
 
-## codelists 
-from codelists import(ethnicity_codelist, covid_icd10_codes, ethnicity,dialysis_codes,dialysis_icd10_codelist,
+## codelists #ethnicity_codelist,ethnicity
+from codelists import( covid_icd10_codes, dialysis_codes,dialysis_icd10_codelist,
     dialysis_opcs4_codelist, kidney_transplant_codes, kidney_tx_icd10_codelist, kidney_tx_opcs4_codelist, solid_organ_transplant_codes,
     solid_organ_transplant_nhsd_snomed_codes, solid_organ_transplant_nhsd_snomed_codes_new, dialysis_opcs4_codelist,
     haematopoietic_stem_cell_transplant_nhsd_snomed_codes, haematopoietic_stem_cell_transplant_nhsd_icd10_codes, 
@@ -849,23 +849,23 @@ dataset.age_treated_group = case(
         when(dataset.age_treated >= 90).then("90+"),
         otherwise="unknown",
 )
-
+#ethnicity_snome,ethnicity_snome_cat,
 ## Ethnicity
 dod_ons = ons_deaths.date
-ethnicity_snome = (
-    clinical_events.where(clinical_events.snomedct_code.is_in(ethnicity_codelist))
-    #.where(clinical_events.date.is_on_or_before(dod_ons))
-    .sort_by(clinical_events.date).last_for_patient().snomedct_code.to_category(ethnicity_codelist)) # (dummy data-more missing 1879)
+# ethnicity_snome = (
+#     clinical_events.where(clinical_events.snomedct_code.is_in(ethnicity_codelist))
+#     #.where(clinical_events.date.is_on_or_before(dod_ons))
+#     .sort_by(clinical_events.date).last_for_patient().snomedct_code.to_category(ethnicity_codelist)) # (dummy data-more missing 1879)
 
-dataset.ethnicity_snome = ethnicity_snome
-dataset.ethnicity_snome_cat = case(
-    when (ethnicity_snome == "1").then("White"),
-    when (ethnicity_snome == "2").then("Mixed"),
-    when (ethnicity_snome == "3").then("South Asian"),
-    when (ethnicity_snome == "4").then("Black"),
-    when (ethnicity_snome == "5").then("Other"),
-    otherwise = "unknown",
-)
+# dataset.ethnicity_snome = ethnicity_snome
+# dataset.ethnicity_snome_cat = case(
+#     when (ethnicity_snome == "1").then("White"),
+#     when (ethnicity_snome == "2").then("Mixed"),
+#     when (ethnicity_snome == "3").then("South Asian"),
+#     when (ethnicity_snome == "4").then("Black"),
+#     when (ethnicity_snome == "5").then("Other"),
+#     otherwise = "unknown",
+# )
 
 #ethnicity_from_sus
 dataset.latest_ethnicity_code = (
@@ -892,10 +892,10 @@ dataset.ethnicity = case(
   otherwise="unknown", 
 ) 
  
-##ethnicity2_ctv3
-dataset.ethnicity_ctv3 = clinical_events.where(
-        clinical_events.ctv3_code.is_in(ethnicity)
-).sort_by(clinical_events.date).last_for_patient().ctv3_code.to_category(ethnicity) #(dummy data-missing 367)
+# ##ethnicity2_ctv3
+# dataset.ethnicity_ctv3 = clinical_events.where(
+#         clinical_events.ctv3_code.is_in(ethnicity)
+# ).sort_by(clinical_events.date).last_for_patient().ctv3_code.to_category(ethnicity) #(dummy data-missing 367)
 
 
 spanning_addrs = addresses.where(addresses.start_date <= treat_date).except_where(
