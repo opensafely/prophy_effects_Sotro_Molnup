@@ -174,12 +174,6 @@
       "downloaded_at": "2024-04-29 20:32:55.758553Z",
       "sha": "ace47eee209d55a7506e60e7e664f8e75ad9848c"
     },
-    "opensafely-ethnicity.csv": {
-      "id": "opensafely/ethnicity/2020-04-27",
-      "url": "https://www.opencodelists.org/codelist/opensafely/ethnicity/2020-04-27/",
-      "downloaded_at": "2024-04-29 19:10:31.166376Z",
-      "sha": "3d2f3998b71863a80b24d60f6f4282e14191ae13"
-    },
     "opensafely-kidney-transplant.csv": {
       "id": "opensafely/kidney-transplant/2020-07-15",
       "url": "https://www.opencodelists.org/codelist/opensafely/kidney-transplant/2020-07-15/",
@@ -227,12 +221,6 @@
       "url": "https://www.opencodelists.org/codelist/opensafely/hypertension-snomed/2020-04-28/",
       "downloaded_at": "2024-06-03 21:26:14.374031Z",
       "sha": "5d5471bb6a8a01e362b191b3eb8e80c2febeb1da"
-    },
-    "primis-covid19-vacc-uptake-eth2001.csv": {
-      "id": "primis-covid19-vacc-uptake/eth2001/v1",
-      "url": "https://www.opencodelists.org/codelist/primis-covid19-vacc-uptake/eth2001/v1/",
-      "downloaded_at": "2024-04-29 20:32:58.110561Z",
-      "sha": "2ff9aea91a05f41fe911a885eee50d2494247d58"
     },
     "primis-covid19-vacc-uptake-longres.csv": {
       "id": "primis-covid19-vacc-uptake/longres/v1",
