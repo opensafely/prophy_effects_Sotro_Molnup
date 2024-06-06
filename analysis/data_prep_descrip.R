@@ -18,9 +18,9 @@ source(here("analysis", "lib", "r_funs.R"))
 dir_create(here::here("output", "tables"), showWarnings = FALSE, recurse = TRUE)
 dir_create(here::here("output", "data"), showWarnings = FALSE, recurse = TRUE)
 
-df_vars00<- read_csv("C:/Users/qw/Documents/Github/prophy_effects_Sotro_Molnup/output/data/dataset_table.csv.gz") %>% #,
-#df_vars00 <- read_csv(here::here("output", "data", "dataset_table.csv.gz")) %>%
-  select(patient_id,age_treated, sex, age_treated_group, ethnicity_snome,ethnicity_snome_cat,ethnicity, imd1, imd, stp,region, 
+#df_vars00<- read_csv("C:/Users/qw/Documents/Github/prophy_effects_Sotro_Molnup/output/data/dataset_table.csv.gz") %>% #,
+df_vars00 <- read_csv(here::here("output", "data", "dataset_table.csv.gz")) %>%
+  select(patient_id,age_treated, sex, age_treated_group, ethnicity, imd1, imd, stp,region, 
   if_old_covid_treat,old_covid_treat, had_first_covid_treat, first_covid_treat_interve,drug, first_covid_treat_status,
   end_date_6mon, start_date_60d, treat_date, first_molnupiravir_date, first_sotrovimab_date, date_of_first_admis_af_treat, hosp_af_treat_alldiag_date,
   hosp_60daf_treat_alldiag_date, ccare_covid_first_af_treat_alldiag_date, hosp_covid60d6m_date, hosp_covid60d6m_classfic,
@@ -35,9 +35,10 @@ df_vars00<- read_csv("C:/Users/qw/Documents/Github/prophy_effects_Sotro_Molnup/o
   immunosuppresant_drugs_nhsd_ever, oral_steroid_drugs_nhsd_ever, is_codelist_highrisk, highrisk_codelist, is_codelist_highrisk_ever, 
   highrisk_codelist_ever, total_covid_vacc, total_covid_vacc_cat, covid_vacc1_date,covid_vacc2_date,covid_vacc3_date,
   covid_vacc4_date, covid_vacc_last_date, imid, imid_ever,dialysis,kidney_transplant,solid_organ_transplant_new,haema_disease,
-  haema_disease_ever, immunosupression_new,solid_cancer_new,solid_cancer_ever,
-  had_imid,had_imid_ever,had_dialysis,had_kidney_transplant,had_solid_organ_transplant_new,had_haema_disease,had_immunosupression_new,
-  had_solid_cancer_new,had_solid_cancer_ever) 
+  haema_disease_ever, immunosupression_new,solid_cancer_new,solid_cancer_ever, had_imid, had_imid_ever, had_dialysis,had_kidney_transplant,
+  had_solid_organ_transplant_new, had_haema_disease, had_immunosupression_new, had_solid_cancer_new, had_solid_cancer_ever,
+  had_diabetes, had_hypertension,had_chronic_cardiac_disease, had_chronic_respiratory_disease, had_autism,had_learning_disability,
+  had_serious_mental_illness, had_dementia, had_housebound) 
 
 df_vars0<-df_vars00 %>%  
     mutate(
@@ -73,7 +74,7 @@ df_vars0<-df_vars00 %>%
     had_ons_dead_date = ifelse(!is.na(ons_dead_date),"1yes","2no"),
     had__ons_dead_date_01 = ifelse(!is.na(ons_dead_date),1,0),
     imd = as.character(imd)
-)
+) 
 
 
 cat("#df_vars0$surv_event\n") 
@@ -106,11 +107,28 @@ df_vars0 <- df_vars0 %>%
   immunosupression_therap_code =ifelse(rowSums(cbind(immunosupression_new,therap_IMDs,therap_PID),na.rm = TRUE)>= 1, 1, 0),
   solid_cancer_therap_code = ifelse(rowSums(cbind(solid_cancer_new,therap_solid_cancer),na.rm = TRUE)>= 1, 1, 0),
   imid_ever_therap_code = ifelse(rowSums(cbind(imid_ever,therap_IMID),na.rm = TRUE)>= 1, 1, 0),
-  solid_cancer_ever_therap_code = ifelse(rowSums(cbind(solid_cancer_ever,therap_solid_cancer),na.rm = TRUE)>= 1, 1, 0)
+  solid_cancer_ever_therap_code = ifelse(rowSums(cbind(solid_cancer_ever,therap_solid_cancer),na.rm = TRUE)>= 1, 1, 0),
+  high_risk_group = ifelse(imid_therap_code==1, "imid_therap_code",
+                           ifelse(dialysis_therap_code==1, "dialysis_therap_code",
+                           ifelse(solid_organ_transplant_therap_code==1, "solid_organ_transplant_therap_code",
+                           ifelse(haema_disease_therap_code==1, "haema_disease_therap_code",
+                           ifelse(immunosupression_therap_code==1, "immunosupression_therap_code",
+                           ifelse(solid_cancer_therap_code==1, "solid_cancer_therap_code", NA)))))),
+  diabetes = as.integer(had_diabetes), #as.factor()
+  hypertension = as.integer(had_hypertension),
+  chronic_cardiac_disease = as.integer(had_chronic_cardiac_disease),
+  chronic_respiratory_disease = as.integer(had_chronic_respiratory_disease),
+  autism = as.integer(had_autism),
+  learning_disability = as.integer(had_learning_disability),
+  serious_mental_illness = as.integer(had_serious_mental_illness),
+  dementia = as.integer(had_dementia),
+  housebound = as.integer(had_housebound),                                                                                                   
 )
-#imid_therap_code,dialysis_therap_code,solid_organ_transplant_therap_code,haema_disease_therap_code
-#immunosupression_therap_code,solid_cancer_therap_code,imid_ever_therap_code,solid_cancer_ever_therap_code
 
+#   had_diabetes, had_hypertension,had_chronic_cardiac_disease, had_chronic_respiratory_disease, had_autism,had_learning_disability,
+#   had_serious_mental_illness, had_dementia, had_housebound
+# #imid_therap_code,dialysis_therap_code,solid_organ_transplant_therap_code,haema_disease_therap_code
+#immunosupression_therap_code,solid_cancer_therap_code,imid_ever_therap_code,solid_cancer_ever_therap_code
 
 df_vars <- df_vars0 %>% filter(old_covid_treat == 0 )  %>% filter(!is.na(stp))%>% filter(allcause_death_under60d != 1) 
 high_risk_cohort <- df_vars %>% filter(highrisk == 1 ) 
@@ -119,6 +137,38 @@ high_risk_ever_cohort <- df_vars %>% filter(highrisk_ever == 1 )
 cohort_molnup<-high_risk_cohort %>% filter(drug == 0 )
 ##cohort_sotro
 cohort_sotro<-high_risk_cohort %>% filter(drug == 1 )
+
+freq_single(high_risk_cohort$diabetes)
+
+#surv_days,surv_from_treat_days,surv_event
+cat("#surv_days-high_risk_cohort:")
+mean(as.numeric(high_risk_cohort$surv_days),na.rm=T)
+cat("#surv_days-sd-high_risk_cohort:")
+sd(as.numeric(high_risk_cohort$surv_days),na.rm=T)
+cat("#surv_days-IQR-high_risk_cohort:")
+IQR(as.numeric(high_risk_cohort$surv_days), na.rm=T)
+cat("##surv_days-sum(is.na):")
+sum(is.na(high_risk_cohort$surv_days))
+
+#surv_days,surv_from_treat_days,surv_event
+cat("#surv_from_treat_days-high_risk_cohort:")
+mean(as.numeric(high_risk_cohort$surv_from_treat_days),na.rm=T)
+cat("#surv_days-sd-high_risk_cohort:")
+sd(as.numeric(high_risk_cohort$surv_from_treat_days),na.rm=T)
+cat("#surv_days-IQR-high_risk_cohort:")
+IQR(as.numeric(high_risk_cohort$surv_from_treat_days), na.rm=T)
+cat("#surv_days-sum(is.na):")
+sum(is.na(high_risk_cohort$surv_from_treat_days))
+
+cat("#sum(is.na(surv_event)):")
+sum(is.na(high_risk_cohort$surv_event))
+
+
+cat("#sum(is.na(drug)):")
+sum(is.na(high_risk_cohort$drug))
+
+cat("#sum(is.na(stp)):")
+sum(is.na(high_risk_cohort$stp))
 
 
 # cat("#age-summary-cohort_sotro:")
@@ -136,12 +186,11 @@ cohort_sotro<-high_risk_cohort %>% filter(drug == 1 )
 # cat("#age-group-cohort_sotro-round5")
 # freq_single_nrst5(cohort_sotro$age_treat_gp_rc)
 
-
 # high_risk_cohort$surv_days <- as.numeric(high_risk_cohort$surv_days)
 # high_risk_cohort$surv_event <- as.numeric(high_risk_cohort$surv_event)
 
-# cat("#summary(cox_model)")
-# #surv_days,surv_event
+# # cat("#summary(cox_model)")
+# # #surv_days,surv_event
 # cox_model <- coxph(Surv(surv_days, surv_event) ~ factor(drug)+ strata(factor(stp)), data = high_risk_cohort)
 # summary(cox_model)
 
@@ -166,7 +215,7 @@ high_risk_cohort_data_sum <-high_risk_cohort_data %>%
   select(all_of(variables)) %>%
   tbl_summary()
 
-proc_rm_b8 <- function(data) {
+proc_rm_b8 <- function(data,variables=variables) {
   result <- data %>%
     select(all_of(variables)) %>%
     mutate(
@@ -204,7 +253,7 @@ proc_rm_b8_str <- function(data, group_var = first_covid_treat_interve) {
   )
 }
 
-high_risk_cohort_tb1b <- proc_rm_b8(high_risk_cohort_data)
+high_risk_cohort_tb1b <- proc_rm_b8(high_risk_cohort_data,variables=variables)
 high_risk_cohort_tb1 <- proc_rm_b8_str(high_risk_cohort_data, "first_covid_treat_interve")
 
 # Merge the tibbles
@@ -213,21 +262,30 @@ print(high_risk_cohort_tb1_all)
 
 #imid_therap_code,dialysis_therap_code,solid_organ_transplant_therap_code,haema_disease_therap_code
 #immunosupression_therap_code,solid_cancer_therap_code,imid_ever_therap_code,solid_cancer_ever_therap_code
-variables2 <- c("imd", "first_covid_treat_interve","imid_therap_code","dialysis_therap_code","solid_organ_transplant_therap_code","haema_disease_therap_code",
-"immunosupression_therap_code","solid_cancer_therap_code","imid_ever_therap_code","solid_cancer_ever_therap_code")
-high_risk_cohort_data <- high_risk_cohort %>%
+# variables2 <- c("imd", "first_covid_treat_interve","imid_therap_code","dialysis_therap_code","solid_organ_transplant_therap_code","haema_disease_therap_code",
+# "immunosupression_therap_code","solid_cancer_therap_code","imid_ever_therap_code","solid_cancer_ever_therap_code")
+
+variables2 <- c("imd", "first_covid_treat_interve","high_risk_group")
+
+high_risk_cohort_data2 <- high_risk_cohort %>%
   select(all_of(variables2)) %>%
     mutate(
-    across(where(is.character), as.factor)
+    across(all_of(variables2), as.factor)
     ) 
 
+high_risk_cohort_tb1b_2 <- proc_rm_b8(high_risk_cohort_data2,variables=variables2)
+high_risk_cohort_tb1_2 <- proc_rm_b8_str(high_risk_cohort_data2, "first_covid_treat_interve")
+high_risk_cohort_tb1_2_all <- left_join((as_tibble(high_risk_cohort_tb1b_2)),(as_tibble(high_risk_cohort_tb1_2)), by = "**Characteristic**")
+print(high_risk_cohort_tb1_2_all)
+#write.csv(high_risk_cohort_tb1_2_all, ("C:/Users/qw/Documents/Github/prophy_effects_Sotro_Molnup/output/data/high_risk_cohort_tb1_2_all.csv"), row.names = FALSE)
 
 # Save dataset(s) ----
-write_csv(high_risk_cohort_tb1_all, here::here("output", "tables", "table1_redacted_8b.csv"))
+#write_csv(high_risk_cohort_tb1_all, here::here("output", "tables", "table1_redacted_8b.csv"))
+write_csv(high_risk_cohort_tb1_2_all, here::here("output", "tables", "table1b_redacted_8b.csv"))
 write.csv(df_vars, here::here("output", "tables", "data4analyse.csv"), row.names = FALSE)
 write_rds(df_vars, here::here("output", "data", "data4analyse.rds"), compress = "gz")
-write_rds(high_risk_cohort, here::here("output", "data", "high_risk_cohort.rds"), compress = "gz")
-write_rds(high_risk_ever_cohort, here::here("output", "data", "high_risk_ever_cohort.rds"), compress = "gz")
-#write.csv(high_risk_cohort_tb1_df, ("C:/Users/qw/Documents/Github/prophy_effects_Sotro_Molnup/output/data/high_risk_cohort_tb1.csv"), row.names = FALSE)
+# write.csv(high_risk_cohort, here::here("output", "data", "high_risk_cohort.csv"), compress = "gz")
+# write.csv(high_risk_ever_cohort, here::here("output", "data", "high_risk_ever_cohort.csv"), compress = "gz")
+# #write.csv(high_risk_cohort_tb1_df, ("C:/Users/qw/Documents/Github/prophy_effects_Sotro_Molnup/output/data/high_risk_cohort_tb1.csv"), row.names = FALSE)
 # write.csv(df_vars, ("C:/Users/qw/Documents/Github/prophy_effects_Sotro_Molnup/output/data/cohort_data4analyse.csv"), row.names = FALSE)
 
