@@ -852,20 +852,6 @@ dataset.age_treated_group = case(
 #ethnicity_snome,ethnicity_snome_cat,
 ## Ethnicity
 dod_ons = ons_deaths.date
-# ethnicity_snome = (
-#     clinical_events.where(clinical_events.snomedct_code.is_in(ethnicity_codelist))
-#     #.where(clinical_events.date.is_on_or_before(dod_ons))
-#     .sort_by(clinical_events.date).last_for_patient().snomedct_code.to_category(ethnicity_codelist)) # (dummy data-more missing 1879)
-
-# dataset.ethnicity_snome = ethnicity_snome
-# dataset.ethnicity_snome_cat = case(
-#     when (ethnicity_snome == "1").then("White"),
-#     when (ethnicity_snome == "2").then("Mixed"),
-#     when (ethnicity_snome == "3").then("South Asian"),
-#     when (ethnicity_snome == "4").then("Black"),
-#     when (ethnicity_snome == "5").then("Other"),
-#     otherwise = "unknown",
-# )
 
 #ethnicity_from_sus
 dataset.latest_ethnicity_code = (
@@ -892,11 +878,6 @@ dataset.ethnicity = case(
   otherwise="unknown", 
 ) 
  
-# ##ethnicity2_ctv3
-# dataset.ethnicity_ctv3 = clinical_events.where(
-#         clinical_events.ctv3_code.is_in(ethnicity)
-# ).sort_by(clinical_events.date).last_for_patient().ctv3_code.to_category(ethnicity) #(dummy data-missing 367)
-
 
 spanning_addrs = addresses.where(addresses.start_date <= treat_date).except_where(
     addresses.end_date < treat_date
@@ -1017,7 +998,8 @@ def had_c_event_snome_exist(codelist, dt=c_events_bf_treat, code_type='snomedct'
         .sort_by(dt.date)
         .exists_for_patient()
 )
-
+#had_diabetes,had_hypertension,had_chronic_cardiac_disease,had_chronic_respiratory_disease,
+#had_autism,had_learning_disability,had_serious_mental_illness,had_dementia,had_housebound
 # Diabetes
 dataset.had_diabetes = had_c_event_snome_exist(codelist = diabetes_codes)
 # Hypertension
