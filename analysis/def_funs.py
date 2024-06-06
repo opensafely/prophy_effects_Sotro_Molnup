@@ -18,10 +18,10 @@ from ehrql import (
 
 
 #from ehrql.tables.raw.tpp import (
-from ehrql.tables.raw.tpp import (
-    covid_therapeutics_raw,
-    isaric,
-)
+# from ehrql.tables.raw.tpp import (
+#     covid_therapeutics_raw,
+#     isaric,
+# )
 index_startdate = "2021-12-16"  
 index_enddate = "2022-02-10"
 
@@ -31,6 +31,9 @@ is_alive = (
     patients.date_of_death.is_after(index_startdate)
     | patients.date_of_death.is_null()
 )
+
+index_startdate = "2021-12-16"  
+index_enddate = "2022-02-10"
 
 # is_registered = practice_registrations.spanning (  
 #     index_startdate, index_enddate
