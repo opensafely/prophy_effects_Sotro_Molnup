@@ -27,7 +27,7 @@ df_vars00 <- read_csv(here::here("output", "data", "dataset_table.csv.gz")) %>%
   hosp_covid60d6m_pdiag, had_ccare_covid60d6m, ccare_covid60d6m_date, hosp_allcause60d6m_date, hosp_allcause60d6m_classfic, hosp_allcause60d6m_pdiag, 
   hospitalise_disc_covid, hospitalise_disc_allcause, ons_dead_date, underly_deathcause_code, death_cause_covid, was_allcause_death_60d_6m,
   allcause_death_60d_6m, was_covid_death_60d_6m, covid_death_60d_6m, was_allcause_death_under60d, allcause_death_under60d, 
-  allcause_death_under30d, bmi, is_molnu_pt_censored,is_sotro_pt_censored,molnu_pt_censored, sotro_pt_censored, molnu_pt_censored_date, sotro_pt_censored_date,risk_cohort,
+  allcause_death_under30d, bmi, bmi_date, is_molnu_pt_censored,is_sotro_pt_censored,molnu_pt_censored, sotro_pt_censored, molnu_pt_censored_date, sotro_pt_censored_date,risk_cohort,
   had_dialysis, had_kidney_transplant, transplant_thymus_opcs4,transplant_thymus_opcs4_count,transplant_thymus_opcs4_a, 
   transplant_thymus_opcs4_2, transplant_conjunctiva_y_code_opcs4, transplant_conjunctiva_y_code_opcs4_count,transplant_conjunctiva_opcs4,
   transplant_conjunctiva_opcs4_count, transplant_conjunctiva_opcs4_2,  oral_steroid_drugs_nhsd, 
@@ -40,9 +40,50 @@ df_vars00 <- read_csv(here::here("output", "data", "dataset_table.csv.gz")) %>%
   had_diabetes, had_hypertension,had_chronic_cardiac_disease, had_chronic_respiratory_disease, had_autism,had_learning_disability,
   had_serious_mental_illness, had_dementia, had_housebound) 
 
+# > freq_single(high_risk_cohort$imd)
+#                    [,1]   [,2]
+# 1 (most deprived)     9  12.16
+# 2                     8  10.81
+# 3                     7   9.46
+# 4                    11  14.86
+# 5 (least deprived)    8  10.81
+# unknown              31  41.89
+# total                74 100.00
+
+# > freq_single(high_risk_cohort$region)
+#                          [,1]   [,2]
+# East                        3   4.05
+# East Midlands              12  16.22
+# London                      9  12.16
+# North East                  6   8.11
+# North West                  9  12.16
+# South East                  8  10.81
+# South West                 12  16.22
+# West Midlands               8  10.81
+# Yorkshire and The Humber    7   9.46
+# total                      74 100.00
+
 df_vars0<-df_vars00 %>%  
     mutate(
-    sex01 = ifelse(sex %in% ("female"), 1, 0),
+    sex_num = ifelse(sex %in% ("female"), 1, 0),
+    ethnicity_num = ifelse(ethnicity == "Asian or Asian British", 0, 
+    ifelse(ethnicity == "Black or Black British", 1, 
+    ifelse(ethnicity == "Chinese or Other Ethnic Groups", 2,
+    ifelse(ethnicity == "Mixed", 3,
+    ifelse(ethnicity == "unknown", 4, 5))))),
+    imd_num = ifelse(imd == "1 (most deprived)", 0, 
+    ifelse(imd == "2", 1, 
+    ifelse(imd == "3", 2,
+    ifelse(imd == "4", 3,
+    ifelse(imd == "5 (least deprived)", 4,5))))),
+    region_num = ifelse(region == "East", 0, 
+    ifelse(region == "East Midlands", 1, 
+    ifelse(region == "London", 2,
+    ifelse(region == "North East", 3,
+    ifelse(region == "North West", 4,
+    ifelse(region == "South East",5,
+    ifelse(region == "South West",6,
+    ifelse(region == "West Midlands",7,8)))))))),
     underly_covid_deathcause0_1 = ifelse(underly_deathcause_code %in% c("U071", "U072", "U099", "U109"), 1, 0),
     death_cause_covid0_1 = ifelse(death_cause_covid %in% ("TRUE"), 1,0 ), 
     test_date_format = ons_dead_date,
@@ -62,6 +103,8 @@ df_vars0<-df_vars00 %>%
     |((!is.na(hosp_covid60d6m_date)) & (censored_bf_dead_hosp == 0))), "1yes","2no")),
     surv_event_underly = as.character(ifelse((((!is.na(death_covid_underly_60d6m_date)) & (censored_bf_dead_hosp == 0))
     |((!is.na(hosp_covid60d6m_date)) & (censored_bf_dead_hosp == 0))),"1yes","2no")),
+    surv_event_num = as.numeric(ifelse(surv_event == "1yes", 1, 0)),
+    surv_event_underly = as.numeric(ifelse(surv_event_underly == "1yes", 1, 0)),
     calendar_day = as.numeric(difftime(start_date_60d, as.Date("2021-12-16"),units = "days")),
     calendar_wk = as.numeric(difftime(start_date_60d, as.Date("2021-12-16"),units = "weeks")),
     age_treated_spline = ns(age_treated, df = 4),
@@ -125,6 +168,9 @@ df_vars0 <- df_vars0 %>%
   housebound = as.integer(had_housebound),                                                                                                   
 )
 
+#sex_num,ethnicity_num,imd_num,region_num,diabetes,hypertension,chronic_cardiac_disease,chronic_respiratory_disease
+#autism,learning_disability,serious_mental_illness,dementia,housebound
+
 #   had_diabetes, had_hypertension,had_chronic_cardiac_disease, had_chronic_respiratory_disease, had_autism,had_learning_disability,
 #   had_serious_mental_illness, had_dementia, had_housebound
 # #imid_therap_code,dialysis_therap_code,solid_organ_transplant_therap_code,haema_disease_therap_code
@@ -138,70 +184,14 @@ cohort_molnup<-high_risk_cohort %>% filter(drug == 0 )
 ##cohort_sotro
 cohort_sotro<-high_risk_cohort %>% filter(drug == 1 )
 
-freq_single(high_risk_cohort$diabetes)
-
-#surv_days,surv_from_treat_days,surv_event
-cat("#surv_days-high_risk_cohort:")
-mean(as.numeric(high_risk_cohort$surv_days),na.rm=T)
-cat("#surv_days-sd-high_risk_cohort:")
-sd(as.numeric(high_risk_cohort$surv_days),na.rm=T)
-cat("#surv_days-IQR-high_risk_cohort:")
-IQR(as.numeric(high_risk_cohort$surv_days), na.rm=T)
-cat("##surv_days-sum(is.na):")
-sum(is.na(high_risk_cohort$surv_days))
-
-#surv_days,surv_from_treat_days,surv_event
-cat("#surv_from_treat_days-high_risk_cohort:")
-mean(as.numeric(high_risk_cohort$surv_from_treat_days),na.rm=T)
-cat("#surv_days-sd-high_risk_cohort:")
-sd(as.numeric(high_risk_cohort$surv_from_treat_days),na.rm=T)
-cat("#surv_days-IQR-high_risk_cohort:")
-IQR(as.numeric(high_risk_cohort$surv_from_treat_days), na.rm=T)
-cat("#surv_days-sum(is.na):")
-sum(is.na(high_risk_cohort$surv_from_treat_days))
-
-cat("#sum(is.na(surv_event)):")
-sum(is.na(high_risk_cohort$surv_event))
+#freq_single(high_risk_cohort$diabetes)
 
 
-cat("#sum(is.na(drug)):")
-sum(is.na(high_risk_cohort$drug))
+cat("#high_risk_cohort$imd\n") 
+freq_single(high_risk_cohort$imd)
 
-cat("#sum(is.na(stp)):")
-sum(is.na(high_risk_cohort$stp))
-
-
-# cat("#age-summary-cohort_sotro:")
-# summary(as.numeric(cohort_sotro$age_treated),na.rm=T)
-
-# cat("#age-mean-cohort_sotro:")
-# mean(as.numeric(cohort_sotro$age_treated),na.rm=T)
-# cat("#age-sd-cohort_sotro:")
-# sd(as.numeric(cohort_sotro$age_treated),na.rm=T)
-# cat("#age-IQR-cohort_sotro:")
-# IQR(as.numeric(cohort_sotro$age_treated), na.rm=T)
-
-# cat("#age-group-cohort_sotro:")
-# freq_single(cohort_sotro$age_treat_gp_rc)
-# cat("#age-group-cohort_sotro-round5")
-# freq_single_nrst5(cohort_sotro$age_treat_gp_rc)
-
-# high_risk_cohort$surv_days <- as.numeric(high_risk_cohort$surv_days)
-# high_risk_cohort$surv_event <- as.numeric(high_risk_cohort$surv_event)
-
-# # cat("#summary(cox_model)")
-# # #surv_days,surv_event
-# cox_model <- coxph(Surv(surv_days, surv_event) ~ factor(drug)+ strata(factor(stp)), data = high_risk_cohort)
-# summary(cox_model)
-
-# #age_treated, sex01
-# cox_model1_age_sex <- coxph(Surv(surv_days, surv_event) ~ factor(drug) + age_treated + sex01+ strata(factor(stp)), data = high_risk_cohort)
-# summary(cox_model1_age_sex)
-
-# Plot the survival curves
-# ggsurvplot(survfit(cox_model), data = high_risk_cohort, pval = TRUE,
-#            ggtheme = theme_minimal(), risk.table = TRUE,
-#            conf.int = TRUE)
+cat("#high_risk_cohort$housebound\n") 
+freq_single(high_risk_cohort$housebound)
 
 ## Clinical and demographics table
 variables <- c("age_treat_gp_rc", "sex","surv_event", "ethnicity", "region", "total_covid_vacc_cat", "first_covid_treat_interve")
@@ -284,8 +274,8 @@ write_csv(high_risk_cohort_tb1_all, here::here("output", "tables", "table1_redac
 write_csv(high_risk_cohort_tb1_2_all, here::here("output", "tables", "table1b_redacted_8b.csv"))
 write.csv(df_vars, here::here("output", "tables", "data4analyse.csv"), row.names = FALSE)
 write_rds(df_vars, here::here("output", "data", "data4analyse.rds"), compress = "gz")
-# write.csv(high_risk_cohort, here::here("output", "data", "high_risk_cohort.csv"), compress = "gz")
-# write.csv(high_risk_ever_cohort, here::here("output", "data", "high_risk_ever_cohort.csv"), compress = "gz")
+write.csv(high_risk_cohort, here::here("output", "data", "high_risk_cohort.csv"), row.names = FALSE)
+write.csv(high_risk_ever_cohort, here::here("output", "data", "high_risk_ever_cohort.csv"), row.names = FALSE)
 # #write.csv(high_risk_cohort_tb1_df, ("C:/Users/qw/Documents/Github/prophy_effects_Sotro_Molnup/output/data/high_risk_cohort_tb1.csv"), row.names = FALSE)
 # write.csv(df_vars, ("C:/Users/qw/Documents/Github/prophy_effects_Sotro_Molnup/output/data/cohort_data4analyse.csv"), row.names = FALSE)
 
