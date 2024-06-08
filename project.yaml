@@ -12,7 +12,7 @@ actions:
         cohort: output/data/dataset_table.csv.gz
 
   prep_descrip_r:
-    run: r:latest analysis/data_prep_descrip.R
+    run: r:latest analysis/data_prep_descrip.r
     needs: [gen_dataset_table]
     outputs:
       moderately_sensitive:
@@ -23,8 +23,15 @@ actions:
         data4: output/data/high_risk_ever_cohort.csv
         data5: output/data/high_risk_cohort.csv
         rds: output/data/data4analyse.rds
+#prep_model_surv.r
+  prep_model_surv_r:
+    run: r:latest analysis/prep_model_surv.r
+    needs: [prep_descrip_r]
+    outputs:
+      highly_sensitive:
+        data6: output/data/high_risk_surv_data.csv
 
-  prep_descrip_stata:
+prep_descrip_stata:
    run: stata-mp:latest analysis/data_prep_descrip.do
    needs: [gen_dataset_table]
    outputs:
