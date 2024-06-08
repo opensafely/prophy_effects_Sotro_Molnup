@@ -38,7 +38,7 @@ df_vars00 <- read_csv(here::here("output", "data", "dataset_table.csv.gz")) %>%
   haema_disease_ever, immunosupression_new,solid_cancer_new,solid_cancer_ever, had_imid, had_imid_ever, had_dialysis,had_kidney_transplant,
   had_solid_organ_transplant_new, had_haema_disease, had_immunosupression_new, had_solid_cancer_new, had_solid_cancer_ever,
   had_diabetes, had_hypertension,had_chronic_cardiac_disease, had_chronic_respiratory_disease, had_autism,had_learning_disability,
-  had_serious_mental_illness, had_dementia, had_housebound) 
+  had_serious_mental_illness, had_dementia, had_housebound,, housebound_lastdate, no_longer_housebound_lastdate, moved_into_care_home_lastdate) 
 
 # > freq_single(high_risk_cohort$imd)
 #                    [,1]   [,2]
@@ -116,7 +116,8 @@ df_vars0<-df_vars00 %>%
     had__hosp_allcause60d6m_01 = ifelse(!is.na(hosp_allcause60d6m_date),1,0),
     had_ons_dead_date = ifelse(!is.na(ons_dead_date),"1yes","2no"),
     had__ons_dead_date_01 = ifelse(!is.na(ons_dead_date),1,0),
-    imd = as.character(imd)
+    imd = as.character(imd),
+    had_housebound_r_num = ifelse(((housebound_lastdate > no_longer_housebound_lastdate) & (housebound_lastdate > moved_into_care_home_lastdate)),1,0)
 ) 
 
 
@@ -192,6 +193,9 @@ freq_single(high_risk_cohort$imd)
 
 cat("#high_risk_cohort$housebound\n") 
 freq_single(high_risk_cohort$housebound)
+
+cat("#freq_single-high_risk_cohort$had_housebound_r_num\n") 
+freq_single(high_risk_cohort$had_housebound_r_num)
 
 ## Clinical and demographics table
 variables <- c("age_treat_gp_rc", "sex","surv_event", "ethnicity", "region", "total_covid_vacc_cat", "first_covid_treat_interve")
