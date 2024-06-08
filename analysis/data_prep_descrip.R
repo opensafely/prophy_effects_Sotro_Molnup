@@ -276,7 +276,7 @@ print(high_risk_cohort_tb1_2_all)
 # Save dataset(s) ----
 write_csv(high_risk_cohort_tb1_all, here::here("output", "tables", "table1_redacted_8b.csv"))
 write_csv(high_risk_cohort_tb1_2_all, here::here("output", "tables", "table1b_redacted_8b.csv"))
-write.csv(df_vars, here::here("output", "tables", "data4analyse.csv"), row.names = FALSE)
+write.csv(df_vars, here::here("output", "data", "data4analyse.csv"), row.names = FALSE)
 write_rds(df_vars, here::here("output", "data", "data4analyse.rds"), compress = "gz")
 write.csv(high_risk_cohort, here::here("output", "data", "high_risk_cohort.csv"), row.names = FALSE)
 write.csv(high_risk_ever_cohort, here::here("output", "data", "high_risk_ever_cohort.csv"), row.names = FALSE)
