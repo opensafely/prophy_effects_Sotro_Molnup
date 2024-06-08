@@ -40,28 +40,6 @@ df_vars00 <- read_csv(here::here("output", "data", "dataset_table.csv.gz")) %>%
   had_diabetes, had_hypertension,had_chronic_cardiac_disease, had_chronic_respiratory_disease, had_autism,had_learning_disability,
   had_serious_mental_illness, had_dementia, had_housebound,, housebound_lastdate, no_longer_housebound_lastdate, moved_into_care_home_lastdate) 
 
-# > freq_single(high_risk_cohort$imd)
-#                    [,1]   [,2]
-# 1 (most deprived)     9  12.16
-# 2                     8  10.81
-# 3                     7   9.46
-# 4                    11  14.86
-# 5 (least deprived)    8  10.81
-# unknown              31  41.89
-# total                74 100.00
-
-# > freq_single(high_risk_cohort$region)
-#                          [,1]   [,2]
-# East                        3   4.05
-# East Midlands              12  16.22
-# London                      9  12.16
-# North East                  6   8.11
-# North West                  9  12.16
-# South East                  8  10.81
-# South West                 12  16.22
-# West Midlands               8  10.81
-# Yorkshire and The Humber    7   9.46
-# total                      74 100.00
 
 df_vars0<-df_vars00 %>%  
     mutate(
@@ -84,6 +62,9 @@ df_vars0<-df_vars00 %>%
     ifelse(region == "South East",5,
     ifelse(region == "South West",6,
     ifelse(region == "West Midlands",7,8)))))))),
+    covid_vacc_num = ifelse(total_covid_vacc_cat == "unvaccinated", 0, 
+    ifelse(region == "One vaccination", 1, 
+    ifelse(region == "Two vaccination", 2, 3))),
     underly_covid_deathcause0_1 = ifelse(underly_deathcause_code %in% c("U071", "U072", "U099", "U109"), 1, 0),
     death_cause_covid0_1 = ifelse(death_cause_covid %in% ("TRUE"), 1,0 ), 
     test_date_format = ons_dead_date,
@@ -158,6 +139,12 @@ df_vars0 <- df_vars0 %>%
                            ifelse(haema_disease_therap_code==1, "haema_disease_therap_code",
                            ifelse(immunosupression_therap_code==1, "immunosupression_therap_code",
                            ifelse(solid_cancer_therap_code==1, "solid_cancer_therap_code", NA)))))),
+  high_risk_num = ifelse(is.na(high_risk_group), 0,
+    ifelse(high_risk_group == "imid_therap_code", 1, 
+    ifelse(high_risk_group == "dialysis_therap_code", 2, 
+    ifelse(high_risk_group == "solid_organ_transplant_therap_code", 3,
+    ifelse(high_risk_group == "haema_disease_therap_code", 4,
+    ifelse(high_risk_group == "immunosupression_therap_code", 5,6)))))),
   diabetes = as.integer(had_diabetes), #as.factor()
   hypertension = as.integer(had_hypertension),
   chronic_cardiac_disease = as.integer(had_chronic_cardiac_disease),
