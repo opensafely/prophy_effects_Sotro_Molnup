@@ -1025,19 +1025,20 @@ dataset.had_dementia = ((dataset.had_dementia_poten) & ( dataset.age_treated > 3
 
 ## Housebound
 #housebound_opensafely_snomed_codes,no_longer_housebound_opensafely_snomed_codes,care_home_primis_snomed_codes
+#housebound_lastdate,no_longer_housebound_lastdate,moved_into_care_home_lastdate
 dataset.had_housebound_poten = had_c_event_snome_exist(codelist = housebound_opensafely_snomed_codes)
-dataset.housebound_date = had_c_event_ctv3snome_lastdate(
+dataset.housebound_lastdate = had_c_event_ctv3snome_lastdate(
     codelist = housebound_opensafely_snomed_codes, code_type='snomedct')
 
 dataset.had_no_longer_housebound = had_c_event_snome_exist(codelist = no_longer_housebound_opensafely_snomed_codes)
-dataset.no_longer_housebound_date = had_c_event_ctv3snome_lastdate(
+dataset.no_longer_housebound_lastdate = had_c_event_ctv3snome_lastdate(
     codelist = no_longer_housebound_opensafely_snomed_codes, code_type='snomedct')
 
 dataset.had_moved_into_care_home = had_c_event_snome_exist(codelist = care_home_primis_snomed_codes)
-dataset.moved_into_care_home_date = had_c_event_ctv3snome_lastdate(
+dataset.moved_into_care_home_lastdate = had_c_event_ctv3snome_lastdate(
     codelist = care_home_primis_snomed_codes, code_type='snomedct')
 
-dataset.had_housebound=(dataset.housebound_date > dataset.no_longer_housebound_date ) & (dataset.housebound_date>dataset.moved_into_care_home_date)
+dataset.had_housebound=(dataset.housebound_lastdate > dataset.no_longer_housebound_lastdate ) & (dataset.housebound_lastdate>dataset.moved_into_care_home_lastdate)
 
 
   
