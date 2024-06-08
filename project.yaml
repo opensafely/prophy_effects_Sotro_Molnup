@@ -19,7 +19,7 @@ actions:
         data2: output/tables/table1_redacted_8b.csv
         data3: output/tables/table1b_redacted_8b.csv
       highly_sensitive:
-        data1: output/tables/data4analyse.csv
+        data1: output/data/data4analyse.csv
         data4: output/data/high_risk_ever_cohort.csv
         data5: output/data/high_risk_cohort.csv
         rds: output/data/data4analyse.rds
