@@ -111,6 +111,14 @@ sum(is.na(high_risk_surv_data$covid_vacc_num))
 cat("#sum(!is.na(covid_vacc_num)):")
 sum(!is.na(high_risk_surv_data$covid_vacc_num))
 
+#covid_vacc_num1
+cat("#freq_single(high_risk_surv_data$covid_vacc_num1)")
+freq_single(high_risk_surv_data$covid_vacc_num1)
+cat("#sum(is.na(covid_vacc_num1)):")
+sum(is.na(high_risk_surv_data$covid_vacc_num1))
+cat("#sum(!is.na(covid_vacc_num1)):")
+sum(!is.na(high_risk_surv_data$covid_vacc_num1))
+
 #imd_num
 cat("#freq_single(high_risk_surv_data$imd_num)")
 freq_single(high_risk_surv_data$imd_num)
