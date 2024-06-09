@@ -63,8 +63,8 @@ df_vars0<-df_vars00 %>%
     ifelse(region == "South West",6,
     ifelse(region == "West Midlands",7,8)))))))),
     covid_vacc_num = ifelse(total_covid_vacc_cat == "unvaccinated", 0, 
-    ifelse(region == "One vaccination", 1, 
-    ifelse(region == "Two vaccination", 2, 3))),
+    ifelse(total_covid_vacc_cat == "One vaccination", 1, 
+    ifelse(total_covid_vacc_cat == "Two vaccination", 2, 3))),
     underly_covid_deathcause0_1 = ifelse(underly_deathcause_code %in% c("U071", "U072", "U099", "U109"), 1, 0),
     death_cause_covid0_1 = ifelse(death_cause_covid %in% ("TRUE"), 1,0 ), 
     test_date_format = ons_dead_date,
@@ -139,12 +139,11 @@ df_vars0 <- df_vars0 %>%
                            ifelse(haema_disease_therap_code==1, "haema_disease_therap_code",
                            ifelse(immunosupression_therap_code==1, "immunosupression_therap_code",
                            ifelse(solid_cancer_therap_code==1, "solid_cancer_therap_code", NA)))))),
-  high_risk_num = ifelse(is.na(high_risk_group), 0,
-    ifelse(high_risk_group == "imid_therap_code", 1, 
-    ifelse(high_risk_group == "dialysis_therap_code", 2, 
-    ifelse(high_risk_group == "solid_organ_transplant_therap_code", 3,
-    ifelse(high_risk_group == "haema_disease_therap_code", 4,
-    ifelse(high_risk_group == "immunosupression_therap_code", 5,6)))))),
+  high_risk_num = ifelse(high_risk_group == "imid_therap_code", 0, 
+    ifelse(high_risk_group == "dialysis_therap_code", 1, 
+    ifelse(high_risk_group == "solid_organ_transplant_therap_code", 2,
+    ifelse(high_risk_group == "haema_disease_therap_code", 3,
+    ifelse(high_risk_group == "immunosupression_therap_code", 4,5))))),
   diabetes = as.integer(had_diabetes), #as.factor()
   hypertension = as.integer(had_hypertension),
   chronic_cardiac_disease = as.integer(had_chronic_cardiac_disease),
@@ -171,6 +170,26 @@ high_risk_ever_cohort <- df_vars %>% filter(highrisk_ever == 1 )
 cohort_molnup<-high_risk_cohort %>% filter(drug == 0 )
 ##cohort_sotro
 cohort_sotro<-high_risk_cohort %>% filter(drug == 1 )
+
+cat("#dim(df_vars0)\n") 
+dim(df_vars0)
+
+cat("#dim(df_vars)\n") 
+dim(df_vars)
+
+cat("#dim(high_risk_cohort)\n") 
+dim(high_risk_cohort)
+
+cat("#dim(high_risk_ever_cohort)\n") 
+dim(high_risk_ever_cohort)
+
+cat("#dim(cohort_molnup)\n") 
+dim(cohort_molnup)
+
+cat("#dim(cohort_sotro)\n") 
+dim(cohort_sotro)
+
+
 #freq_single(high_risk_cohort$diabetes)
 
 cat("#high_risk_cohort$imd\n") 
@@ -258,6 +277,8 @@ high_risk_cohort_tb1_2_all <- left_join((as_tibble(high_risk_cohort_tb1b_2)),(as
 print(high_risk_cohort_tb1_2_all)
 #write.csv(high_risk_cohort_tb1_2_all, ("C:/Users/qw/Documents/Github/prophy_effects_Sotro_Molnup/output/data/high_risk_cohort_tb1_2_all.csv"), row.names = FALSE)
 
+cat("#str(high_risk_cohort)\n") 
+str(high_risk_cohort, list.len = ncol(high_risk_cohort), give.attr= F)
 # Save dataset(s) ----
 write_csv(high_risk_cohort_tb1_all, here::here("output", "tables", "table1_redacted_8b.csv"))
 write_csv(high_risk_cohort_tb1_2_all, here::here("output", "tables", "table1b_redacted_8b.csv"))
