@@ -62,7 +62,7 @@ df_vars0<-df_vars00 %>%
     ifelse(region == "South East",5,
     ifelse(region == "South West",6,
     ifelse(region == "West Midlands",7,8)))))))),
-    covid_vacc_num = ifelse(total_covid_vacc == 1, 1,  #
+    covid_vacc_num = ifelse(total_covid_vacc == 1, 1,  
     ifelse(total_covid_vacc == 2, 2,
     ifelse(total_covid_vacc >= 3, 3, 0))),
     covid_vacc_num1 = ifelse(total_covid_vacc_cat == "unvaccinated", 0, 
