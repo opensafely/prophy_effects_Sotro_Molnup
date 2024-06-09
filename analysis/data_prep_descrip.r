@@ -62,6 +62,9 @@ df_vars0<-df_vars00 %>%
     ifelse(region == "South East",5,
     ifelse(region == "South West",6,
     ifelse(region == "West Midlands",7,8)))))))),
+    covid_vacc_num0 = ifelse(total_covid_vacc == 1, 1,  #
+    ifelse(total_covid_vacc == 2, 2,
+    ifelse(total_covid_vacc >= 3, 3, 0))),
     covid_vacc_num = ifelse(total_covid_vacc_cat == "unvaccinated", 0, 
     ifelse(total_covid_vacc_cat == "One vaccination", 1, 
     ifelse(total_covid_vacc_cat == "Two vaccination", 2, 3))),
@@ -107,9 +110,11 @@ freq_single_nrst5(df_vars0$surv_event)
 cat("#risk_cohort\n") 
 freq_single_nrst5(df_vars0$risk_cohort)
 
-#df_vars0$highrisk_therap_cohort <- grepl("IMID|solid organ recipients|haematologic malignancy|Patients with a haematological diseases \\(sic\\)|sickle cell disease|stem cell transplant recipient|immune deficiencies|primary immune deficiencies|solid cancer", df_vars0$risk_cohort, ignore.case = TRUE)
+#df_vars0$highrisk_therap_cohort <- grepl("IMID|solid organ recipients|haematologic malignancy
+#|Patients with a haematological diseases \\(sic\\)|sickle cell disease|stem cell transplant recipient|immune deficiencies
+#|primary immune deficiencies|solid cancer", df_vars0$risk_cohort, ignore.case = TRUE)
 df_vars0 <- df_vars0 %>%
-  mutate(had_highrisk_therap = grepl("IMID|solid organ recipients|haematologic malignancy|primary immune deficiencies|solid cancer", risk_cohort, ignore.case = TRUE),
+  mutate(had_highrisk_therap = grepl("IMID|solid organ recipients|haematologic malignancy||Patients with a haematological diseases \\(sic\\)|sickle cell disease|stem cell transplant recipient|immune deficiencies|primary immune deficiencies|solid cancer", risk_cohort, ignore.case = TRUE),
   highrisk_therap = as.integer(had_highrisk_therap),
   is_highrisk=(had_highrisk_therap|is_codelist_highrisk),
   is_highrisk_ever = (had_highrisk_therap|is_codelist_highrisk_ever),
@@ -165,6 +170,7 @@ df_vars0 <- df_vars0 %>%
 
 df_vars <- df_vars0 %>% filter(old_covid_treat == 0 )  %>% filter(!is.na(stp))%>% filter(allcause_death_under60d != 1) 
 high_risk_cohort <- df_vars %>% filter(highrisk == 1 ) 
+
 high_risk_ever_cohort <- df_vars %>% filter(highrisk_ever == 1 ) 
 ##cohort_molnup
 cohort_molnup<-high_risk_cohort %>% filter(drug == 0 )
