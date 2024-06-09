@@ -171,9 +171,7 @@ high_risk_ever_cohort <- df_vars %>% filter(highrisk_ever == 1 )
 cohort_molnup<-high_risk_cohort %>% filter(drug == 0 )
 ##cohort_sotro
 cohort_sotro<-high_risk_cohort %>% filter(drug == 1 )
-
 #freq_single(high_risk_cohort$diabetes)
-
 
 cat("#high_risk_cohort$imd\n") 
 freq_single(high_risk_cohort$imd)
