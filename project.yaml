@@ -22,7 +22,7 @@ actions:
         data1: output/data/data4analyse.csv
         data4: output/data/high_risk_ever_cohort.csv
         data5: output/data/high_risk_cohort.csv
-        rds: output/data/data4analyse.rds
+#        rds: output/data/data4analyse.rds
 #prep_model_surv.r
   prep_model_surv_r:
     run: r:latest analysis/prep_model_surv.r
