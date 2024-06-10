@@ -91,8 +91,8 @@ df_vars0<-df_vars00 %>%
     surv_event_underly = as.numeric(ifelse(surv_event_underly == "1yes", 1, 0)),
     calendar_day = as.numeric(difftime(start_date_60d, as.Date("2021-12-16"),units = "days")),
     calendar_wk = as.numeric(difftime(start_date_60d, as.Date("2021-12-16"),units = "weeks")),
-    age_treated_spline = ns(age_treated, df = 4),
-    calendar_day_spline = ns(calendar_day, df = 4),
+    # age_treated_spline = ns(age_treated, df = 4),
+    # calendar_day_spline = ns(calendar_day, df = 4),
     age_treat_gp_rc = ifelse(age_treated_group=="90+","80-89",age_treated_group),
     had_hosp_covid60d6m = ifelse(!is.na(hosp_covid60d6m_date),"1yes","2no"),
     had_hosp_covid60d6m_01 = ifelse(!is.na(hosp_covid60d6m_date),1,0),
@@ -114,10 +114,10 @@ freq_single_nrst5(df_vars0$risk_cohort)
 #|Patients with a haematological diseases \\(sic\\)|sickle cell disease|stem cell transplant recipient|immune deficiencies
 #|primary immune deficiencies|solid cancer", df_vars0$risk_cohort, ignore.case = TRUE)
 df_vars0 <- df_vars0 %>%
-  mutate(had_highrisk_therap = grepl("IMID|solid organ recipients|haematologic malignancy||Patients with a haematological diseases \\(sic\\)|sickle cell disease|stem cell transplant recipient|immune deficiencies|primary immune deficiencies|solid cancer", risk_cohort, ignore.case = TRUE),
+  mutate(had_highrisk_therap = grepl("IMID|solid organ recipients|haematologic malignancy|Patients with a haematological diseases \\(sic\\)|sickle cell disease|stem cell transplant recipient|immune deficiencies|primary immune deficiencies|solid cancer", risk_cohort, ignore.case = TRUE),
   highrisk_therap = as.integer(had_highrisk_therap),
-  is_highrisk=(had_highrisk_therap|is_codelist_highrisk),
-  is_highrisk_ever = (had_highrisk_therap|is_codelist_highrisk_ever),
+  is_highrisk=((highrisk_therap == 1)|(is_codelist_highrisk == 1)),
+  is_highrisk_ever = ((highrisk_therap == 1)|(is_codelist_highrisk_ever == 1)),
   highrisk = as.integer(is_highrisk),
   highrisk_ever = as.integer(is_highrisk_ever),
   therap_IMID = as.integer((grepl("IMID", risk_cohort, ignore.case = TRUE))), #IMID #Immune Mediated Inflammatory Diseases
@@ -286,10 +286,11 @@ print(high_risk_cohort_tb1_2_all)
 cat("#str(high_risk_cohort)\n") 
 str(high_risk_cohort, list.len = ncol(high_risk_cohort), give.attr= F)
 # Save dataset(s) ----
+
 write_csv(high_risk_cohort_tb1_all, here::here("output", "tables", "table1_redacted_8b.csv"))
 write_csv(high_risk_cohort_tb1_2_all, here::here("output", "tables", "table1b_redacted_8b.csv"))
 write.csv(df_vars, here::here("output", "data", "data4analyse.csv"), row.names = FALSE)
-write_rds(df_vars, here::here("output", "data", "data4analyse.rds"), compress = "gz")
+#write_rds(df_vars, here::here("output", "data", "data4analyse.rds"), compress = "gz")
 write.csv(high_risk_cohort, here::here("output", "data", "high_risk_cohort.csv"), row.names = FALSE)
 write.csv(high_risk_ever_cohort, here::here("output", "data", "high_risk_ever_cohort.csv"), row.names = FALSE)
 # #write.csv(high_risk_cohort_tb1_df, ("C:/Users/qw/Documents/Github/prophy_effects_Sotro_Molnup/output/data/high_risk_cohort_tb1.csv"), row.names = FALSE)
