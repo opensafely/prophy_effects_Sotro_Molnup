@@ -143,6 +143,14 @@ sum(is.na(high_risk_surv_data$ethnicity_num))
 cat("#sum(!is.na(ethnicity_num)):")
 sum(!is.na(high_risk_surv_data$ethnicity_num))
 
+#bmi
+cat("#freq_single(high_risk_surv_data$bmi)")
+freq_single(high_risk_surv_data$bmi)
+cat("#sum(is.na(bmi)):")
+sum(is.na(high_risk_surv_data$bmi))
+cat("#sum(!is.na(bmi)):")
+sum(!is.na(high_risk_surv_data$bmi))
+
 #diabetes
 cat("#freq_single(high_risk_surv_data$diabetes)")
 freq_single(high_risk_surv_data$diabetes)
@@ -210,16 +218,14 @@ cat("#sum(!is.na(dementia)):")
 sum(!is.na(high_risk_surv_data$dementia))
 
 
-# cat("#summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth )")
-# cox_model1_age_sex_highrisk_vacc_imd_reg_eth <- coxph(Surv(surv_days, surv_event_num) ~ drug + age_treated + sex_num + high_risk_num + covid_vacc_num + imd_num + region_num + ethnicity_num + strata(stp), data = high_risk_surv_data)
-# summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth)
+cat("#summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth )")
+cox_model1_age_sex_highrisk_vacc_imd_reg_eth <- coxph(Surv(surv_days, surv_event_num) ~ drug + age_treated + sex_num + high_risk_num + covid_vacc_num + imd_num + region_num + ethnicity_num + strata(stp), data = high_risk_surv_data)
+summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth)
 
 # cat("#summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb )")
-# cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb <- coxph(Surv(surv_days, surv_event_num) ~ drug + age_treated + sex_num + high_risk_num + covid_vacc_num + imd_num + region_num + ethnicity_num + diabetes + hypertension + chronic_cardiac_disease + chronic_respiratory_disease + autism + learning_disability + serious_mental_illness + dementia + strata(stp), data = high_risk_surv_data)
+# cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb <- coxph(Surv(surv_days, surv_event_num) ~ drug + age_treated + sex_num + high_risk_num + covid_vacc_num + imd_num + region_num + ethnicity_num + diabetes + hypertension + chronic_cardiac_disease + chronic_respiratory_disease + strata(stp), data = high_risk_surv_data)
 # summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb)
 
-# imd_num, drug, region_num, sex_num, ethnicity_num,stp, covid_vacc_num, high_risk_num, diabetes,hypertension,chronic_cardiac_disease,
-#     chronic_respiratory_disease, autism, learning_disability, serious_mental_illness, dementia
 
 # Plot the survival curves
 # ggsurvplot(survfit(cox_model), data = high_risk_surv_data, pval = TRUE,
