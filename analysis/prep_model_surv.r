@@ -370,8 +370,9 @@ sum(!is.na(high_risk_surv_data$dementia))
 
 
 cat("#summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth )")
-cox_model1_age_sex_highrisk_vacc_imd_reg_eth <- coxph(Surv(surv_days, surv_event_num) ~ drug + age_treated + sex_num + high_risk_num + covid_vacc_num + imd_num + region_num + ethnicity_num + strata(stp), data = high_risk_surv_data)
-summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth)
+cox_model1_age_sex_highrisk_vacc_imd_reg_eth <- coxph(Surv(surv_days, surv_event_num) ~ drug + age_treated + sex_num 
+    + high_risk_num + covid_vacc_num + imd_num + region_num + ethnicity_num + strata(stp), data = high_risk_surv_data) %>% summary()
+#summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth)
 
 covariates <- c("age_treated", "sex_num", "high_risk_num", "covid_vacc_num", "imd_num", "region_num", "ethnicity_num" )
 # Create formulas for stratified Cox models
@@ -400,9 +401,11 @@ names(res_age_sex_highrisk_vacc_imd_reg_eth) <- c("beta", "HR (95% CI for HR)", 
 # Print the result
 print(res_age_sex_highrisk_vacc_imd_reg_eth)
 ################################
-# cat("#summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb )")
-# cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb <- coxph(Surv(surv_days, surv_event_num) ~ drug + age_treated + sex_num + high_risk_num + covid_vacc_num + imd_num + region_num + ethnicity_num + bmi_cat_num + diabetes + hypertension + chronic_cardiac_disease + chronic_respiratory_disease + strata(stp), data = high_risk_surv_data)
-# summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb)
+cat("#summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb )")
+cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb <- coxph(Surv(surv_days, surv_event_num) ~ drug + age_treated 
++ sex_num + high_risk_num + covid_vacc_num + imd_num + ethnicity_num + bmi_cat_num + diabetes + hypertension 
++ chronic_cardiac_disease + chronic_respiratory_disease + strata(region_num), data = high_risk_surv_data) %>% summary()
+#summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb)
 
 # Plot the survival curves
 # ggsurvplot(survfit(cox_model), data = high_risk_surv_data, pval = TRUE,
