@@ -43,6 +43,14 @@ df_vars00 <- read_csv(here::here("output", "data", "dataset_table.csv.gz")) %>%
 
 df_vars0<-df_vars00 %>%  
     mutate(
+    bmi_num_rc = ifelse((bmi<10|bmi>60),NA,bmi),
+    bmi_rc_cat = fct_explicit_na(cut(as.numeric(bmi_num_rc), breaks=c(0,18.4999,24.999,29.999,60),
+    labels=c("0underweight","1normal","2overweight", "3obese"),include.lowest = T), 
+                                na_level = "unknown"),
+    bmi_cat_num = ifelse(bmi_rc_cat == "0underweight", 0, 
+    ifelse(bmi_rc_cat == "1normal", 1, 
+    ifelse(bmi_rc_cat == "2overweight", 2,
+    ifelse(bmi_rc_cat == "3obese", 3, 4)))),
     sex_num = ifelse(sex %in% ("female"), 1, 0),
     ethnicity_num = ifelse(ethnicity == "Asian or Asian British", 0, 
     ifelse(ethnicity == "Black or Black British", 1, 
