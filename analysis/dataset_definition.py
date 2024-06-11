@@ -155,16 +155,33 @@ hosp_af60d_covid_pdiag_1stdate_df = (
     ).sort_by(apcs.admission_date).first_for_patient()
 )
 
+hosp_60d_12m_covid_pdiag_1stdate_df = (  
+    apcs.where((apcs.primary_diagnosis.is_in(covid_icd10_codes)) &    #primary_diagnosis
+        (apcs.admission_date.is_after(treat_date + days(60))) &
+        (apcs.admission_date.is_on_or_before(treat_date + days(60) + months(12))) & #  apcs.snomedct_code.is_in(covid_icd10_codes)
+        (apcs.patient_classification.is_in(["1"]))   ## ordinary admissions only - exclude day cases and regular attenders
+    ).sort_by(apcs.admission_date).first_for_patient()
+)
+
 ##critical_care                    
 ccare_af60d_covid_pdiag = (
     hosp_af60d_covid_pdiag_1stdate_df.admission_method.is_in(["21", "22", "23", "24", "25", "2A", "2B", "2C", "2D", "28"]) & \
     (hosp_af60d_covid_pdiag_1stdate_df.days_in_critical_care>0))
+
+ccare_60d_12m_covid_pdiag = (
+    hosp_60d_12m_covid_pdiag_1stdate_df.admission_method.is_in(["21", "22", "23", "24", "25", "2A", "2B", "2C", "2D", "28"]) & \
+    (hosp_60d_12m_covid_pdiag_1stdate_df.days_in_critical_care>0))
 
 ##covid_hospitalisation as per primary_diagnosis
 dataset.hosp_covid60d6m_date = hosp_af60d_covid_pdiag_1stdate_df.admission_date #hosp_af60d_covid_pdiag_1stdate_df
 dataset.hosp_covid60d6m_classfic = hosp_af60d_covid_pdiag_1stdate_df.patient_classification #hosp_af60d_covid_pdiag_classfic
 dataset.hosp_covid60d6m_pdiag = hosp_af60d_covid_pdiag_1stdate_df.primary_diagnosis #hosp_af60d_covid_pdiag
 dataset.had_ccare_covid60d6m = ccare_af60d_covid_pdiag #had_ccare_covid_af60d_6mon_pdiag_date
+
+dataset.hosp_covid60d12m_date = hosp_60d_12m_covid_pdiag_1stdate_df .admission_date #
+dataset.hosp_covid60d12m_classfic = hosp_60d_12m_covid_pdiag_1stdate_df .patient_classification #
+dataset.hosp_covid60d12m_pdiag =hosp_60d_12m_covid_pdiag_1stdate_df .primary_diagnosis #
+dataset.had_ccare_covid60d12m = ccare_60d_12m_covid_pdiag #
 
 ##covid_critical_care-date
 ##ccare_covid_date =ccare_covid60d6m_date
