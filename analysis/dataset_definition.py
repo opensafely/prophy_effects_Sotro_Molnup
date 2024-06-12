@@ -89,7 +89,8 @@ dataset.drug = case(
 dataset.end_date_6mon = dataset.treat_date + days(60) + months(6)
 dataset.start_date_60d = dataset.treat_date + days(60)
 treat_date = dataset.treat_date  
-
+dataset.end_date_12mon = dataset.treat_date + days(60) + months(12)
+dataset.end_date_24mon = dataset.treat_date + days(60) + months(24)
 #dataset.treat_date = dataset.first_covid_treat_date 
 dataset.if_old_covid_treat = (
     had_covid_treat_df0
@@ -163,6 +164,14 @@ hosp_60d_12m_covid_pdiag_1stdate_df = (
     ).sort_by(apcs.admission_date).first_for_patient()
 )
 
+hosp_60d_24m_covid_pdiag_1stdate_df = (  
+    apcs.where((apcs.primary_diagnosis.is_in(covid_icd10_codes)) &    #primary_diagnosis
+        (apcs.admission_date.is_after(treat_date + days(60))) &
+        (apcs.admission_date.is_on_or_before(treat_date + days(60) + months(24))) & #  apcs.snomedct_code.is_in(covid_icd10_codes)
+        (apcs.patient_classification.is_in(["1"]))   ## ordinary admissions only - exclude day cases and regular attenders
+    ).sort_by(apcs.admission_date).first_for_patient()
+)
+
 ##critical_care                    
 ccare_af60d_covid_pdiag = (
     hosp_af60d_covid_pdiag_1stdate_df.admission_method.is_in(["21", "22", "23", "24", "25", "2A", "2B", "2C", "2D", "28"]) & \
@@ -172,16 +181,26 @@ ccare_60d_12m_covid_pdiag = (
     hosp_60d_12m_covid_pdiag_1stdate_df.admission_method.is_in(["21", "22", "23", "24", "25", "2A", "2B", "2C", "2D", "28"]) & \
     (hosp_60d_12m_covid_pdiag_1stdate_df.days_in_critical_care>0))
 
+ccare_60d_24m_covid_pdiag = (
+    hosp_60d_24m_covid_pdiag_1stdate_df.admission_method.is_in(["21", "22", "23", "24", "25", "2A", "2B", "2C", "2D", "28"]) & \
+    (hosp_60d_24m_covid_pdiag_1stdate_df.days_in_critical_care>0))
+
 ##covid_hospitalisation as per primary_diagnosis
 dataset.hosp_covid60d6m_date = hosp_af60d_covid_pdiag_1stdate_df.admission_date #hosp_af60d_covid_pdiag_1stdate_df
 dataset.hosp_covid60d6m_classfic = hosp_af60d_covid_pdiag_1stdate_df.patient_classification #hosp_af60d_covid_pdiag_classfic
 dataset.hosp_covid60d6m_pdiag = hosp_af60d_covid_pdiag_1stdate_df.primary_diagnosis #hosp_af60d_covid_pdiag
 dataset.had_ccare_covid60d6m = ccare_af60d_covid_pdiag #had_ccare_covid_af60d_6mon_pdiag_date
 
-dataset.hosp_covid60d12m_date = hosp_60d_12m_covid_pdiag_1stdate_df .admission_date #
-dataset.hosp_covid60d12m_classfic = hosp_60d_12m_covid_pdiag_1stdate_df .patient_classification #
-dataset.hosp_covid60d12m_pdiag =hosp_60d_12m_covid_pdiag_1stdate_df .primary_diagnosis #
+dataset.hosp_covid60d12m_date = hosp_60d_12m_covid_pdiag_1stdate_df.admission_date #
+dataset.hosp_covid60d12m_classfic = hosp_60d_12m_covid_pdiag_1stdate_df.patient_classification #
+dataset.hosp_covid60d12m_pdiag =hosp_60d_12m_covid_pdiag_1stdate_df.primary_diagnosis #
 dataset.had_ccare_covid60d12m = ccare_60d_12m_covid_pdiag #
+
+
+dataset.hosp_covid60d24m_date = hosp_60d_24m_covid_pdiag_1stdate_df.admission_date #
+dataset.hosp_covid60d24m_classfic = hosp_60d_24m_covid_pdiag_1stdate_df.patient_classification #
+dataset.hosp_covid60d24m_pdiag =hosp_60d_24m_covid_pdiag_1stdate_df.primary_diagnosis #
+dataset.had_ccare_covid60d24m = ccare_60d_24m_covid_pdiag #
 
 ##covid_critical_care-date
 ##ccare_covid_date =ccare_covid60d6m_date
@@ -202,12 +221,39 @@ hosp_allcause_af60d_6mon_df = (
     ).sort_by(apcs.admission_date).first_for_patient()
 ) 
 
+hosp_allcause_af60d_12mon_df = ( 
+    apcs.where(
+    (apcs.admission_date.is_after(treat_date + days(60))) &
+    (apcs.admission_date.is_on_or_before (treat_date + days(60) + months(12))) &
+    (apcs.patient_classification.is_in(["1"]))
+    ).sort_by(apcs.admission_date).first_for_patient()
+) 
+
+hosp_allcause_af60d_24mon_df  = ( 
+    apcs.where(
+    (apcs.admission_date.is_after(treat_date + days(60))) &
+    (apcs.admission_date.is_on_or_before (treat_date + days(60) + months(24))) &
+    (apcs.patient_classification.is_in(["1"]))
+    ).sort_by(apcs.admission_date).first_for_patient()
+)
+
 dataset.hosp_allcause60d6m_date = hosp_allcause_af60d_6mon_df.admission_date #hosp_allcause_af60d_6mon_pdiag_date
 dataset.hosp_allcause60d6m_classfic = hosp_allcause_af60d_6mon_df.patient_classification
 dataset.hosp_allcause60d6m_pdiag = hosp_allcause_af60d_6mon_df.primary_diagnosis
-
 hosp_covid60d6m_date = dataset.hosp_covid60d6m_date #first hospitalise after 60days
 hosp_allcause60d6m_date = dataset.hosp_allcause60d6m_date 
+
+dataset.hosp_allcause60d12m_date = hosp_allcause_af60d_12mon_df.admission_date #hosp_allcause_af60d_6mon_pdiag_date
+dataset.hosp_allcause60d12m_classfic = hosp_allcause_af60d_12mon_df.patient_classification
+dataset.hosp_allcause60d12m_pdiag = hosp_allcause_af60d_12mon_df.primary_diagnosis
+hosp_covid60d12m_date = dataset.hosp_covid60d12m_date #first hospitalise after 60days
+hosp_allcause60d12m_date = dataset.hosp_allcause60d12m_date 
+
+dataset.hosp_allcause60d24m_date = hosp_allcause_af60d_24mon_df.admission_date #hosp_allcause_af60d_6mon_pdiag_date
+dataset.hosp_allcause60d24m_classfic = hosp_allcause_af60d_24mon_df.patient_classification
+dataset.hosp_allcause60d24m_pdiag = hosp_allcause_af60d_24mon_df.primary_diagnosis
+hosp_covid60d24m_date = dataset.hosp_covid60d24m_date #first hospitalise after 60days
+hosp_allcause60d24m_date = dataset.hosp_allcause60d24m_date 
 
 dataset.hospitalise_disc_covid = ( #covid_first discharge after 60days
     apcs.where(apcs.discharge_date.is_on_or_before(hosp_covid60d6m_date)
@@ -232,6 +278,26 @@ dataset.allcause_death_60d_6m = case(
     when(dataset.was_allcause_death_60d_6m).then(1), otherwise = 0
 )
 
+##all-cause death 60d-12m #ons_dead_tr60d_12mon_covid_treat
+dataset.was_allcause_death_60d_12m = (ons_deaths.date.is_after(treat_date + days(60)) & 
+    ons_deaths.date.is_on_or_before(treat_date + days(60) + months(12)) 
+)
+
+#was_allcause_death_60d_12m, allcause_death_60d_12m(0,1) ,was_covid_death_60d_12m ,covid_death_60d_12m (0,1) 
+dataset.allcause_death_60d_12m = case(
+    when(dataset.was_allcause_death_60d_12m).then(1), otherwise = 0
+)
+
+##all-cause death 60d-24m #ons_dead_tr60d_24mon_covid_treat
+dataset.was_allcause_death_60d_24m = (ons_deaths.date.is_after(treat_date + days(60)) & 
+    ons_deaths.date.is_on_or_before(treat_date + days(60) + months(24)) 
+)
+
+#was_allcause_death_60d_12m, allcause_death_60d_12m(0,1) ,was_covid_death_60d_12m ,covid_death_60d_12m (0,1) 
+dataset.allcause_death_60d_24m = case(
+    when(dataset.was_allcause_death_60d_24m).then(1), otherwise = 0
+)
+
 #covid-death 60d-6m #ons_dead_tr60d_6mon_covid_treat2
 dataset.was_covid_death_60d_6m = (ons_deaths.date.is_after(treat_date + days(60)) & 
     ons_deaths.date.is_on_or_before(treat_date + days(60) + months(6)) & (dataset.death_cause_covid)
@@ -240,7 +306,25 @@ dataset.was_covid_death_60d_6m = (ons_deaths.date.is_after(treat_date + days(60)
 dataset.covid_death_60d_6m = case(
     when(dataset.was_covid_death_60d_6m).then(1), otherwise = 0
 )
+###
+#covid-death 60d-12m #ons_dead_tr60d_12mon_covid_treat2
+dataset.was_covid_death_60d_12m = (ons_deaths.date.is_after(treat_date + days(60)) & 
+    ons_deaths.date.is_on_or_before(treat_date + days(60) + months(12)) & (dataset.death_cause_covid)
+)
 
+dataset.covid_death_60d_12m = case(
+    when(dataset.was_covid_death_60d_12m).then(1), otherwise = 0
+)
+###
+#covid-death 60d-24m #ons_dead_tr60d_24mon_covid_treat2
+dataset.was_covid_death_60d_24m = (ons_deaths.date.is_after(treat_date + days(60)) & 
+    ons_deaths.date.is_on_or_before(treat_date + days(60) + months(24)) & (dataset.death_cause_covid)
+)
+
+dataset.covid_death_60d_24m = case(
+    when(dataset.was_covid_death_60d_24m).then(1), otherwise = 0
+)
+###
 #all-cause death <60d #ons_dead_trstart_60d_covid_treat
 dataset.was_allcause_death_under60d = (ons_deaths.date.is_after(treat_date) & 
     ons_deaths.date.is_on_or_before(treat_date + days(60)))
@@ -256,40 +340,103 @@ dataset.was_allcause_death_under30d = (ons_deaths.date.is_after(treat_date) &
 dataset.allcause_death_under30d = case(
     when(dataset.was_allcause_death_under30d).then(1), otherwise = 0
 )
-
+#####
+#####
 ##censored
-had_covid_treat_excpt_molnu_df = (
+def had_covid_treat_excpt_drug_df(drug, enddate1, startdate1 =treat_date, where=True):
+    return(
     had_covid_treat_df0
-    .except_where(had_covid_treat_df0.intervention.is_in(["Molnupiravir"])) \
-    .where((had_covid_treat_df0.treatment_start_date > treat_date) &  \
-    (had_covid_treat_df0.treatment_start_date <= (treat_date + days(60) + months(6))))  \
-    ).sort_by(had_covid_treat_df0.treatment_start_date)
-
-had_covid_treat_excpt_sotro_df = (
-    had_covid_treat_df0
-    .except_where(had_covid_treat_df0.intervention.is_in(["Sotrovimab"])) \
-    .where((had_covid_treat_df0.treatment_start_date > treat_date) &  \
-    (had_covid_treat_df0.treatment_start_date <= (treat_date + days(60) + months(6))))  \
+    .except_where(had_covid_treat_df0.intervention.is_in([drug])) \
+    .where((had_covid_treat_df0.treatment_start_date > startdate1) &  \
+    (had_covid_treat_df0.treatment_start_date <= enddate1))  \
     ).sort_by(had_covid_treat_df0.treatment_start_date)
 
 
-dataset.molnu_pt_censored_date = had_covid_treat_excpt_molnu_df.first_for_patient().treatment_start_date ##potential
-dataset.sotro_pt_censored_date = had_covid_treat_excpt_sotro_df.first_for_patient().treatment_start_date
-dataset.molnu_pt_censored_drug =had_covid_treat_excpt_molnu_df.first_for_patient().intervention
-dataset.sotro_pt_censored_drug =had_covid_treat_excpt_sotro_df.first_for_patient().intervention
+# had_covid_treat6m_excpt_molnu_df = (
+#     had_covid_treat_df0
+#     .except_where(had_covid_treat_df0.intervention.is_in(["Molnupiravir"])) \
+#     .where((had_covid_treat_df0.treatment_start_date > treat_date) &  \
+#     (had_covid_treat_df0.treatment_start_date <= (treat_date + days(60) + months(6))))  \
+#     ).sort_by(had_covid_treat_df0.treatment_start_date)
 
-dataset.molnu_pt_censored_exist =had_covid_treat_excpt_molnu_df.exists_for_patient() 
-dataset.sotro_pt_censored_exist =had_covid_treat_excpt_sotro_df.exists_for_patient() 
+# had_covid_treat6m_excpt_sotro_df = (
+#     had_covid_treat_df0
+#     .except_where(had_covid_treat_df0.intervention.is_in(["Sotrovimab"])) \
+#     .where((had_covid_treat_df0.treatment_start_date > treat_date) &  \
+#     (had_covid_treat_df0.treatment_start_date <= (treat_date + days(60) + months(6))))  \
+#     ).sort_by(had_covid_treat_df0.treatment_start_date)
 
-dataset.is_molnu_pt_censored =  ((dataset.molnu_pt_censored_exist ) & (dataset.first_covid_treat_interve.is_in(["Molnupiravir"])))
-dataset.is_sotro_pt_censored =  ((dataset.sotro_pt_censored_exist ) & (dataset.first_covid_treat_interve.is_in(["Sotrovimab"])))
+had_covid_treat6m_excpt_molnu_df = had_covid_treat_excpt_drug_df(drug ="Molnupiravir", enddate1 =(treat_date + days(60) + months(6)))
+had_covid_treat6m_excpt_sotro_df = had_covid_treat_excpt_drug_df(drug ="Sotrovimab", enddate1 =(treat_date + days(60) + months(6)))
 
-dataset.molnu_pt_censored = case(
-     when(dataset.is_molnu_pt_censored).then(1), otherwise = 0
+had_covid_treat12m_excpt_molnu_df = had_covid_treat_excpt_drug_df(drug ="Molnupiravir", enddate1 =(treat_date + days(60) + months(12)))
+had_covid_treat12m_excpt_sotro_df = had_covid_treat_excpt_drug_df(drug ="Sotrovimab", enddate1 =(treat_date + days(60) + months(12)))
+
+had_covid_treat24m_excpt_molnu_df = had_covid_treat_excpt_drug_df(drug ="Molnupiravir", enddate1 =(treat_date + days(60) + months(24)))
+had_covid_treat24m_excpt_sotro_df = had_covid_treat_excpt_drug_df(drug ="Sotrovimab", enddate1 =(treat_date + days(60) + months(24)))
+
+#molnu_pt_censored_date=molnu_pt6m_censored_date, sotro_pt_censored_date=sotro_pt6m_censored_date, 
+#molnu_pt_censored_drug=molnu_pt6m_censored_drug, sotro_pt_censored_drug= sotro_pt6m_censored_drug,
+#molnu_pt_censored_exist=molnu_pt6m_censored_exist, sotro_pt_censored_exist=sotro_pt6m_censored_exist, 
+#is_molnu_pt_censored = is_molnu_pt6m_censored, is_sotro_pt_censored =is_sotro_pt6m_censored,
+#molnu_pt_censored = molnu_pt6m_censored, sotro_pt_censored = sotro_pt6m_censored,
+#molnu_pt6m_censored_date0, sotro_pt6m_censored_date0
+##6month##
+dataset.molnu_pt6m_censored_date = had_covid_treat6m_excpt_molnu_df.first_for_patient().treatment_start_date ##potential
+dataset.sotro_pt6m_censored_date = had_covid_treat6m_excpt_sotro_df.first_for_patient().treatment_start_date
+dataset.molnu_pt6m_censored_drug =had_covid_treat6m_excpt_molnu_df.first_for_patient().intervention
+dataset.sotro_pt6m_censored_drug =had_covid_treat6m_excpt_sotro_df.first_for_patient().intervention
+dataset.molnu_pt6m_censored_exist =had_covid_treat6m_excpt_molnu_df.exists_for_patient() 
+dataset.sotro_pt6m_censored_exist =had_covid_treat6m_excpt_sotro_df.exists_for_patient() 
+dataset.is_molnu_pt6m_censored =  ((dataset.molnu_pt6m_censored_exist ) & (dataset.first_covid_treat_interve.is_in(["Molnupiravir"])))
+dataset.is_sotro_pt6m_censored =  ((dataset.sotro_pt6m_censored_exist ) & (dataset.first_covid_treat_interve.is_in(["Sotrovimab"])))
+
+dataset.molnu_pt6m_censored = case(
+    when(dataset.is_molnu_pt6m_censored).then(1), otherwise = 0
 )
 
-dataset.sotro_pt_censored = case(
-     when(dataset.is_sotro_pt_censored).then(1), otherwise = 0
+dataset.sotro_pt6m_censored = case(
+    when(dataset.is_sotro_pt6m_censored).then(1), otherwise = 0
+)
+##12month##
+dataset.molnu_pt12m_censored_date = had_covid_treat12m_excpt_molnu_df.first_for_patient().treatment_start_date ##potential
+dataset.sotro_pt12m_censored_date = had_covid_treat12m_excpt_sotro_df.first_for_patient().treatment_start_date
+dataset.molnu_pt12m_censored_drug =had_covid_treat12m_excpt_molnu_df.first_for_patient().intervention
+dataset.sotro_pt12m_censored_drug =had_covid_treat12m_excpt_sotro_df.first_for_patient().intervention
+dataset.molnu_pt12m_censored_exist =had_covid_treat12m_excpt_molnu_df.exists_for_patient() 
+dataset.sotro_pt12m_censored_exist =had_covid_treat12m_excpt_sotro_df.exists_for_patient() 
+dataset.is_molnu_pt12m_censored =  ((dataset.molnu_pt12m_censored_exist ) & (dataset.first_covid_treat_interve.is_in(["Molnupiravir"])))
+dataset.is_sotro_pt12m_censored =  ((dataset.sotro_pt12m_censored_exist ) & (dataset.first_covid_treat_interve.is_in(["Sotrovimab"])))
+
+dataset.molnu_pt12m_censored = case(
+    when(dataset.is_molnu_pt12m_censored).then(1), otherwise = 0
+)
+
+dataset.sotro_pt12m_censored = case(
+    when(dataset.is_sotro_pt12m_censored).then(1), otherwise = 0
+)
+
+#is_molnu_pt6m_censored, is_sotro_pt6m_censored, molnu_pt6m_censored, sotro_pt6m_censored, molnu_pt6m_censored_date, sotro_pt6m_censored_date,
+#is_molnu_pt12m_censored, is_sotro_pt12m_censored, molnu_pt12m_censored, sotro_pt12m_censored, molnu_pt12m_censored_date, sotro_pt12m_censored_date,
+#is_molnu_pt24m_censored, is_sotro_pt24m_censored, molnu_pt24m_censored, sotro_pt24m_censored, molnu_pt24m_censored_date, sotro_pt24m_censored_date,
+    
+############################
+##24month##
+dataset.molnu_pt24m_censored_date = had_covid_treat24m_excpt_molnu_df.first_for_patient().treatment_start_date ##potential
+dataset.sotro_pt24m_censored_date = had_covid_treat24m_excpt_sotro_df.first_for_patient().treatment_start_date
+dataset.molnu_pt24m_censored_drug =had_covid_treat24m_excpt_molnu_df.first_for_patient().intervention
+dataset.sotro_pt24m_censored_drug =had_covid_treat24m_excpt_sotro_df.first_for_patient().intervention
+dataset.molnu_pt24m_censored_exist =had_covid_treat24m_excpt_molnu_df.exists_for_patient() 
+dataset.sotro_pt24m_censored_exist =had_covid_treat24m_excpt_sotro_df.exists_for_patient() 
+dataset.is_molnu_pt24m_censored =  ((dataset.molnu_pt24m_censored_exist ) & (dataset.first_covid_treat_interve.is_in(["Molnupiravir"])))
+dataset.is_sotro_pt24m_censored =  ((dataset.sotro_pt24m_censored_exist ) & (dataset.first_covid_treat_interve.is_in(["Sotrovimab"])))
+
+dataset.molnu_pt24m_censored = case(
+    when(dataset.is_molnu_pt24m_censored).then(1), otherwise = 0
+)
+
+dataset.sotro_pt24m_censored = case(
+    when(dataset.is_sotro_pt24m_censored).then(1), otherwise = 0
 )
 
 ####### comorbidities ####### 
@@ -1056,7 +1203,6 @@ dataset.moved_into_care_home_lastdate = had_c_event_ctv3snome_lastdate(
     codelist = care_home_primis_snomed_codes, code_type='snomedct')
 
 dataset.had_housebound=(dataset.housebound_lastdate > dataset.no_longer_housebound_lastdate ) & (dataset.housebound_lastdate>dataset.moved_into_care_home_lastdate)
-
 
   
 
