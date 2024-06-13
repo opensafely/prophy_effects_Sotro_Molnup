@@ -44,7 +44,8 @@ df_vars00 <- read_csv(here::here("output", "data", "dataset_table.csv.gz")) %>%
   had_serious_mental_illness, had_dementia, had_housebound, housebound_lastdate, no_longer_housebound_lastdate, moved_into_care_home_lastdate) 
 
 
-df_vars0<-df_vars00 %>%  
+#bmi_rc_cat,bmi_cat_num
+df_vars01<-df_vars00 %>%  
     mutate(
     bmi_num_rc = ifelse((bmi<10|bmi>60),NA,bmi),
     bmi_rc_cat = fct_explicit_na(cut(as.numeric(bmi_num_rc), breaks=c(0,18.4999,24.999,29.999,60),
@@ -92,13 +93,13 @@ df_vars0<-df_vars00 %>%
     censored6m_bf_dead_hosp = ifelse(((!is.na(censored6m_date_molnu) & (censored6m_date_molnu == surv6m_end_covid_cause_date)) 
     |((!is.na(censored6m_date_sotro)) & censored6m_date_sotro == surv6m_end_covid_cause_date)),1,0),
     surv6m_days = as.numeric(difftime(surv6m_end_covid_cause_date, start_date_60d, units = "days")),
-    surv6m_from_treat_days = as.numeric(difftime(surv6m_end_covid_cause_date, treat_date, units = "days")),
+    surv6m_days_from_treat = as.numeric(difftime(surv6m_end_covid_cause_date, treat_date, units = "days")),
     surv6m_event =as.character(ifelse((((!is.na(death_covid_cause_60d6m_date)) & (censored6m_bf_dead_hosp == 0))
     |((!is.na(hosp_covid60d6m_date)) & (censored6m_bf_dead_hosp == 0))), "1yes","2no")),
     surv6m_event_underly = as.character(ifelse((((!is.na(death_covid_underly_60d6m_date)) & (censored6m_bf_dead_hosp == 0))
     |((!is.na(hosp_covid60d6m_date)) & (censored6m_bf_dead_hosp == 0))),"1yes","2no")),
     surv6m_event_num = as.numeric(ifelse(surv6m_event == "1yes", 1, 0)),
-    surv6m_event_underly = as.numeric(ifelse(surv6m_event_underly == "1yes", 1, 0)),
+    surv6m_event_underly_num = as.numeric(ifelse(surv6m_event_underly == "1yes", 1, 0)),
     calendar_day = as.numeric(difftime(start_date_60d, as.Date("2021-12-16"),units = "days")),
     calendar_wk = as.numeric(difftime(start_date_60d, as.Date("2021-12-16"),units = "weeks")),
     age_treat_gp_rc = ifelse(age_treated_group=="90+","80-89",age_treated_group),
@@ -123,13 +124,13 @@ mutate(
     censored12m_bf_dead_hosp = ifelse(((!is.na(censored12m_date_molnu) & (censored12m_date_molnu == surv12m_end_covid_cause_date)) 
     |((!is.na(censored12m_date_sotro)) & censored12m_date_sotro == surv12m_end_covid_cause_date)),1,0),
     surv12m_days = as.numeric(difftime(surv12m_end_covid_cause_date, start_date_60d, units = "days")),
-    surv12m_from_treat_days = as.numeric(difftime(surv12m_end_covid_cause_date, treat_date, units = "days")),
+    surv12m_days_from_treat = as.numeric(difftime(surv12m_end_covid_cause_date, treat_date, units = "days")),
     surv12m_event =as.character(ifelse((((!is.na(death_covid_cause_60d12m_date)) & (censored12m_bf_dead_hosp == 0))
     |((!is.na(hosp_covid60d12m_date)) & (censored12m_bf_dead_hosp == 0))), "1yes","2no")),
     surv12m_event_underly = as.character(ifelse((((!is.na(death_covid_underly_60d12m_date)) & (censored12m_bf_dead_hosp == 0))
     |((!is.na(hosp_covid60d12m_date)) & (censored12m_bf_dead_hosp == 0))),"1yes","2no")),
     surv12m_event_num = as.numeric(ifelse(surv12m_event == "1yes", 1, 0)),
-    surv12m_event_underly = as.numeric(ifelse(surv12m_event_underly == "1yes", 1, 0)),
+    surv12m_event_underly_num = as.numeric(ifelse(surv12m_event_underly == "1yes", 1, 0)),
 ) %>%  #24month
 mutate(
     death_covid_underly_60d24m_date =as.Date(ifelse(((underly_covid_deathcause0_1 == 1) & (ons_dead_date >start_date_60d) & (ons_dead_date <end_date_24mon)), as.character(ons_dead_date), NA)),
@@ -143,21 +144,21 @@ mutate(
     censored24m_bf_dead_hosp = ifelse(((!is.na(censored24m_date_molnu) & (censored24m_date_molnu == surv24m_end_covid_cause_date)) 
     |((!is.na(censored24m_date_sotro)) & censored24m_date_sotro == surv24m_end_covid_cause_date)),1,0),
     surv24m_days = as.numeric(difftime(surv24m_end_covid_cause_date, start_date_60d, units = "days")),
-    surv24m_from_treat_days = as.numeric(difftime(surv24m_end_covid_cause_date, treat_date, units = "days")),
+    surv24m_days_from_treat = as.numeric(difftime(surv24m_end_covid_cause_date, treat_date, units = "days")),
     surv24m_event =as.character(ifelse((((!is.na(death_covid_cause_60d24m_date)) & (censored24m_bf_dead_hosp == 0))
     |((!is.na(hosp_covid60d24m_date)) & (censored24m_bf_dead_hosp == 0))), "1yes","2no")),
     surv24m_event_underly = as.character(ifelse((((!is.na(death_covid_underly_60d24m_date)) & (censored24m_bf_dead_hosp == 0))
     |((!is.na(hosp_covid60d24m_date)) & (censored24m_bf_dead_hosp == 0))),"1yes","2no")),
     surv24m_event_num = as.numeric(ifelse(surv24m_event == "1yes", 1, 0)),
-    surv24m_event_underly = as.numeric(ifelse(surv24m_event_underly == "1yes", 1, 0)) 
+    surv24m_event_underly_num = as.numeric(ifelse(surv24m_event_underly == "1yes", 1, 0)) 
 )
 
-cat("#df_vars0$surv6m_event\n") 
-freq_single_nrst5(df_vars0$surv6m_event)
+cat("#df_vars01$surv6m_event\n") 
+freq_single_nrst5(df_vars01$surv6m_event)
 cat("#risk_cohort\n") 
-freq_single_nrst5(df_vars0$risk_cohort)
+freq_single_nrst5(df_vars01$risk_cohort)
 
-df_vars0 <- df_vars0 %>%
+df_vars0 <- df_vars01 %>%
   mutate(had_highrisk_therap = grepl("IMID|solid organ recipients|haematologic malignancy|Patients with a haematological diseases \\(sic\\)|sickle cell disease|stem cell transplant recipient|immune deficiencies|primary immune deficiencies|solid cancer", risk_cohort, ignore.case = TRUE),
   highrisk_therap = as.integer(had_highrisk_therap),
   is_highrisk=((highrisk_therap == 1)|(is_codelist_highrisk == 1)),
@@ -203,7 +204,7 @@ df_vars0 <- df_vars0 %>%
   dementia = as.integer(had_dementia),
   housebound = as.integer(had_housebound),                                                                                                   
 )
-
+#diabetes,hypertension,chronic_cardiac_disease,chronic_respiratory_disease,autism,learning_disability,serious_mental_illness,dementia,
 #was_allcause_death_under60d, allcause_death_under60d, 
 cat("#freq_single-df_vars0$had_housebound_r_num\n") 
 freq_single(df_vars0$allcause_death_under60d)
@@ -249,6 +250,7 @@ freq_single(high_risk_cohort$had_housebound_r_num)
 
 ## Clinical and demographics table
 variables <- c("age_treat_gp_rc", "sex","surv6m_event", "surv12m_event", "surv24m_event","ethnicity", "region", "total_covid_vacc_cat", "first_covid_treat_interve")
+
 high_risk_cohort_data <- high_risk_cohort %>%
   select(all_of(variables)) %>%
     mutate(
@@ -259,8 +261,8 @@ high_risk_cohort_data_sum <-high_risk_cohort_data %>%
   select(all_of(variables)) %>%
   tbl_summary(missing = "always")
 
-cat("#print(high_risk_cohort_data_sum)\n") 
-print(high_risk_cohort_data_sum)
+# cat("#print(high_risk_cohort_data_sum)\n") 
+# print(high_risk_cohort_data_sum)
 
 proc_rm_b8 <- function(data,variables=variables) {
   result <- data %>%
@@ -307,10 +309,11 @@ high_risk_cohort_tb1 <- proc_rm_b8_str(high_risk_cohort_data, "first_covid_treat
 high_risk_cohort_tb1_all <- left_join((as_tibble(high_risk_cohort_tb1b)),(as_tibble(high_risk_cohort_tb1)), by = "**Characteristic**")
 print(high_risk_cohort_tb1_all)
 
-variables2 <- c("imd", "first_covid_treat_interve","high_risk_group")
-
-
-
+variables02 <- c("age_treat_gp_rc", "sex","surv6m_event", "surv12m_event", "surv24m_event","ethnicity", "region", 
+"total_covid_vacc_cat", "first_covid_treat_interve", "bmi_rc_cat","bmi_cat_num","imd", "first_covid_treat_interve","high_risk_group",
+"diabetes","hypertension","chronic_cardiac_disease","chronic_respiratory_disease","autism","learning_disability","serious_mental_illness","dementia")
+##bmi_rc_cat,bmi_cat_num
+variables2 <- c("bmi_rc_cat","bmi_cat_num","imd", "first_covid_treat_interve","high_risk_group")
 
 high_risk_cohort_data2 <- high_risk_cohort %>%
   select(all_of(variables2)) %>%
@@ -318,24 +321,26 @@ high_risk_cohort_data2 <- high_risk_cohort %>%
     across(all_of(variables2), as.factor)
     ) 
 
-high_risk_cohort_data_sum2 <-high_risk_cohort_data2 %>%
-  select(all_of(variables2)) %>%
-  tbl_summary(missing = "always")
+high_risk_cohort_data_sum02 <-high_risk_cohort %>%
+  select(all_of(variables02)) %>%
+    mutate(
+    across(all_of(variables02), as.factor)
+    ) %>%tbl_summary(missing = "always")
 
-cat("#print(high_risk_cohort_data_sum2)\n") 
-print(high_risk_cohort_data_sum2)
+# cat("#print(high_risk_cohort_data_sum2)\n") 
+# print(high_risk_cohort_data_sum2)
 
 high_risk_cohort_tb1b_2 <- proc_rm_b8(high_risk_cohort_data2,variables=variables2)
 high_risk_cohort_tb1_2 <- proc_rm_b8_str(high_risk_cohort_data2, "first_covid_treat_interve")
 high_risk_cohort_tb1_2_all <- left_join((as_tibble(high_risk_cohort_tb1b_2)),(as_tibble(high_risk_cohort_tb1_2)), by = "**Characteristic**")
-print(high_risk_cohort_tb1_2_all)
+#print(high_risk_cohort_tb1_2_all)
 #write.csv(high_risk_cohort_tb1_2_all, ("C:/Users/qw/Documents/Github/prophy_effects_Sotro_Molnup/output/data/high_risk_cohort_tb1_2_all.csv"), row.names = FALSE)
 
 cat("#str(high_risk_cohort)\n") 
 str(high_risk_cohort, list.len = ncol(high_risk_cohort), give.attr= F)
 # Save dataset(s) ----
-
-write_csv(high_risk_cohort_tb1_all, here::here("output", "tables", "table1_redacted_8b.csv"))
+write_csv(as_tibble(high_risk_cohort_data_sum02), here::here("output", "tables", "table1_ab.csv"))
+write_csv(high_risk_cohort_tb1_all, here::here("output", "tables", "table1a_redacted_8b.csv"))
 write_csv(high_risk_cohort_tb1_2_all, here::here("output", "tables", "table1b_redacted_8b.csv"))
 write.csv(df_vars, here::here("output", "data", "data4analyse.csv"), row.names = FALSE)
 #write_rds(df_vars, here::here("output", "data", "data4analyse.rds"), compress = "gz")
