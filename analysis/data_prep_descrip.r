@@ -257,7 +257,10 @@ high_risk_cohort_data <- high_risk_cohort %>%
 
 high_risk_cohort_data_sum <-high_risk_cohort_data %>%
   select(all_of(variables)) %>%
-  tbl_summary()
+  tbl_summary(missing = "always")
+
+cat("#print(high_risk_cohort_data_sum)\n") 
+print(high_risk_cohort_data_sum)
 
 proc_rm_b8 <- function(data,variables=variables) {
   result <- data %>%
@@ -306,11 +309,21 @@ print(high_risk_cohort_tb1_all)
 
 variables2 <- c("imd", "first_covid_treat_interve","high_risk_group")
 
+
+
+
 high_risk_cohort_data2 <- high_risk_cohort %>%
   select(all_of(variables2)) %>%
     mutate(
     across(all_of(variables2), as.factor)
     ) 
+
+high_risk_cohort_data_sum2 <-high_risk_cohort_data2 %>%
+  select(all_of(variables2)) %>%
+  tbl_summary(missing = "always")
+
+cat("#print(high_risk_cohort_data_sum2)\n") 
+print(high_risk_cohort_data_sum2)
 
 high_risk_cohort_tb1b_2 <- proc_rm_b8(high_risk_cohort_data2,variables=variables2)
 high_risk_cohort_tb1_2 <- proc_rm_b8_str(high_risk_cohort_data2, "first_covid_treat_interve")
