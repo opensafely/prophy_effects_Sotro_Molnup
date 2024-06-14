@@ -101,7 +101,7 @@ cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb <- coxph(Surv(surv12m_days, 
 # cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_stp <- coxph(Surv(surv12m_days, surv12m_event_num) ~ drug + age_treated 
 # + sex_num + high_risk_num + covid_vacc_num + imd_num + ethnicity_num + bmi_cat_num + diabetes + hypertension 
 # + chronic_cardiac_disease + chronic_respiratory_disease + strata(stp), data = high_risk_surv_data1) %>% summary()
-# summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_stp)
+
 
 #covid_vacc_num
 cat("#freq_single(high_risk_surv_data1$covid_vacc_num)")
