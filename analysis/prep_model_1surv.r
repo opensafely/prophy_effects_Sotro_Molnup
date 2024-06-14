@@ -216,8 +216,6 @@ sum(is.na(high_risk_surv_data1$dementia))
 cat("#sum(!is.na(dementia)):")
 sum(!is.na(high_risk_surv_data1$dementia))
 
-
-
 # Plot the survival curves
 # ggsurvplot(survfit(cox_model), data = high_risk_surv_data1, pval = TRUE,
 #            ggtheme = theme_minimal(), risk.table = TRUE,
@@ -226,5 +224,5 @@ sum(!is.na(high_risk_surv_data1$dementia))
 #####################################################################################
 # Save dataset(s) ----
 write.csv(high_risk_surv_data1, here::here("output", "data", "high_risk_surv_data1.csv"))
-####################################################################################
+#####################################################################################
 #####################################################################################
