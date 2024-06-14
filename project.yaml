@@ -36,6 +36,13 @@ actions:
     outputs:
       highly_sensitive:
         data8: output/data/high_risk_surv_data1.csv
+  
+  prep_model_2surv_r:
+    run: r:latest analysis/prep_model_2surv.r
+    needs: [prep_descrip_r]
+    outputs:
+      highly_sensitive:
+        data8: output/data/high_risk_surv_data2.csv
 
 prep_descrip_stata:
    run: stata-mp:latest analysis/data_prep_descrip.do
