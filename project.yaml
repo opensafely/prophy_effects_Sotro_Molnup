@@ -16,32 +16,32 @@ actions:
     needs: [gen_dataset_table]
     outputs:
       moderately_sensitive:
-        data1: output/tables/table1_sum.csv
-        data2: output/tables/table1_redacted_under8.csv
+        table1: output/tables/table1_sum.csv
+        table2: output/tables/table1_redacted_under8.csv
       highly_sensitive:
-        data4: output/data/high_risk_ever_cohort.csv
-        data5: output/data/high_risk_cohort.csv
+        data1: output/data/high_risk_ever_cohort.csv
+        data2: output/data/high_risk_cohort.csv
 
   prep_model_surv_r:
     run: r:latest analysis/prep_model_surv.r
     needs: [prep_descrip_r]
     outputs:
       highly_sensitive:
-        data7: output/data/high_risk_surv_data.csv
+        data3: output/data/high_risk_surv_data.csv
 
   prep_model_1surv_r:
     run: r:latest analysis/prep_model_1surv.r
     needs: [prep_descrip_r]
     outputs:
       highly_sensitive:
-        data8: output/data/high_risk_surv_data1.csv
+        data4: output/data/high_risk_surv_data1.csv
   
   prep_model_2surv_r:
     run: r:latest analysis/prep_model_2surv.r
     needs: [prep_descrip_r]
     outputs:
       highly_sensitive:
-        data8: output/data/high_risk_surv_data2.csv
+        data5: output/data/high_risk_surv_data2.csv
 
 prep_descrip_stata:
    run: stata-mp:latest analysis/data_prep_descrip.do
