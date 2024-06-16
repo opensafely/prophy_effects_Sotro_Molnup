@@ -299,9 +299,12 @@ proc_rm_b8_str <- function(data, group_var = first_covid_treat_interve) {
   )
 }
 
+
+
 high_risk_cohort_tb1_overall <- proc_rm_b8(high_risk_cohort_data,var=vars)
 high_risk_cohort_tb1_bydrug <- proc_rm_b8_str(high_risk_cohort_data, "first_covid_treat_interve")
-high_risk_cohort_tb1 <- cbind((as_tibble(high_risk_cohort_tb1_overall)[1:63,]),(as_tibble(high_risk_cohort_tb1_bydrug)))
+len_a<-dim(as_tibble(high_risk_cohort_tb1_bydrug))[1]
+high_risk_cohort_tb1 <- cbind((as_tibble(high_risk_cohort_tb1_overall)[1:len_a,]),(as_tibble(high_risk_cohort_tb1_bydrug)))
 
 gen_sum <- function(data, var=variables2, by_var = NULL) {
   if (!is.null(by_var)) {
@@ -325,7 +328,8 @@ gen_sum <- function(data, var=variables2, by_var = NULL) {
 
 high_risk_cohort_sum_overall <- gen_sum(high_risk_cohort, variables2)
 high_risk_cohort_sum_bydrug <- gen_sum(high_risk_cohort, variables2, by_var = "first_covid_treat_interve")
-high_risk_cohort_sum <- cbind((as_tibble(high_risk_cohort_sum_overall)[1:87,]),(as_tibble(high_risk_cohort_sum_bydrug)))
+len_b<-dim(as_tibble(high_risk_cohort_sum_bydrug))[1]
+high_risk_cohort_sum <- cbind((as_tibble(high_risk_cohort_sum_overall)[1:len_b,]),(as_tibble(high_risk_cohort_sum_bydrug)))
 
 cat("#str(high_risk_cohort)\n") 
 str(high_risk_cohort, list.len = ncol(high_risk_cohort), give.attr= F)
