@@ -43,6 +43,13 @@ actions:
       highly_sensitive:
         data5: output/data/high_risk_surv_data2.csv
 
+  prep_descrip_agegp_r:
+    run: r:latest analysis/data_prep_descrip_1agegp.r
+    needs: [prep_descrip_r]
+    outputs:
+      highly_sensitive:
+        table01: output/tables/high_risk_vars_age_rc.csv
+
 prep_descrip_stata:
    run: stata-mp:latest analysis/data_prep_descrip.do
    needs: [gen_dataset_table]
