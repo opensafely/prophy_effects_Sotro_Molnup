@@ -250,7 +250,7 @@ vars <- c("age_treat_gp_rc", "sex","surv6m_event", "surv12m_event", "surv24m_eve
 "total_covid_vacc_cat", "bmi_rc_cat","bmi_cat_num","imd", "high_risk_group","diabetes","hypertension","chronic_cardiac_disease",
 "chronic_respiratory_disease","autism","learning_disability","serious_mental_illness","dementia","first_covid_treat_interve")
 ##bmi_rc_cat,bmi_cat_num
-variables2 <- c("age_treated","age_treat_gp_rc", "sex","surv6m_event", "surv12m_event", "surv24m_event","ethnicity", "region", 
+vars2 <- c("age_treated","age_treat_gp_rc", "sex","surv6m_event", "surv12m_event", "surv24m_event","ethnicity", "region", 
 "total_covid_vacc_cat", "bmi_rc_cat","bmi_cat_num","imd", "high_risk_group","diabetes","hypertension","chronic_cardiac_disease",
 "chronic_respiratory_disease","autism","learning_disability","serious_mental_illness","dementia","first_covid_treat_interve")
 
@@ -260,74 +260,13 @@ high_risk_cohort_data <- high_risk_cohort %>%
     across(where(is.character), as.factor)
     ) 
 
-
-proc_rm_b8 <- function(data,var=vars) {
-  result <- data %>%
-    select(all_of(vars)) %>%
-    mutate(
-      across(where(is.factor), ~ {
-        freq <- table(.x)
-        levels_to_replace <- names(freq[freq < 8])
-        .x <- factor(.x, levels = levels(.x))
-        .x[.x %in% levels_to_replace] <- NA
-        .x
-      })
-    ) %>%
-    ungroup()
-  result %>%
-    tbl_summary(
-    missing = "no"
-    )
-}
-
-proc_rm_b8_str <- function(data, group_var = first_covid_treat_interve) {
-  data %>% group_by(first_covid_treat_interve) %>%
-  mutate(
-    across(where(is.factor), ~ {
-      # Calculate frequencies within each first_covid_treat_interve group
-      freq <- table(.x)  
-      levels_to_replace <- names(freq[freq < 8])  
-      .x <- factor(.x, levels = levels(.x))
-      .x[.x %in% levels_to_replace] <- NA
-      .x
-    })
-  ) %>%
-  ungroup() %>%
-  tbl_summary(
-    by = group_var,  
-    missing = "no"  
-  )
-}
-
-
-
 high_risk_cohort_tb1_overall <- proc_rm_b8(high_risk_cohort_data,var=vars)
 high_risk_cohort_tb1_bydrug <- proc_rm_b8_str(high_risk_cohort_data, "first_covid_treat_interve")
 len_a<-dim(as_tibble(high_risk_cohort_tb1_bydrug))[1]
 high_risk_cohort_tb1 <- cbind((as_tibble(high_risk_cohort_tb1_overall)[1:len_a,]),(as_tibble(high_risk_cohort_tb1_bydrug)))
 
-gen_sum <- function(data, var=variables2, by_var = NULL) {
-  if (!is.null(by_var)) {
-    data <- data %>% select(all_of(var), all_of(by_var))
-  } else {
-    data <- data %>% select(all_of(var))
-  }
-  
-  data %>%
-    mutate(across(where(is.character), as.factor)) %>%
-    tbl_summary(
-      by = by_var, 
-      missing = "always",
-      type = all_continuous() ~ "continuous2",
-      statistic = list(
-        all_continuous() ~ c("{mean} ({sd})", "{median} ({IQR})"),
-        all_categorical() ~ "{n} ({p}%)"
-      )
-    )
-}
-
-high_risk_cohort_sum_overall <- gen_sum(high_risk_cohort, variables2)
-high_risk_cohort_sum_bydrug <- gen_sum(high_risk_cohort, variables2, by_var = "first_covid_treat_interve")
+high_risk_cohort_sum_overall <- gen_sum(high_risk_cohort, var=vars2)
+high_risk_cohort_sum_bydrug <- gen_sum(high_risk_cohort, var=vars2, by_var = "first_covid_treat_interve")
 len_b<-dim(as_tibble(high_risk_cohort_sum_bydrug))[1]
 high_risk_cohort_sum <- cbind((as_tibble(high_risk_cohort_sum_overall)[1:len_b,]),(as_tibble(high_risk_cohort_sum_bydrug)))
 
