@@ -22,3 +22,61 @@ freq_single_nrst5<-function(idx_colname){ta_feq<-r2nrst5(table(idx_colname))
 		fre_tb<-t(fre_tb0)
 		return(fre_tb)
 }
+
+gen_sum <- function(data, var, by_var = NULL) {
+  if (!is.null(by_var)) {
+    data <- data %>% select(all_of(var), all_of(by_var))
+  } else {
+    data <- data %>% select(all_of(var))
+  }
+  
+  data %>%
+    mutate(across(where(is.character), as.factor)) %>%
+    tbl_summary(
+      by = by_var, 
+      missing = "always",
+      type = all_continuous() ~ "continuous2",
+      statistic = list(
+        all_continuous() ~ c("{mean} ({sd})", "{median} ({IQR})"),
+        all_categorical() ~ "{n} ({p}%)"
+      )
+    )
+}
+
+proc_rm_b8 <- function(data,var=vars) {
+  result <- data %>%
+    select(all_of(vars)) %>%
+    mutate(
+      across(where(is.factor), ~ {
+        freq <- table(.x)
+        levels_to_replace <- names(freq[freq < 8])
+        .x <- factor(.x, levels = levels(.x))
+        .x[.x %in% levels_to_replace] <- NA
+        .x
+      })
+    ) %>%
+    ungroup()
+  result %>%
+    tbl_summary(
+    missing = "no"
+    )
+}
+
+proc_rm_b8_str <- function(data, group_var = first_covid_treat_interve) {
+  data %>% group_by(first_covid_treat_interve) %>%
+  mutate(
+    across(where(is.factor), ~ {
+      # Calculate frequencies within each first_covid_treat_interve group
+      freq <- table(.x)  
+      levels_to_replace <- names(freq[freq < 8])  
+      .x <- factor(.x, levels = levels(.x))
+      .x[.x %in% levels_to_replace] <- NA
+      .x
+    })
+  ) %>%
+  ungroup() %>%
+  tbl_summary(
+    by = group_var,  
+    missing = "no"  
+  )
+}
