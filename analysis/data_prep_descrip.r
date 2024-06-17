@@ -18,6 +18,7 @@ source(here("analysis", "lib", "r_funs.R"))
 dir_create(here::here("output", "tables"), showWarnings = FALSE, recurse = TRUE)
 dir_create(here::here("output", "data"), showWarnings = FALSE, recurse = TRUE)
 
+
 #df_vars00<- read_csv("C:/Users/qw/Documents/Github/prophy_effects_Sotro_Molnup/output/data/dataset_table.csv.gz") %>% #,
 df_vars00 <- read_csv(here::here("output", "data", "dataset_table.csv.gz")) %>%
   select(patient_id,age_treated, sex, age_treated_group, ethnicity, imd1, imd, stp,region, 
@@ -185,15 +186,17 @@ df_vars0 <- df_vars01 %>%
   solid_cancer_ever_therap_code = ifelse(rowSums(cbind(solid_cancer_ever,therap_solid_cancer),na.rm = TRUE)>= 1, 1, 0),
   high_risk_group = ifelse(imid_therap_code==1, "imid_therap_code",
                            ifelse(dialysis_therap_code==1, "dialysis_therap_code",
+                           ifelse(kidney_transplant_therap_code==1, "kidney_transplant_code",
                            ifelse(solid_organ_transplant_therap_code==1, "solid_organ_transplant_therap_code",
                            ifelse(haema_disease_therap_code==1, "haema_disease_therap_code",
                            ifelse(immunosupression_therap_code==1, "immunosupression_therap_code",
-                           ifelse(solid_cancer_therap_code==1, "solid_cancer_therap_code", NA)))))),
+                           ifelse(solid_cancer_therap_code==1, "solid_cancer_therap_code", NA))))))),
   high_risk_num = ifelse(high_risk_group == "imid_therap_code", 0, 
-    ifelse(high_risk_group == "dialysis_therap_code", 1, 
-    ifelse(high_risk_group == "solid_organ_transplant_therap_code", 2,
-    ifelse(high_risk_group == "haema_disease_therap_code", 3,
-    ifelse(high_risk_group == "immunosupression_therap_code", 4,5))))),
+    ifelse(high_risk_group == "dialysis_therap_code", 1,
+    ifelse(high_risk_group == "kidney_transplant_code", 2,  
+    ifelse(high_risk_group == "solid_organ_transplant_therap_code", 3,
+    ifelse(high_risk_group == "haema_disease_therap_code", 4,
+    ifelse(high_risk_group == "immunosupression_therap_code", 5,6)))))),
   diabetes = as.integer(had_diabetes), #as.factor()
   hypertension = as.integer(had_hypertension),
   chronic_cardiac_disease = as.integer(had_chronic_cardiac_disease),
