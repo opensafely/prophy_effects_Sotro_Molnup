@@ -34,8 +34,8 @@ vars_age=c("age_50a_cat","age_60a_cat","age_5ygroup_cat")
 high_risk_vars_age_rc_overall <- gen_sum(high_risk_vars_age_rc, var=vars_age)
 high_risk_vars_age_rc_bydrug <- gen_sum(high_risk_vars_age_rc, var=vars_age, by_var = "first_covid_treat_interve")
 len_c<-dim(as_tibble(high_risk_vars_age_rc_bydrug))[1]
-
 high_risk_vars_age_rc_table <- cbind((as_tibble(high_risk_vars_age_rc_overall)[1:len_c,]),(as_tibble(high_risk_vars_age_rc_bydrug)))
+
 # Save dataset(s) ----
 write.csv(high_risk_vars_age_rc, here::here("output", "data", "high_risk_vars_age_rc.csv"), row.names = FALSE)
 write.csv(high_risk_vars_age_rc_table, here::here("output", "tables", "high_risk_vars_age_rc_table.csv"), row.names = FALSE)
