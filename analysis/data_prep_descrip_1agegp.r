@@ -6,9 +6,6 @@ library('arrow')
 library('dplyr')
 library('readr')
 library('fs')
-library('survival')
-library('survminer')
-library('splines')
 library('gtsummary')
 
 ## import functions
@@ -20,7 +17,7 @@ dir_create(here::here("output", "data"), showWarnings = FALSE, recurse = TRUE)
 
 #high_risk_vars_age<- read_csv("C:/Users/qw/Documents/Github/prophy_effects_Sotro_Molnup/output/data/high_risk_cohort.csv") %>% 
 high_risk_vars_age <- read_csv(here::here("output", "data", "high_risk_cohort.csv")) %>%
-  select(patient_id, age_treated, sex, age_treated_group, drug) 
+  select(patient_id, age_treated, sex, age_treated_group, first_covid_treat_interve, drug) 
 
 
 #bmi_rc_cat,bmi_cat_num
@@ -33,29 +30,12 @@ high_risk_vars_age_rc<-high_risk_vars_age %>%
      labels=c("18-24","25-29","30-34", "35-39","40-44","45-49","50-54", "55-59","60-64", 
      "65-69","70-74","75-79","80-200"),include.lowest = T)))
 
-data_molnup<-high_risk_vars_age_rc %>% filter(drug == 0 )
-data_sotro<-high_risk_vars_age_rc %>% filter(drug == 1 )
+vars_age=c("age_50a_cat","age_60a_cat","age_5ygroup_cat")
+high_risk_vars_age_rc_overall <- gen_sum(high_risk_vars_age_rc, var=vars_age)
+high_risk_vars_age_rc_bydrug <- gen_sum(high_risk_vars_age_rc, var=vars_age, by_var = "first_covid_treat_interve")
+len_c<-dim(as_tibble(high_risk_vars_age_rc_bydrug))[1]
 
-cat("#freq_single-high_risk_vars_age_rc$age_50a_cat\n") 
-freq_single(high_risk_vars_age_rc$age_50a_cat)
-cat("#freq_single-high_risk_vars_age_rc$age_60a_cat\n") 
-freq_single(high_risk_vars_age_rc$age_60a_cat)
-cat("#freq_single-high_risk_vars_age_rc$age_5ygroup_cat\n") 
-freq_single(high_risk_vars_age_rc$age_5ygroup_cat)
-
-cat("#freq_single-data_molnup$age_50a_cat\n") 
-freq_single(data_molnup$age_50a_cat)
-cat("#freq_single-data_molnup$age_60a_cat\n") 
-freq_single(data_molnup$age_60a_cat)
-cat("#freq_single-data_molnup$age_5ygroup_cat\n") 
-freq_single(data_molnup$age_5ygroup_cat)
-
-cat("#freq_single-data_sotro$age_50a_cat\n") 
-freq_single(data_sotro$age_50a_cat)
-cat("#freq_single-data_sotro$age_60a_cat\n") 
-freq_single(data_sotro$age_60a_cat)
-cat("#freq_single-data_sotro$age_5ygroup_cat\n") 
-freq_single(data_sotro$age_5ygroup_cat)
-
+high_risk_vars_age_rc_table <- cbind((as_tibble(high_risk_vars_age_rc_overall)[1:len_c,]),(as_tibble(high_risk_vars_age_rc_bydrug)))
 # Save dataset(s) ----
-write.csv(high_risk_vars_age_rc, here::here("output", "tables", "high_risk_vars_age_rc.csv"), row.names = FALSE)
+write.csv(high_risk_vars_age_rc, here::here("output", "data", "high_risk_vars_age_rc.csv"), row.names = FALSE)
+write.csv(high_risk_vars_age_rc_table, here::here("output", "tables", "high_risk_vars_age_rc_table.csv"), row.names = FALSE)
