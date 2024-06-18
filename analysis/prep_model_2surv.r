@@ -37,8 +37,6 @@ str(high_risk_surv_data2, list.len = ncol(high_risk_surv_data2), give.attr= F)
 
 cat("#freq_single(high_risk_surv_data2$ethnicity_num)")
 freq_single(high_risk_surv_data2$ethnicity_num)
-##variables <- c("age_treat_gp_rc", "sex", "sex_num","surv6m_event", "ethnicity", "region", "total_covid_vacc_cat", "first_covid_treat_interve")
-##variables2 <- c("imd", "first_covid_treat_interve","high_risk_group")
 
 cat("#high_risk_surv_data2$drug, high_risk_surv_data2$surv24m_event_num")
 table(high_risk_surv_data2$drug, high_risk_surv_data2$surv24m_event_num)
@@ -53,7 +51,6 @@ summary(cox_model0)
 cat("#1summary(cox_model_strata(region_num))")
 cox_model_region<- coxph(Surv(surv24m_days, surv24m_event_num) ~ (drug)+ strata(region_num), data = high_risk_surv_data2)
 summary(cox_model_region)
-
 
 cat("#2summary(cox_model_strata(stp))")
 cox_model_stp <- coxph(Surv(surv24m_days, surv24m_event_num) ~ (drug)+ strata(stp), data = high_risk_surv_data2)
@@ -96,6 +93,7 @@ cat("#1summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_region )")
 cox_model1_age_sex_highrisk_vacc_imd_reg_eth_region <- coxph(Surv(surv24m_days, surv24m_event_num) ~ drug + age_treated + sex_num 
 + high_risk_num + covid_vacc_num + imd_num + ethnicity_num + strata(region_num), data = high_risk_surv_data2)
 summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_region)
+
 cat("#2summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_stp )")
 cox_model1_age_sex_highrisk_vacc_imd_reg_eth_stp <- coxph(Surv(surv24m_days, surv24m_event_num) ~ drug + age_treated + sex_num 
 + high_risk_num + covid_vacc_num + imd_num + ethnicity_num + strata(stp), data = high_risk_surv_data2)
@@ -108,11 +106,11 @@ cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb <- coxph(Surv(surv24m_days, 
 summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb)
 
 
-# cat("#1summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb)+ strata(stp)")
-# cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_stp <- coxph(Surv(surv24m_days, surv24m_event_num) ~ drug + age_treated 
-# + sex_num + high_risk_num + covid_vacc_num + imd_num + ethnicity_num + bmi_cat_num + diabetes + hypertension 
-# + chronic_cardiac_disease + chronic_respiratory_disease + strata(stp), data = high_risk_surv_data2)
-#summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_stp)
+cat("#1summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb)+ strata(stp)")
+cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_stp <- coxph(Surv(surv24m_days, surv24m_event_num) ~ drug + age_treated 
++ sex_num + high_risk_num + covid_vacc_num + imd_num + ethnicity_num + bmi_cat_num + diabetes + hypertension 
++ chronic_cardiac_disease + chronic_respiratory_disease + strata(stp), data = high_risk_surv_data2)
+summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_stp)
 
 cat("#freq_single(high_risk_surv_data2$surv24m_event_num)")
 freq_single(high_risk_surv_data2$surv24m_event_num)
@@ -126,126 +124,11 @@ sum(!is.na(high_risk_surv_data2$surv24m_event_num))
 cat("#freq_single(high_risk_surv_data2$surv24m_days)")
 summary(as.numeric(high_risk_surv_data2$surv24m_days),na.rm=T)
 
-#covid_vacc_num
-cat("#freq_single(high_risk_surv_data2$covid_vacc_num)")
-freq_single(high_risk_surv_data2$covid_vacc_num)
-cat("#sum(is.na(covid_vacc_num)):")
-sum(is.na(high_risk_surv_data2$covid_vacc_num))
-cat("#sum(!is.na(covid_vacc_num)):")
-sum(!is.na(high_risk_surv_data2$covid_vacc_num))
-
-#covid_vacc_num1
-cat("#freq_single(high_risk_surv_data2$covid_vacc_num1)")
-freq_single(high_risk_surv_data2$covid_vacc_num1)
-cat("#sum(is.na(covid_vacc_num1)):")
-sum(is.na(high_risk_surv_data2$covid_vacc_num1))
-cat("#sum(!is.na(covid_vacc_num1)):")
-sum(!is.na(high_risk_surv_data2$covid_vacc_num1))
-
-#imd_num
-cat("#freq_single(high_risk_surv_data2$imd_num)")
-freq_single(high_risk_surv_data2$imd_num)
-cat("#sum(is.na(imd_num)):")
-sum(is.na(high_risk_surv_data2$imd_num))
-cat("#sum(!is.na(imd_num)):")
-sum(!is.na(high_risk_surv_data2$imd_num))
-
-#region_num
-cat("#freq_single(high_risk_surv_data2$region_num)")
-freq_single(high_risk_surv_data2$region_num)
-cat("#sum(is.na(region_num)):")
-sum(is.na(high_risk_surv_data2$region_num))
-cat("#sum(!is.na(region_num)):")
-sum(!is.na(high_risk_surv_data2$region_num))
-
-#ethnicity_num
-cat("#freq_single(high_risk_surv_data2$ethnicity_num)")
-freq_single(high_risk_surv_data2$ethnicity_num)
-cat("#sum(is.na(ethnicity_num)):")
-sum(is.na(high_risk_surv_data2$ethnicity_num))
-cat("#sum(!is.na(ethnicity_num)):")
-sum(!is.na(high_risk_surv_data2$ethnicity_num))
-
-#bmi
-cat("#sum(is.na(bmi)):")
-sum(is.na(high_risk_surv_data2$bmi))
-cat("#sum(!is.na(bmi)):")
-sum(!is.na(high_risk_surv_data2$bmi))
-#bmi, bmi_cat_num
-cat("#freq_single(high_risk_surv_data2$bmi_cat_num)")
-freq_single(high_risk_surv_data2$bmi_cat_num)
-
-#diabetes
-cat("#freq_single(high_risk_surv_data2$diabetes)")
-freq_single(high_risk_surv_data2$diabetes)
-cat("#sum(is.na(diabetes)):")
-sum(is.na(high_risk_surv_data2$diabetes))
-cat("#sum(!is.na(diabetes)):")
-sum(!is.na(high_risk_surv_data2$diabetes))
-
-# hypertension
-cat("#freq_single(high_risk_surv_data2$hypertension)")
-freq_single(high_risk_surv_data2$hypertension)
-cat("#sum(is.na(hypertension)):")
-sum(is.na(high_risk_surv_data2$hypertension))
-cat("#sum(!is.na(hypertension)):")
-sum(!is.na(high_risk_surv_data2$hypertension))
-
-#+ chronic_cardiac_disease 
-cat("#freq_single(high_risk_surv_data2$chronic_cardiac_disease)")
-freq_single(high_risk_surv_data2$chronic_cardiac_disease)
-cat("#sum(is.na(chronic_cardiac_disease)):")
-sum(is.na(high_risk_surv_data2$chronic_cardiac_disease))
-cat("#sum(!is.na(chronic_cardiac_disease)):")
-sum(!is.na(high_risk_surv_data2$chronic_cardiac_disease))
-
-# chronic_respiratory_disease 
-cat("#freq_single(high_risk_surv_data2$chronic_respiratory_disease)")
-freq_single(high_risk_surv_data2$chronic_respiratory_disease)
-cat("#sum(is.na(chronic_respiratory_disease)):")
-sum(is.na(high_risk_surv_data2$chronic_respiratory_disease))
-cat("#sum(!is.na(chronic_respiratory_disease)):")
-sum(!is.na(high_risk_surv_data2$chronic_respiratory_disease))
-
-# autism 
- cat("#freq_single(high_risk_surv_data2$autism)")
-freq_single(high_risk_surv_data2$autism)
-cat("#sum(is.na(autism)):")
-sum(is.na(high_risk_surv_data2$autism))
-cat("#sum(!is.na(autism)):")
-sum(!is.na(high_risk_surv_data2$autism))
-
-# learning_disability 
-cat("#freq_single(high_risk_surv_data2$learning_disability)")
-freq_single(high_risk_surv_data2$learning_disability)
-cat("#sum(is.na(learning_disability)):")
-sum(is.na(high_risk_surv_data2$learning_disability))
-cat("#sum(!is.na(learning_disability)):")
-sum(!is.na(high_risk_surv_data2$learning_disability))
-
-# serious_mental_illness 
-cat("#freq_single(high_risk_surv_data2$serious_mental_illness)")
-freq_single(high_risk_surv_data2$serious_mental_illness)
-cat("#sum(is.na(serious_mental_illness)):")
-sum(is.na(high_risk_surv_data2$serious_mental_illness))
-cat("#sum(!is.na(serious_mental_illness)):")
-sum(!is.na(high_risk_surv_data2$serious_mental_illness))
-
-# dementia 
-cat("#freq_single(high_risk_surv_data2$dementia)")
-freq_single(high_risk_surv_data2$dementia)
-cat("#sum(is.na(dementia)):")
-sum(is.na(high_risk_surv_data2$dementia))
-cat("#sum(!is.na(dementia)):")
-sum(!is.na(high_risk_surv_data2$dementia))
-
 # Plot the survival curves
 # ggsurvplot(survfit(cox_model), data = high_risk_surv_data2, pval = TRUE,
 #            ggtheme = theme_minimal(), risk.table = TRUE,
 #            conf.int = TRUE)
 
-#####################################################################################
 # Save dataset(s) ----
 write.csv(high_risk_surv_data2, here::here("output", "data", "high_risk_surv_data2.csv"))
-#####################################################################################
-#####################################################################################
+
