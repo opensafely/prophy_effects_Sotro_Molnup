@@ -209,13 +209,14 @@ df_vars0 <- df_vars01 %>%
 )
 #diabetes,hypertension,chronic_cardiac_disease,chronic_respiratory_disease,autism,learning_disability,serious_mental_illness,dementia,
 #was_allcause_death_under60d, allcause_death_under60d, 
-cat("#freq_single-df_vars0$had_housebound_r_num\n") 
+cat("#freq_single-df_vars0$allcause_death_under60d\n") 
 freq_single(df_vars0$allcause_death_under60d)
+
 
 df_vars <- df_vars0 %>% filter(old_covid_treat == 0 )  %>% filter(!is.na(stp))%>% filter(allcause_death_under60d != 1) 
 high_risk_cohort <- df_vars %>% filter(highrisk == 1 ) 
-
 high_risk_ever_cohort <- df_vars %>% filter(highrisk_ever == 1 ) 
+
 ##cohort_molnup
 cohort_molnup<-high_risk_cohort %>% filter(drug == 0 )
 ##cohort_sotro
@@ -247,6 +248,10 @@ freq_single(high_risk_cohort$housebound)
 
 cat("#freq_single-high_risk_cohort$had_housebound_r_num\n") 
 freq_single(high_risk_cohort$had_housebound_r_num)
+
+##calendar_day
+cat(#summary(#high_risk_cohort$calendar_day)\n") 
+summary(high_risk_cohort$calendar_day)
 
 ## Clinical and demographics table
 vars <- c("age_treat_gp_rc", "sex","surv6m_event", "surv12m_event", "surv24m_event","ethnicity", "region", 
