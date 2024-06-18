@@ -52,26 +52,26 @@ actions:
       moderately_sensitive:
         table01: output/tables/high_risk_vars_age_rc_table.csv
 
-  # prep_model_surv_sen_r:
-  #   run: r:latest analysis/prep_model_surv_sen.r
-  #   needs: [prep_descrip_r]
-  #   outputs:
-  #     highly_sensitive:
-  #       data7: output/data/high_risk_surv_data0.csv
+  prep_model_surv_sen_r:
+    run: r:latest analysis/prep_model_surv_sen.r
+    needs: [prep_descrip_r]
+    outputs:
+      highly_sensitive:
+        data7: output/data/high_risk_surv_data0.csv
 
-  # prep_model_1surv_sen_r:
-  #   run: r:latest analysis/prep_model_1surv_sen.r
-  #   needs: [prep_descrip_r]
-  #   outputs:
-  #     highly_sensitive:
-  #       data8: output/data/high_risk_surv_data01.csv
+  prep_model_1surv_sen_r:
+    run: r:latest analysis/prep_model_1surv_sen.r
+    needs: [prep_descrip_r]
+    outputs:
+      highly_sensitive:
+        data8: output/data/high_risk_surv_data01.csv
 
-  # prep_model_2surv_sen_r:
-  #   run: r:latest analysis/prep_model_2surv_sen.r
-  #   needs: [prep_descrip_r]
-  #   outputs:
-  #     highly_sensitive:
-  #       data9: output/data/high_risk_surv_data02.csv
+  prep_model_2surv_sen_r:
+    run: r:latest analysis/prep_model_2surv_sen.r
+    needs: [prep_descrip_r]
+    outputs:
+      highly_sensitive:
+        data9: output/data/high_risk_surv_data02.csv
 
 
 
