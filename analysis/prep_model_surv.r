@@ -47,6 +47,10 @@ table(high_risk_surv_data$drug, high_risk_surv_data$surv6m_event_num)
 cat("#high_risk_surv_data$stp, high_risk_surv_data$surv6m_event_num")
 table(high_risk_surv_data$stp, high_risk_surv_data$surv6m_event_num)
 
+# (1) age and sex; (2) high-risk groups; 
+# (3) ethnic background, deprivation, vaccination status, calendar week;
+# (4) body mass index, diabetes, hypertension, and chronic heart and lung diseases.
+
 options(scipen = 999)
 #strata(region_num)
 cat("#summary(cox_model0)")
@@ -61,64 +65,48 @@ cat("#2summary(cox_model_strata(stp))")
 cox_model_stp <- coxph(Surv(surv6m_days, surv6m_event_num) ~ (drug)+ strata(stp), data = high_risk_surv_data)
 summary(cox_model_stp)
 
-
 ##age_treated, sex_num
-cat("#1summary(cox_model1_age_sex_strata(region_num) )")
+cat("#Model01_1summary(cox_model1_age_sex_strata(region_num) )")
 cox_model1_age_sex_region <- coxph(Surv(surv6m_days, surv6m_event_num) ~ drug + age_treated + sex_num 
 + strata(region_num), data = high_risk_surv_data)
 summary(cox_model1_age_sex_region)
 
-cat("#2summary(cox_model1_age_sex_strata(stp) )")
-cox_model1_age_sex_stp <- coxph(Surv(surv6m_days, surv6m_event_num) ~ drug + age_treated + sex_num 
-+ strata(stp), data = high_risk_surv_data)
-summary(cox_model1_age_sex_stp)
-
-
-cat("#1summary(cox_model1_age_sex_highrisk_region_num )")
+cat("#Model02_1summary(cox_model1_age_sex_highrisk_(region_num)")
 cox_model1_age_sex_highrisk_region <- coxph(Surv(surv6m_days, surv6m_event_num) ~ drug + age_treated + sex_num 
 + high_risk_num + strata(region_num), data = high_risk_surv_data)
 summary(cox_model1_age_sex_highrisk_region)
 
-cat("#2summary(cox_model1_age_sex_highrisk_stp )")
+cat("#Model03_1summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_region )")
+cox_model1_age_sex_highrisk_vacc_imd_reg_eth_region <- coxph(Surv(surv6m_days, surv6m_event_num) ~ drug + age_treated + sex_num 
+    + high_risk_num + covid_vacc_num + imd_num + ethnicity_num + ns(calendar_day, df = 4) + strata(region_num), data = high_risk_surv_data) 
+summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_region)
+
+cat("#Model04_1summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_region )+ strata(region_num)")
+cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_region <- coxph(Surv(surv6m_days, surv6m_event_num) ~ drug + age_treated 
++ sex_num + high_risk_num + covid_vacc_num + imd_num + ethnicity_num + ns(calendar_day, df = 4) + bmi_cat_num + diabetes + hypertension 
++ chronic_cardiac_disease + chronic_respiratory_disease + strata(region_num), data = high_risk_surv_data)
+summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_region)
+
+cat("#Model01_2summary(cox_model1_age_sex_strata(stp) )")
+cox_model1_age_sex_stp <- coxph(Surv(surv6m_days, surv6m_event_num) ~ drug + age_treated + sex_num 
++ strata(stp), data = high_risk_surv_data)
+summary(cox_model1_age_sex_stp)
+
+cat("#Model02_2summary(cox_model1_age_sex_highrisk_(stp)")
 cox_model1_age_sex_highrisk_stp <- coxph(Surv(surv6m_days, surv6m_event_num) ~ drug + age_treated + sex_num 
 + high_risk_num + strata(stp), data = high_risk_surv_data)
 summary(cox_model1_age_sex_highrisk_stp)
 
+cat("#Model03_2summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_stp)")
+cox_model1_age_sex_highrisk_vacc_imd_reg_eth_stp <- coxph(Surv(surv6m_days, surv6m_event_num) ~ drug + age_treated + sex_num 
+    + high_risk_num + covid_vacc_num + imd_num + ethnicity_num + ns(calendar_day, df = 4) + strata(stp), data = high_risk_surv_data)
+summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_stp)
 
-cat("#1summary(cox_model1_age_sex_highrisk_vacc_region )")
-cox_model1_age_sex_highrisk_vacc_region <- coxph(Surv(surv6m_days, surv6m_event_num) ~ drug + age_treated + sex_num 
-+ high_risk_num + covid_vacc_num + strata(region_num), data = high_risk_surv_data)
-options(scipen = 999)
-summary(cox_model1_age_sex_highrisk_vacc_region)
-
-cat("#2summary(cox_model1_age_sex_highrisk_vacc_stp )")
-cox_model1_age_sex_highrisk_vacc_stp <- coxph(Surv(surv6m_days, surv6m_event_num) ~ drug + age_treated + sex_num 
-+ high_risk_num + covid_vacc_num + strata(stp), data = high_risk_surv_data)
-summary(cox_model1_age_sex_highrisk_vacc_stp)
-
-cat("#1summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_region )")
-cox_model1_age_sex_highrisk_vacc_imd_reg_eth_region <- coxph(Surv(surv6m_days, surv6m_event_num) ~ drug + age_treated + sex_num 
-    + high_risk_num + covid_vacc_num + imd_num + ethnicity_num + strata(region_num), data = high_risk_surv_data) 
-summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_region)
-
-# cat("#2summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_stp)")
-# cox_model1_age_sex_highrisk_vacc_imd_reg_eth_stp <- coxph(Surv(surv6m_days, surv6m_event_num) ~ drug + age_treated + sex_num 
-#     + high_risk_num + covid_vacc_num + imd_num + ethnicity_num + strata(stp), data = high_risk_surv_data)
-# summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_stp)
-
-# cat("#1summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_region )+ strata(region_num)")
-# cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_region <- coxph(Surv(surv6m_days, surv6m_event_num) ~ drug + age_treated 
-# + sex_num + high_risk_num + covid_vacc_num + imd_num + ethnicity_num + bmi_cat_num + diabetes + hypertension 
-# + chronic_cardiac_disease + chronic_respiratory_disease + strata(region_num), data = high_risk_surv_data)
-# summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_region)
-
-
-# cat("#1summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb)+ strata(stp)")
-# cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_stp <- coxph(Surv(surv6m_days, surv6m_event_num) ~ drug + age_treated 
-# + sex_num + high_risk_num + covid_vacc_num + imd_num + ethnicity_num + bmi_cat_num + diabetes + hypertension 
-# + chronic_cardiac_disease + chronic_respiratory_disease + strata(stp), data = high_risk_surv_data) %>% summary()
-# options(scipen = 999)
-# summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_stp)
+cat("##Model04_1summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb)+ strata(stp)")
+cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_stp <- coxph(Surv(surv6m_days, surv6m_event_num) ~ drug + age_treated 
++ sex_num + high_risk_num + covid_vacc_num + imd_num + ethnicity_num + ns(calendar_day, df = 4) + bmi_cat_num + diabetes + hypertension 
++ chronic_cardiac_disease + chronic_respiratory_disease + strata(stp), data = high_risk_surv_data) %>% summary()
+summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_stp)
 
 #covid_vacc_num
 cat("#freq_single(high_risk_surv_data$covid_vacc_num)")
