@@ -22,7 +22,6 @@ dir_create(here::here("output", "data"), showWarnings = FALSE, recurse = TRUE)
 
 ##surv6m_days, surv6m_days_from_treat, surv6m_event, surv6m_event_underly, surv6m_event_num, surv6m_event_underly_num
 
-
 #high_risk_surv_data<- read_csv("C:/Users/qw/Documents/Github/prophy_effects_Sotro_Molnup/output/data/high_risk_cohort.csv") %>%
 high_risk_surv_data <- read_csv(here::here("output", "data", "high_risk_cohort.csv")) %>%
     select(patient_id, age_treated, imd, imd_num, drug, bmi, bmi_cat_num, region_num, sex_num, ethnicity_num,stp, covid_vacc_num, 
@@ -48,6 +47,7 @@ table(high_risk_surv_data$drug, high_risk_surv_data$surv6m_event_num)
 cat("#high_risk_surv_data$stp, high_risk_surv_data$surv6m_event_num")
 table(high_risk_surv_data$stp, high_risk_surv_data$surv6m_event_num)
 
+options(scipen = 999)
 #strata(region_num)
 cat("#summary(cox_model0)")
 cox_model0 <- coxph(Surv(surv6m_days, surv6m_event_num) ~ (drug), data = high_risk_surv_data) 
