@@ -112,11 +112,11 @@ cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_region <- coxph(Surv(surv6m_
 summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_region)
 
 
-# cat("#1summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb)+ strata(stp)")
-# cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_stp <- coxph(Surv(surv6m_days, surv6m_event_num) ~ drug + age_treated 
-# + sex_num + high_risk_num + covid_vacc_num + imd_num + ethnicity_num + bmi_cat_num + diabetes + hypertension 
-# + chronic_cardiac_disease + chronic_respiratory_disease + strata(stp), data = high_risk_surv_data) %>% summary()
-# summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_stp)
+cat("#1summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb)+ strata(stp)")
+cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_stp <- coxph(Surv(surv6m_days, surv6m_event_num) ~ drug + age_treated 
++ sex_num + high_risk_num + covid_vacc_num + imd_num + ethnicity_num + bmi_cat_num + diabetes + hypertension 
++ chronic_cardiac_disease + chronic_respiratory_disease + strata(stp), data = high_risk_surv_data) %>% summary()
+summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_stp)
 
 #covid_vacc_num
 cat("#freq_single(high_risk_surv_data$covid_vacc_num)")
