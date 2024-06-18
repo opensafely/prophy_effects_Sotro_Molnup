@@ -250,7 +250,7 @@ cat("#freq_single-high_risk_cohort$had_housebound_r_num\n")
 freq_single(high_risk_cohort$had_housebound_r_num)
 
 ##calendar_day
-cat(#summary(#high_risk_cohort$calendar_day)\n") 
+cat("#summary(#high_risk_cohort$calendar_day)\n") 
 summary(high_risk_cohort$calendar_day)
 
 ## Clinical and demographics table
