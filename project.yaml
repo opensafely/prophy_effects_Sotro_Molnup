@@ -19,36 +19,38 @@ actions:
         table1: output/tables/table1_sum.csv
         table2: output/tables/table1_redacted_under8.csv
       highly_sensitive:
-        data1: output/data/high_risk_ever_cohort.csv
+        data1: output/data/data4analyses.csv
         data2: output/data/high_risk_cohort.csv
+        data3: output/data/high_risk_ever_cohort.csv
+        data4: output/data/high_risk_cohort_inc60ddeath.csv
 
   prep_model_surv_r:
     run: r:latest analysis/prep_model_surv.r
     needs: [prep_descrip_r]
     outputs:
       highly_sensitive:
-        data3: output/data/high_risk_surv_data.csv
+        data5: output/data/high_risk_surv_data.csv
 
   prep_model_1surv_r:
     run: r:latest analysis/prep_model_1surv.r
     needs: [prep_descrip_r]
     outputs:
       highly_sensitive:
-        data4: output/data/high_risk_surv_data1.csv
+        data6: output/data/high_risk_surv_data1.csv
   
   prep_model_2surv_r:
     run: r:latest analysis/prep_model_2surv.r
     needs: [prep_descrip_r]
     outputs:
       highly_sensitive:
-        data5: output/data/high_risk_surv_data2.csv
+        data7: output/data/high_risk_surv_data2.csv
 
   prep_descrip_agegp_r:
     run: r:latest analysis/data_prep_descrip_1agegp.r
     needs: [prep_descrip_r]
     outputs:
       highly_sensitive:
-        data6: output/data/high_risk_vars_age_rc.csv
+        data8: output/data/high_risk_vars_age_rc.csv
       moderately_sensitive:
         table01: output/tables/high_risk_vars_age_rc_table.csv
 
@@ -57,21 +59,21 @@ actions:
     needs: [prep_descrip_r]
     outputs:
       highly_sensitive:
-        data7: output/data/high_risk_surv_data0.csv
+        data9: output/data/high_risk_surv_data0.csv
 
   prep_model_1surv_sen_r:
     run: r:latest analysis/prep_model_1surv_sen.r
     needs: [prep_descrip_r]
     outputs:
       highly_sensitive:
-        data8: output/data/high_risk_surv_data01.csv
+        data10: output/data/high_risk_surv_data01.csv
 
   prep_model_2surv_sen_r:
     run: r:latest analysis/prep_model_2surv_sen.r
     needs: [prep_descrip_r]
     outputs:
       highly_sensitive:
-        data9: output/data/high_risk_surv_data02.csv
+        data11: output/data/high_risk_surv_data02.csv
 
 
 
