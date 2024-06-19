@@ -295,16 +295,18 @@ high_risk_cohort_tb1_bydrug <- proc_rm_b8_str(high_risk_cohort_data, "first_covi
 len_a<-dim(as_tibble(high_risk_cohort_tb1_bydrug))[1]
 high_risk_cohort_tb1 <- cbind((as_tibble(high_risk_cohort_tb1_overall)[1:len_a,]),(as_tibble(high_risk_cohort_tb1_bydrug)))
 
-high_risk_cohort_sum_overall <- gen_sum(high_risk_cohort, var=vars2)
-high_risk_cohort_sum_bydrug <- gen_sum(high_risk_cohort, var=vars2, by_var = "first_covid_treat_interve")
+
+high_risk_cohort_sum_overall <- gen_sum_num(high_risk_cohort, var=vars)
+high_risk_cohort_sum_bydrug <- gen_sum_num(high_risk_cohort, var=vars, by_var = "first_covid_treat_interve")
 len_b<-dim(as_tibble(high_risk_cohort_sum_bydrug))[1]
-high_risk_cohort_sum <- cbind((as_tibble(high_risk_cohort_sum_overall)[1:len_b,]),(as_tibble(high_risk_cohort_sum_bydrug)))
+high_risk_cohort_sum0 <- cbind((as_tibble(high_risk_cohort_sum_overall)[1:len_b,]),(as_tibble(high_risk_cohort_sum_bydrug)))
+high_risk_cohort_sum <-high_risk_cohort_sum0 %>% select(-3)
 
 cat("#str(high_risk_cohort)\n") 
 str(high_risk_cohort, list.len = ncol(high_risk_cohort), give.attr= F)
 
-# Save dataset(s) ----
-write_csv(high_risk_cohort_sum, here::here("output", "tables", "table1_sum.csv"))
+# Save dataset(s) ----#high_risk_cohort_tb1_rd10#
+write_csv(high_risk_cohort_sum, here::here("output", "tables", "table1_sum_num.csv"))
 write_csv(high_risk_cohort_tb1, here::here("output", "tables", "table1_redacted_under8.csv"))
 write.csv(df_vars0, here::here("output", "data", "data4analyses.csv"))
 write.csv(high_risk_cohort, here::here("output", "data", "high_risk_cohort.csv"))
