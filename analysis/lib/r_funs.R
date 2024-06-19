@@ -96,7 +96,7 @@ gen_sum_num <- function(data, var, by_var = NULL) {
      mutate(across(where(is.character), as.factor)) %>%
      tbl_summary(
        by = by_var, 
-       missing = "always",
+       missing = "no",
        statistic = list(
          all_categorical() ~ "{n}"
        )
