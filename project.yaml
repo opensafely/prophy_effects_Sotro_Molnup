@@ -39,9 +39,12 @@ actions:
     run: r:latest analysis/prep_model_1surv.r
     needs: [prep_descrip_r]
     outputs:
+      moderately_sensitive:
+        table5: output/tables/table_cox_model_surv1_regn_6m.csv
+        table6: output/tables/table_cox_model_surv1_stp_6m.csv
       highly_sensitive:
         data6: output/data/high_risk_surv_data1.csv
-  
+
   prep_model_2surv_r:
     run: r:latest analysis/prep_model_2surv.r
     needs: [prep_descrip_r]
