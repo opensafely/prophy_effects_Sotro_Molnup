@@ -302,7 +302,9 @@ len_b<-dim(as_tibble(high_risk_cohort_sum_bydrug))[1]
 high_risk_cohort_sum0 <- cbind((as_tibble(high_risk_cohort_sum_overall)[1:len_b,]),(as_tibble(high_risk_cohort_sum_bydrug)))
 high_risk_cohort_sum <-high_risk_cohort_sum0 %>% select(-3)
 high_risk_cohort_sum_rd_m10 <- high_risk_cohort_sum %>% 
+  mutate(across(tail(names(.), 3), ~ as.numeric(.))) %>%
   mutate(across(where(is.numeric), roundmid_any10))
+
 
 cat("#str(high_risk_cohort)\n") 
 str(high_risk_cohort, list.len = ncol(high_risk_cohort), give.attr= F)
