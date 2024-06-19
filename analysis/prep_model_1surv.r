@@ -93,8 +93,7 @@ surv1_regn3<- surv1_regn3 %>% rename(hazard_ratio = estimate)
 
 surv1_regn4 <- tidy(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_region, exponentiate = TRUE, conf.int = TRUE)
 surv1_regn4<- surv1_regn4 %>% rename(hazard_ratio = estimate)
-
-#surv1_regn<-rbind("#cox_model1_age_sex_region",surv1_regn1, "#cox_model1_age_sex_highrisk_region",surv1_regn2, "#cox_model1_age_sex_highrisk_vacc_imd_reg_eth_region",surv1_regn3)
+##surv1_regn<-rbind("#cox_model1_age_sex_region",surv1_regn1, "#cox_model1_age_sex_highrisk_region",surv1_regn2, "#cox_model1_age_sex_highrisk_vacc_imd_reg_eth_region",surv1_regn3)
 surv1_regn<-rbind("#1cox_model1_age_sex_region",surv1_regn1, "#2cox_model1_age_sex_highrisk_region",surv1_regn2, "#3cox_model1_age_sex_highrisk_vacc_imd_reg_eth_region",surv1_regn3,"#4cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_region",surv1_regn4)
 
 cat("#Model01_2summary(cox_model1_age_sex_strata(stp) )")
@@ -131,17 +130,17 @@ surv1_stp3<- surv1_stp3 %>% rename(hazard_ratio = estimate)
 surv1_stp4 <- tidy(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_stp, exponentiate = TRUE, conf.int = TRUE)
 surv1_stp4<- surv1_stp4 %>% rename(hazard_ratio = estimate)
 
-#surv1_stp<-rbind("#surv1_1cox_model1_age_sex_stp",surv1_stp1, "#surv1_2cox_model1_age_sex_highrisk_stp",surv1_stp2, "#surv1_3cox_model1_age_sex_highrisk_vacc_imd_reg_eth_stp",surv1_stp3)
+##surv1_stp<-rbind("#surv1_1cox_model1_age_sex_stp",surv1_stp1, "#surv1_2cox_model1_age_sex_highrisk_stp",surv1_stp2, "#surv1_3cox_model1_age_sex_highrisk_vacc_imd_reg_eth_stp",surv1_stp3)
 surv1_stp<-rbind("#surv1_1cox_model1_age_sex_stp",surv1_stp1, "#surv1_2cox_model1_age_sex_highrisk_stp",surv1_stp2, "#surv1_3cox_model1_age_sex_highrisk_vacc_imd_reg_eth_stp",surv1_stp3,"#surv1_4cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_stp",surv1_stp4)
 
-#################################
+# #################################
 # Plot the survival curves
 # ggsurvplot(survfit(cox_model), data = high_risk_surv_data1, pval = TRUE,
 #            ggtheme = theme_minimal(), risk.table = TRUE,
 #            conf.int = TRUE)
 
 # Save dataset(s) ----
-write.csv(surv1_regn, here::here("output", "tables", "table_cox_model_surv1_regn_6m.csv"))
-write.csv(surv1_stp, here::here("output", "tables", "table_cox_model_surv1_stp_6m.csv"))
+write.csv(surv1_regn, here::here("output", "tables", "table_cox_model_surv1_regn_12m.csv"))
+write.csv(surv1_stp, here::here("output", "tables", "table_cox_model_surv1_stp_12m.csv"))
 write.csv(high_risk_surv_data1, here::here("output", "data", "high_risk_surv_data1.csv"))
 
