@@ -118,7 +118,7 @@ summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_stp)
 cat("##Model04_1summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb)+ strata(stp)")
 cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_stp <- coxph(Surv(surv6m_days, surv6m_event_num) ~ drug + age_treated 
 + sex_num + high_risk_num + covid_vacc_num + imd_num + ethnicity_num + ns(calendar_day, df = 4) + bmi_cat_num + diabetes + hypertension 
-+ chronic_cardiac_disease + chronic_respiratory_disease + strata(stp), data = high_risk_surv_data) %>% summary()
++ chronic_cardiac_disease + chronic_respiratory_disease + strata(stp), data = high_risk_surv_data)
 summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_stp)
 
 #organised output#
