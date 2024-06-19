@@ -155,7 +155,7 @@ summary(as.numeric(high_risk_surv_data2$surv24m_days),na.rm=T)
 
 # Save dataset(s) ----
 write.csv(high_risk_surv_data2, here::here("output", "data", "high_risk_surv_data2.csv"))
-write.csv(surv2_regn, here::here("output", "tables", "table_cox_model_surv2_regn_6m.csv"))
-write.csv(surv2_stp, here::here("output", "tables", "table_cox_model_surv2_stp_6m.csv"))
+write.csv(surv2_regn, here::here("output", "tables", "table_cox_model_surv2_regn_24m.csv"))
+write.csv(surv2_stp, here::here("output", "tables", "table_cox_model_surv2_stp_24m.csv"))
 
 
