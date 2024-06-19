@@ -296,14 +296,15 @@ len_a<-dim(as_tibble(high_risk_cohort_tb1_bydrug))[1]
 high_risk_cohort_tb1 <- cbind((as_tibble(high_risk_cohort_tb1_overall)[1:len_a,]),(as_tibble(high_risk_cohort_tb1_bydrug)))
 
 
-high_risk_cohort_sum_overall <- gen_sum_num(high_risk_cohort, var=vars)
 high_risk_cohort_sum_bydrug <- gen_sum_num(high_risk_cohort, var=vars, by_var = "first_covid_treat_interve")
-len_b<-dim(as_tibble(high_risk_cohort_sum_bydrug))[1]
-high_risk_cohort_sum0 <- cbind((as_tibble(high_risk_cohort_sum_overall)[1:len_b,]),(as_tibble(high_risk_cohort_sum_bydrug)))
-high_risk_cohort_sum <-high_risk_cohort_sum0 %>% select(-3)
-high_risk_cohort_sum_rd_m10 <- high_risk_cohort_sum %>% 
-  mutate(across(tail(names(.), 3), ~ as.numeric(gsub(",", "", .)))) %>%
-  mutate(across(where(is.numeric), roundmid_any10))
+high_risk_cohort_sum <-as_tibble(high_risk_cohort_sum_bydrug) %>% 
+  mutate(across(tail(names(.), 2), ~ as.numeric(gsub(",", "", .)))) %>%
+  mutate(total = rowSums(across(where(is.numeric)), na.rm = TRUE))
+
+high_risk_cohort_sum_rd_m10 <- as_tibble(high_risk_cohort_sum_bydrug) %>% 
+  mutate(across(tail(names(.), 2), ~ as.numeric(gsub(",", "", .)))) %>%
+  mutate(across(where(is.numeric), roundmid_any10)) %>%
+  mutate(total = rowSums(across(where(is.numeric)), na.rm = TRUE))
 
 cat("#str(high_risk_cohort_sum_rd_m10)\n") 
 str(high_risk_cohort_sum_rd_m10, list.len = ncol(high_risk_cohort_sum_rd_m10), give.attr= F)
