@@ -82,10 +82,9 @@ proc_rm_b8_str <- function(data, group_var = first_covid_treat_interve) {
 }
 
 roundmid_any10 <- function(x, to = 10) {
-  # This function rounds to the nearest multiple of 'to' with a custom midpoint
-  ceiling(x / to) * to - (floor(to / 2) * (x != 0))
+  rounded <- ceiling(x / to) * to - (floor(to / 2) * (x != 0))
+  return(rounded)
 }
-
 gen_sum_num <- function(data, var, by_var = NULL) {
   if (!is.null(by_var)) {
      data <- data %>% select(all_of(var), all_of(by_var))
