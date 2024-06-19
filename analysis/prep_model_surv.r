@@ -21,8 +21,6 @@ source(here("analysis", "lib", "r_funs.R"))
 dir_create(here::here("output", "tables"), showWarnings = FALSE, recurse = TRUE)
 dir_create(here::here("output", "data"), showWarnings = FALSE, recurse = TRUE)
 
-##surv6m_days, surv6m_days_from_treat, surv6m_event, surv6m_event_underly, surv6m_event_num, surv6m_event_underly_num
-
 #high_risk_surv_data<- read_csv("C:/Users/qw/Documents/Github/prophy_effects_Sotro_Molnup/output/data/high_risk_cohort.csv") %>%
 high_risk_surv_data <- read_csv(here::here("output", "data", "high_risk_cohort.csv")) %>%
     select(patient_id, age_treated, imd, imd_num, drug, bmi, bmi_cat_num, region_num, sex_num, ethnicity_num,stp, covid_vacc_num, 
@@ -47,10 +45,6 @@ cat("#high_risk_surv_data$drug, high_risk_surv_data$surv6m_event_num")
 table(high_risk_surv_data$drug, high_risk_surv_data$surv6m_event_num)
 cat("#high_risk_surv_data$stp, high_risk_surv_data$surv6m_event_num")
 table(high_risk_surv_data$stp, high_risk_surv_data$surv6m_event_num)
-
-# (1) age and sex; (2) high-risk groups; 
-# (3) ethnic background, deprivation, vaccination status, calendar week;
-# (4) body mass index, diabetes, hypertension, and chronic heart and lung diseases.
 
 options(scipen = 999)
 #strata(region_num)
@@ -88,21 +82,22 @@ cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_region <- coxph(Surv(surv6m_
 + chronic_cardiac_disease + chronic_respiratory_disease + strata(region_num), data = high_risk_surv_data)
 summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_region)
 
-# Extract the necessary information using broom::tidy
-tidy_cox_1 <- tidy(cox_model1_age_sex_region, exponentiate = TRUE, conf.int = TRUE)
-tidy_cox_1 <- tidy_cox_1 %>% rename(hazard_ratio = estimate)
+# Extract information using broom::tidy
+#organised output#
+surv0_regn1 <- tidy(cox_model1_age_sex_region, exponentiate = TRUE, conf.int = TRUE)
+surv0_regn1 <- surv0_regn1 %>% rename(hazard_ratio = estimate)
 
-tidy_cox_2 <- tidy(cox_model1_age_sex_highrisk_region, exponentiate = TRUE, conf.int = TRUE)
-tidy_cox_2 <- tidy_cox_2 %>% rename(hazard_ratio = estimate)
+surv0_regn2 <- tidy(cox_model1_age_sex_highrisk_region, exponentiate = TRUE, conf.int = TRUE)
+surv0_regn2 <- surv0_regn2 %>% rename(hazard_ratio = estimate)
 
-tidy_cox_3 <- tidy(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_region, exponentiate = TRUE, conf.int = TRUE)
-tidy_cox_3<- tidy_cox_3 %>% rename(hazard_ratio = estimate)
+surv0_regn3 <- tidy(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_region, exponentiate = TRUE, conf.int = TRUE)
+surv0_regn3<- surv0_regn3 %>% rename(hazard_ratio = estimate)
 
-tidy_cox_4 <- tidy(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_region, exponentiate = TRUE, conf.int = TRUE)
-tidy_cox_4<- tidy_cox_4 %>% rename(hazard_ratio = estimate)
+surv0_regn4 <- tidy(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_region, exponentiate = TRUE, conf.int = TRUE)
+surv0_regn4<- surv0_regn4 %>% rename(hazard_ratio = estimate)
 
-#tidy_cox<-rbind("#cox_model1_age_sex_region",tidy_cox_1, "#cox_model1_age_sex_highrisk_region",tidy_cox_2, "#cox_model1_age_sex_highrisk_vacc_imd_reg_eth_region",tidy_cox_3)
-tidy_cox<-rbind("#cox_model1_age_sex_region",tidy_cox_1, "#cox_model1_age_sex_highrisk_region",tidy_cox_2, "#cox_model1_age_sex_highrisk_vacc_imd_reg_eth_region",tidy_cox_3,"#cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_region",tidy_cox_4)
+#surv0_regn<-rbind("#cox_model1_age_sex_region",surv0_regn1, "#cox_model1_age_sex_highrisk_region",surv0_regn2, "#cox_model1_age_sex_highrisk_vacc_imd_reg_eth_region",surv0_regn3)
+surv0_regn<-rbind("#1cox_model1_age_sex_region",surv0_regn1, "#2cox_model1_age_sex_highrisk_region",surv0_regn2, "#3cox_model1_age_sex_highrisk_vacc_imd_reg_eth_region",surv0_regn3,"#4cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_region",surv0_regn4)
 
 
 cat("#Model01_2summary(cox_model1_age_sex_strata(stp) )")
@@ -126,6 +121,21 @@ cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_stp <- coxph(Surv(surv6m_day
 + chronic_cardiac_disease + chronic_respiratory_disease + strata(stp), data = high_risk_surv_data) %>% summary()
 summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_stp)
 
+#organised output#
+surv0_stp1 <- tidy(cox_model1_age_sex_stp, exponentiate = TRUE, conf.int = TRUE)
+surv0_stp1 <- surv0_stp1 %>% rename(hazard_ratio = estimate)
+
+surv0_stp2 <- tidy(cox_model1_age_sex_highrisk_stp, exponentiate = TRUE, conf.int = TRUE)
+surv0_stp2 <- surv0_stp2 %>% rename(hazard_ratio = estimate)
+
+surv0_stp3 <- tidy(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_stp, exponentiate = TRUE, conf.int = TRUE)
+surv0_stp3<- surv0_stp3 %>% rename(hazard_ratio = estimate)
+
+surv0_stp4 <- tidy(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_stp, exponentiate = TRUE, conf.int = TRUE)
+surv0_stp4<- surv0_stp4 %>% rename(hazard_ratio = estimate)
+
+#surv0_stp<-rbind("#surv0_1cox_model1_age_sex_stp",surv0_stp1, "#surv0_2cox_model1_age_sex_highrisk_stp",surv0_stp2, "#surv0_3cox_model1_age_sex_highrisk_vacc_imd_reg_eth_stp",surv0_stp3)
+surv0_stp<-rbind("#surv0_1cox_model1_age_sex_stp",surv0_stp1, "#surv0_2cox_model1_age_sex_highrisk_stp",surv0_stp2, "#surv0_3cox_model1_age_sex_highrisk_vacc_imd_reg_eth_stp",surv0_stp3,"#surv0_4cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_stp",surv0_stp4)
 
 #covid_vacc_num
 cat("#freq_single(high_risk_surv_data$covid_vacc_num)")
@@ -240,16 +250,13 @@ sum(is.na(high_risk_surv_data$dementia))
 cat("#sum(!is.na(dementia)):")
 sum(!is.na(high_risk_surv_data$dementia))
 
-
-
 # Plot the survival curves
 # ggsurvplot(survfit(cox_model), data = high_risk_surv_data, pval = TRUE,
 #            ggtheme = theme_minimal(), risk.table = TRUE,
 #            conf.int = TRUE)
 
-#####################################################################################
-# Save dataset(s) ----tidy_cox
-write.csv(tidy_cox, here::here("output", "tables", "table_cox_model_6m.csv"))
+# Save dataset(s) ----surv0_regn
+write.csv(surv0_regn, here::here("output", "tables", "table_cox_model_surv0_regn_6m.csv"))
+write.csv(surv0_stp, here::here("output", "tables", "table_cox_model_surv0_stp_6m.csv"))
 write.csv(high_risk_surv_data, here::here("output", "data", "high_risk_surv_data.csv"))
-####################################################################################
-#####################################################################################
+
