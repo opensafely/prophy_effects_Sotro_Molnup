@@ -23,7 +23,7 @@ freq_single_nrst5<-function(idx_colname){ta_feq<-r2nrst5(table(idx_colname))
 		return(fre_tb)
 }
 
-gen_sum <- function(data, var, by_var = NULL) {
+gen_sum_perct <- function(data, var, by_var = NULL) {
   if (!is.null(by_var)) {
     data <- data %>% select(all_of(var), all_of(by_var))
   } else {
@@ -34,7 +34,7 @@ gen_sum <- function(data, var, by_var = NULL) {
     mutate(across(where(is.character), as.factor)) %>%
     tbl_summary(
       by = by_var, 
-      missing = "always",
+      missing = "no",
       type = all_continuous() ~ "continuous2",
       statistic = list(
         all_continuous() ~ c("{mean} ({sd})", "{median} ({IQR})"),
@@ -80,3 +80,27 @@ proc_rm_b8_str <- function(data, group_var = first_covid_treat_interve) {
     missing = "no"  
   )
 }
+
+roundmid_any10 <- function(x, to = 10) {
+  # This function rounds to the nearest multiple of 'to' with a custom midpoint
+  ceiling(x / to) * to - (floor(to / 2) * (x != 0))
+}
+
+gen_sum_num <- function(data, var, by_var = NULL) {
+  if (!is.null(by_var)) {
+     data <- data %>% select(all_of(var), all_of(by_var))
+   } else {
+     data <- data %>% select(all_of(var))
+  }
+   
+   data %>%
+     mutate(across(where(is.character), as.factor)) %>%
+     tbl_summary(
+       by = by_var, 
+       missing = "always",
+       statistic = list(
+         all_categorical() ~ "{n}"
+       )
+     )
+ }
+
