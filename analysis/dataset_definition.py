@@ -878,7 +878,7 @@ dataset.solid_cancer_ever = case(
 
 #covid_therapeutics-MOL1_high_risk_cohort-SOT02_risk_cohorts
 therapeutics_df = (covid_therapeutics
-    .where(covid_therapeutics.intervention.is_in(["Molnupiravir","Sotrovimab"])) #, "Paxlovid" ,"Remdesivir","Casirivimab and imdevimab"
+    .where(covid_therapeutics.intervention.is_in(["Molnupiravir","Sotrovimab"])) # "Paxlovid" ,"Remdesivir","Casirivimab and imdevimab"
     .sort_by(covid_therapeutics.treatment_start_date).last_for_patient()
     )
 
@@ -1187,7 +1187,7 @@ dataset.had_dementia_poten = had_c_event_snome_exist(codelist = dementia_nhsd_sn
 
 dataset.had_dementia = ((dataset.had_dementia_poten) & ( dataset.age_treated > 39))
 
-## Housebound
+## Housebound #to be checked
 #housebound_opensafely_snomed_codes,no_longer_housebound_opensafely_snomed_codes,care_home_primis_snomed_codes
 #housebound_lastdate,no_longer_housebound_lastdate,moved_into_care_home_lastdate
 dataset.had_housebound_poten = had_c_event_snome_exist(codelist = housebound_opensafely_snomed_codes)
