@@ -12,6 +12,7 @@ library('survminer')
 library('splines')
 library('gtsummary')
 library('ggpubr')
+library('broom')
 
 ## import functions
 source(here("analysis", "lib", "r_funs.R"))
@@ -87,6 +88,23 @@ cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_region <- coxph(Surv(surv6m_
 + chronic_cardiac_disease + chronic_respiratory_disease + strata(region_num), data = high_risk_surv_data)
 summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_region)
 
+# Extract the necessary information using broom::tidy
+tidy_cox_1 <- tidy(cox_model1_age_sex_region, exponentiate = TRUE, conf.int = TRUE)
+tidy_cox_1 <- tidy_cox_1 %>% rename(hazard_ratio = estimate)
+
+tidy_cox_2 <- tidy(cox_model1_age_sex_highrisk_region, exponentiate = TRUE, conf.int = TRUE)
+tidy_cox_2 <- tidy_cox_2 %>% rename(hazard_ratio = estimate)
+
+tidy_cox_3 <- tidy(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_region, exponentiate = TRUE, conf.int = TRUE)
+tidy_cox_3<- tidy_cox_3 %>% rename(hazard_ratio = estimate)
+
+tidy_cox_4 <- tidy(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_region, exponentiate = TRUE, conf.int = TRUE)
+tidy_cox_4<- tidy_cox_4 %>% rename(hazard_ratio = estimate)
+
+#tidy_cox<-rbind("#cox_model1_age_sex_region",tidy_cox_1, "#cox_model1_age_sex_highrisk_region",tidy_cox_2, "#cox_model1_age_sex_highrisk_vacc_imd_reg_eth_region",tidy_cox_3)
+tidy_cox<-rbind("#cox_model1_age_sex_region",tidy_cox_1, "#cox_model1_age_sex_highrisk_region",tidy_cox_2, "#cox_model1_age_sex_highrisk_vacc_imd_reg_eth_region",tidy_cox_3,"#cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_region",tidy_cox_4)
+
+
 cat("#Model01_2summary(cox_model1_age_sex_strata(stp) )")
 cox_model1_age_sex_stp <- coxph(Surv(surv6m_days, surv6m_event_num) ~ drug + age_treated + sex_num 
 + strata(stp), data = high_risk_surv_data)
@@ -107,6 +125,7 @@ cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_stp <- coxph(Surv(surv6m_day
 + sex_num + high_risk_num + covid_vacc_num + imd_num + ethnicity_num + ns(calendar_day, df = 4) + bmi_cat_num + diabetes + hypertension 
 + chronic_cardiac_disease + chronic_respiratory_disease + strata(stp), data = high_risk_surv_data) %>% summary()
 summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_stp)
+
 
 #covid_vacc_num
 cat("#freq_single(high_risk_surv_data$covid_vacc_num)")
@@ -229,7 +248,8 @@ sum(!is.na(high_risk_surv_data$dementia))
 #            conf.int = TRUE)
 
 #####################################################################################
-# Save dataset(s) ----
+# Save dataset(s) ----tidy_cox
+write.csv(tidy_cox, here::here("output", "tables", "table_cox_model_6m.csv"))
 write.csv(high_risk_surv_data, here::here("output", "data", "high_risk_surv_data.csv"))
 ####################################################################################
 #####################################################################################
