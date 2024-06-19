@@ -301,12 +301,15 @@ high_risk_cohort_sum_bydrug <- gen_sum_num(high_risk_cohort, var=vars, by_var = 
 len_b<-dim(as_tibble(high_risk_cohort_sum_bydrug))[1]
 high_risk_cohort_sum0 <- cbind((as_tibble(high_risk_cohort_sum_overall)[1:len_b,]),(as_tibble(high_risk_cohort_sum_bydrug)))
 high_risk_cohort_sum <-high_risk_cohort_sum0 %>% select(-3)
+high_risk_cohort_sum_rd_m10 <- high_risk_cohort_sum %>% 
+  mutate(across(where(is.numeric), roundmid_any10))
 
 cat("#str(high_risk_cohort)\n") 
 str(high_risk_cohort, list.len = ncol(high_risk_cohort), give.attr= F)
 
 # Save dataset(s) ----#high_risk_cohort_tb1_rd10#
 write_csv(high_risk_cohort_sum, here::here("output", "tables", "table1_sum_num.csv"))
+write_csv(high_risk_cohort_sum_rd_m10, here::here("output", "tables", "table1_sum_rd_m10.csv"))
 write_csv(high_risk_cohort_tb1, here::here("output", "tables", "table1_redacted_under8.csv"))
 write.csv(df_vars0, here::here("output", "data", "data4analyses.csv"))
 write.csv(high_risk_cohort, here::here("output", "data", "high_risk_cohort.csv"))
