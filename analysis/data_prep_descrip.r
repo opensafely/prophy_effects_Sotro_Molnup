@@ -212,10 +212,32 @@ df_vars0 <- df_vars01 %>%
 cat("#freq_single-df_vars0$allcause_death_under60d\n") 
 freq_single(df_vars0$allcause_death_under60d)
 
-
 df_vars <- df_vars0 %>% filter(old_covid_treat == 0 )  %>% filter(!is.na(stp))%>% filter(allcause_death_under60d != 1) 
 high_risk_cohort <- df_vars %>% filter(highrisk == 1 ) 
 high_risk_ever_cohort <- df_vars %>% filter(highrisk_ever == 1 ) 
+
+high_risk_cohort_inc60ddeath <- df_vars0 %>% filter(old_covid_treat == 0 ) %>% filter(!is.na(stp)) %>% filter(highrisk == 1) %>% ###mutate
+   mutate(surv6m_event_num = ifelse(allcause_death_under60d == 1, 0,surv6m_event_num),
+    surv12m_event_num = ifelse(allcause_death_under60d == 1, 0,surv12m_event_num), 
+    surv24m_event_num = ifelse(allcause_death_under60d == 1, 0,surv24m_event_num))
+
+cat("#freq_single-high_risk_cohort_inc60ddeath$surv6m_event_num\n") 
+freq_single(high_risk_cohort_inc60ddeath$surv6m_event_num)
+
+cat("#freq_single-high_risk_cohort_inc60ddeath$surv12m_event_num\n") 
+freq_single(high_risk_cohort_inc60ddeath$surv12m_event_num)
+
+cat("#freq_single-high_risk_cohort_inc60ddeath$surv24m_event_num\n") 
+freq_single(high_risk_cohort_inc60ddeath$surv24m_event_num)
+
+cat("#freq_single-high_risk_cohort$surv6m_event_num\n") 
+freq_single(high_risk_cohort$surv6m_event_num)
+
+cat("#freq_single-high_risk_cohort$surv12m_event_num\n") 
+freq_single(high_risk_cohort$surv12m_event_num)
+
+cat("#freq_single-high_risk_cohort$surv24m_event_num\n") 
+freq_single(high_risk_cohort$surv24m_event_num)
 
 ##cohort_molnup
 cohort_molnup<-high_risk_cohort %>% filter(drug == 0 )
@@ -284,7 +306,9 @@ str(high_risk_cohort, list.len = ncol(high_risk_cohort), give.attr= F)
 # Save dataset(s) ----
 write_csv(high_risk_cohort_sum, here::here("output", "tables", "table1_sum.csv"))
 write_csv(high_risk_cohort_tb1, here::here("output", "tables", "table1_redacted_under8.csv"))
+write.csv(df_vars0, here::here("output", "data", "data4analyses.csv"), row.names = FALSE)
 write.csv(high_risk_cohort, here::here("output", "data", "high_risk_cohort.csv"), row.names = FALSE)
+write.csv(high_risk_cohort_inc60ddeath, here::here("output", "data", "high_risk_cohort_inc60ddeath"), row.names = FALSE)
 write.csv(high_risk_ever_cohort, here::here("output", "data", "high_risk_ever_cohort.csv"), row.names = FALSE)
 # #write.csv(high_risk_cohort_tb1_df, "C:/Users/qw/Documents/Github/prophy_effects_Sotro_Molnup/output/data/high_risk_cohort_tb1_bydrug.csv", row.names = FALSE)
 # write.csv(df_vars,"C:/Users/qw/Documents/Github/prophy_effects_Sotro_Molnup/output/data/cohort_data4analyse.csv", row.names = FALSE)
