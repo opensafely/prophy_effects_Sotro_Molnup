@@ -40,8 +40,8 @@ actions:
     needs: [prep_descrip_r]
     outputs:
       moderately_sensitive:
-        table5: output/tables/table_cox_model_surv1_regn_6m.csv
-        table6: output/tables/table_cox_model_surv1_stp_6m.csv
+        table5: output/tables/table_cox_model_surv1_regn_12m.csv
+        table6: output/tables/table_cox_model_surv1_stp_12m.csv
       highly_sensitive:
         data6: output/data/high_risk_surv_data1.csv
 
@@ -50,8 +50,8 @@ actions:
     needs: [prep_descrip_r]
     outputs:
       moderately_sensitive:
-        table7: output/tables/table_cox_model_surv2_regn_6m.csv
-        table8: output/tables/table_cox_model_surv2_stp_6m.csv
+        table7: output/tables/table_cox_model_surv2_regn_24m.csv
+        table8: output/tables/table_cox_model_surv2_stp_24m.csv
       highly_sensitive:
         data7: output/data/high_risk_surv_data2.csv
 
