@@ -74,11 +74,11 @@ cox_model1_age_sex_highrisk_vacc_imd_reg_eth_region <- coxph(Surv(surv24m_days, 
     + high_risk_num + covid_vacc_num + imd_num + ethnicity_num + ns(calendar_day, df = 4) + strata(region_num), data = high_risk_surv_data2) 
 summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_region)
 
-cat("#Model04_1summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb )+ strata(region_num)")
-cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_region <- coxph(Surv(surv24m_days, surv24m_event_num) ~ drug + age_treated 
-+ sex_num + high_risk_num + covid_vacc_num + imd_num + ethnicity_num + ns(calendar_day, df = 4) + bmi_cat_num + diabetes + hypertension 
-+ chronic_cardiac_disease + chronic_respiratory_disease + strata(region_num), data = high_risk_surv_data2)
-summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_region)
+# cat("#Model04_1summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb )+ strata(region_num)")
+# cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_region <- coxph(Surv(surv24m_days, surv24m_event_num) ~ drug + age_treated 
+# + sex_num + high_risk_num + covid_vacc_num + imd_num + ethnicity_num + ns(calendar_day, df = 4) + bmi_cat_num + diabetes + hypertension 
+# + chronic_cardiac_disease + chronic_respiratory_disease + strata(region_num), data = high_risk_surv_data2)
+# summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_region)
 
 # Extract information using broom::tidy
 #organised output#
@@ -91,11 +91,11 @@ surv2_regn2 <- surv2_regn2 %>% rename(hazard_ratio = estimate)
 surv2_regn3 <- tidy(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_region, exponentiate = TRUE, conf.int = TRUE)
 surv2_regn3<- surv2_regn3 %>% rename(hazard_ratio = estimate)
 
-surv2_regn4 <- tidy(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_region, exponentiate = TRUE, conf.int = TRUE)
-surv2_regn4<- surv2_regn4 %>% rename(hazard_ratio = estimate)
+# surv2_regn4 <- tidy(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_region, exponentiate = TRUE, conf.int = TRUE)
+# surv2_regn4<- surv2_regn4 %>% rename(hazard_ratio = estimate)
+# surv2_regn<-rbind("#1cox_model1_age_sex_region",surv2_regn1, "#2cox_model1_age_sex_highrisk_region",surv2_regn2, "#3cox_model1_age_sex_highrisk_vacc_imd_reg_eth_region",surv2_regn3,"#4cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_region",surv2_regn4)
 
-#surv2_regn<-rbind("#cox_model1_age_sex_region",surv2_regn1, "#cox_model1_age_sex_highrisk_region",surv2_regn2, "#cox_model1_age_sex_highrisk_vacc_imd_reg_eth_region",surv2_regn3)
-surv2_regn<-rbind("#1cox_model1_age_sex_region",surv2_regn1, "#2cox_model1_age_sex_highrisk_region",surv2_regn2, "#3cox_model1_age_sex_highrisk_vacc_imd_reg_eth_region",surv2_regn3,"#4cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_region",surv2_regn4)
+surv2_regn<-rbind("#cox_model1_age_sex_region",surv2_regn1, "#cox_model1_age_sex_highrisk_region",surv2_regn2, "#cox_model1_age_sex_highrisk_vacc_imd_reg_eth_region",surv2_regn3)
 
 #####
 cat("#Model01_2summary(cox_model1_age_sex_strata(stp))")
@@ -113,11 +113,11 @@ cox_model1_age_sex_highrisk_vacc_imd_reg_eth_stp <- coxph(Surv(surv24m_days, sur
     + high_risk_num + covid_vacc_num + imd_num + ethnicity_num + ns(calendar_day, df = 4) + strata(stp), data = high_risk_surv_data2)
 summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_stp)
 
-cat("##Model04_1summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb)+ strata(stp)")
-cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_stp <- coxph(Surv(surv24m_days, surv24m_event_num) ~ drug + age_treated 
-+ sex_num + high_risk_num + covid_vacc_num + imd_num + ethnicity_num + ns(calendar_day, df = 4) + bmi_cat_num + diabetes + hypertension 
-+ chronic_cardiac_disease + chronic_respiratory_disease + strata(stp), data = high_risk_surv_data2) 
-summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_stp)
+# cat("##Model04_1summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb)+ strata(stp)")
+# cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_stp <- coxph(Surv(surv24m_days, surv24m_event_num) ~ drug + age_treated 
+# + sex_num + high_risk_num + covid_vacc_num + imd_num + ethnicity_num + ns(calendar_day, df = 4) + bmi_cat_num + diabetes + hypertension 
+# + chronic_cardiac_disease + chronic_respiratory_disease + strata(stp), data = high_risk_surv_data2) 
+# summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_stp)
 
 #organised output#
 surv2_stp1 <- tidy(cox_model1_age_sex_stp, exponentiate = TRUE, conf.int = TRUE)
@@ -129,12 +129,11 @@ surv2_stp2 <- surv2_stp2 %>% rename(hazard_ratio = estimate)
 surv2_stp3 <- tidy(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_stp, exponentiate = TRUE, conf.int = TRUE)
 surv2_stp3<- surv2_stp3 %>% rename(hazard_ratio = estimate)
 
-surv2_stp4 <- tidy(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_stp, exponentiate = TRUE, conf.int = TRUE)
-surv2_stp4<- surv2_stp4 %>% rename(hazard_ratio = estimate)
+# surv2_stp4 <- tidy(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_stp, exponentiate = TRUE, conf.int = TRUE)
+# surv2_stp4<- surv2_stp4 %>% rename(hazard_ratio = estimate)
+# surv2_stp<-rbind("#surv2_1cox_model1_age_sex_stp",surv2_stp1, "#surv2_2cox_model1_age_sex_highrisk_stp",surv2_stp2, "#surv2_3cox_model1_age_sex_highrisk_vacc_imd_reg_eth_stp",surv2_stp3,"#surv2_4cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_stp",surv2_stp4)
 
-#surv2_stp<-rbind("#surv2_1cox_model1_age_sex_stp",surv2_stp1, "#surv2_2cox_model1_age_sex_highrisk_stp",surv2_stp2, "#surv2_3cox_model1_age_sex_highrisk_vacc_imd_reg_eth_stp",surv2_stp3)
-surv2_stp<-rbind("#surv2_1cox_model1_age_sex_stp",surv2_stp1, "#surv2_2cox_model1_age_sex_highrisk_stp",surv2_stp2, "#surv2_3cox_model1_age_sex_highrisk_vacc_imd_reg_eth_stp",surv2_stp3,"#surv2_4cox_model1_age_sex_highrisk_vacc_imd_reg_eth_comorb_stp",surv2_stp4)
-
+surv2_stp<-rbind("#surv2_1cox_model1_age_sex_stp",surv2_stp1, "#surv2_2cox_model1_age_sex_highrisk_stp",surv2_stp2, "#surv2_3cox_model1_age_sex_highrisk_vacc_imd_reg_eth_stp",surv2_stp3)
 
 cat("#freq_single(high_risk_surv_data2$surv24m_event_num)")
 freq_single(high_risk_surv_data2$surv24m_event_num)
