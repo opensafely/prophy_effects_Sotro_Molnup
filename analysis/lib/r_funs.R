@@ -66,7 +66,7 @@ proc_rm_b8_str <- function(data, group_var = first_covid_treat_interve) {
   data %>% group_by(first_covid_treat_interve) %>%
   mutate(
     across(where(is.factor), ~ {
-      # Calculate frequencies within each first_covid_treat_interve group
+      # Calculate frequencies within each  group
       freq <- table(.x)  
       levels_to_replace <- names(freq[freq < 8])  
       .x <- factor(.x, levels = levels(.x))
@@ -103,3 +103,38 @@ gen_sum_num <- function(data, var, by_var = NULL) {
      )
  }
 
+sum_var <- function(var) {
+  mean_sd <- paste0(round(mean(var, na.rm = TRUE), 2), " (", round(sd(var, na.rm = TRUE), 2), ")")
+  median_iqr <- paste0(round(median(var, na.rm = TRUE), 2), " (", 
+                       round(quantile(var, 0.25, na.rm = TRUE), 2), "-", 
+                       round(quantile(var, 0.75, na.rm = TRUE), 2), ")")
+  tibble(mean_sd = mean_sd, median_iqr = median_iqr)
+}
+
+ttests <- function(data, vars, group_var) {
+  data %>%
+    select(all_of(c(vars, group_var))) %>%
+    pivot_longer(cols = all_of(vars), names_to = "variable", values_to = "value") %>%
+    group_by(variable) %>%
+    nest() %>%
+    mutate(t_test = map(data, ~ t.test(value ~ !!sym(group_var), data = .x)),
+           tidy_t_test = map(t_test, broom::tidy)) %>%
+    select(variable, tidy_t_test) %>%
+    unnest(tidy_t_test)
+}
+
+chi_sq <- function(data, var, group_var) {
+  formula <- as.formula(paste(var, "~", group_var))
+  test_result <- chisq.test(table(data[[var]], data[[group_var]]))
+  tidy_result <- tidy(test_result)
+  tidy_result <- tidy_result %>% mutate(variable = var)
+  return(tidy_result)
+}
+
+ranksum_test <- function(data, var, group_var) {
+  formula <- as.formula(paste(var, "~", group_var))
+  test_result <- wilcox.test(as.formula(paste(var, "~", group_var)), data = data)
+  tidy_result <- tidy(test_result)
+  tidy_result <- tidy_result %>% mutate(variable = var)
+  return(tidy_result)
+}
