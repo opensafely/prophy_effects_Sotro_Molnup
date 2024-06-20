@@ -64,28 +64,34 @@ actions:
       moderately_sensitive:
         table01: output/tables/high_risk_vars_age_rc_table.csv
 
-  prep_model_surv_sen_r:
-    run: r:latest analysis/prep_model_surv_sen.r
+  ext_cox_surv_r:
+    run: r:latest analysis/ext_cox_surv.r
     needs: [prep_descrip_r]
     outputs:
+      moderately_sensitive:
+        table9: output/tables/table_ext_cox_surv0_regn_6m.csv
+        table10: output/tables/table_ext_cox_surv0_stp_6m.csv
       highly_sensitive:
-        data9: output/data/high_risk_surv_data0.csv
+        data8: output/data/ext_high_risk_surv_data.csv
 
-  prep_model_1surv_sen_r:
-    run: r:latest analysis/prep_model_1surv_sen.r
+  ext_cox_1surv_r:
+    run: r:latest analysis/ext_cox_1surv.r
     needs: [prep_descrip_r]
     outputs:
+      moderately_sensitive:
+        table11: output/tables/table_ext_cox_surv1_regn_12m.csv
+        table12: output/tables/table_ext_cox_surv1_stp_12m.csv
       highly_sensitive:
-        data10: output/data/high_risk_surv_data01.csv
+        data9: output/data/ext_high_risk_surv1_data.csv
 
-  prep_model_2surv_sen_r:
-    run: r:latest analysis/prep_model_2surv_sen.r
+  ext_cox_2surv_r:
+    run: r:latest analysis/ext_cox_2surv.r
     needs: [prep_descrip_r]
     outputs:
+      moderately_sensitive:
+        table13: output/tables/table_ext_cox_surv2_regn_24m.csv
+        table14: output/tables/table_ext_cox_surv2_stp_24m.csv
       highly_sensitive:
-        data11: output/data/high_risk_surv_data02.csv
-
-
-
+        data10: output/data/ext_high_risk_surv2_data.csv
 
 
