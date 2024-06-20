@@ -94,4 +94,17 @@ actions:
       highly_sensitive:
         data10: output/data/ext_high_risk_surv2_data.csv
 
+  prep_base_comp_r:
+    run: r:latest analysis/prep_base_comp.r
+    needs: [prep_descrip_r]
+    outputs:
+      moderately_sensitive:
+        table15: output/tables/sum_continu_vars_output.csv
+        table16: output/tables/t_test_output.csv
+        table17: output/tables/chi_sq_output.csv
+      highly_sensitive:
+        data15: output/data/high_risk_basecomp_data.csv
+
+
+
 
