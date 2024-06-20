@@ -42,7 +42,7 @@ df_vars00 <- read_csv(here::here("output", "data", "dataset_table.csv.gz")) %>%
   haema_disease_ever, immunosupression_new,solid_cancer_new,solid_cancer_ever, had_imid, had_imid_ever, had_dialysis,had_kidney_transplant,
   had_solid_organ_transplant_new, had_haema_disease, had_immunosupression_new, had_solid_cancer_new, had_solid_cancer_ever,
   had_diabetes, had_hypertension,had_chronic_cardiac_disease, had_chronic_respiratory_disease, had_autism,had_learning_disability,
-  had_serious_mental_illness, had_dementia, had_housebound, housebound_lastdate, no_longer_housebound_lastdate, moved_into_care_home_lastdate) 
+  had_serious_mental_illness, had_dementia, rural_urban, had_housebound, housebound_lastdate, no_longer_housebound_lastdate, moved_into_care_home_lastdate) 
 
 
 #bmi_rc_cat,bmi_cat_num
@@ -101,8 +101,8 @@ df_vars01<-df_vars00 %>%
     |((!is.na(hosp_covid60d6m_date)) & (censored6m_bf_dead_hosp == 0))),"1yes","2no")),
     surv6m_event_num = as.numeric(ifelse(surv6m_event == "1yes", 1, 0)),
     surv6m_event_underly_num = as.numeric(ifelse(surv6m_event_underly == "1yes", 1, 0)),
-    calendar_day = as.numeric(difftime(start_date_60d, as.Date("2021-12-16"),units = "days")),
-    calendar_wk = as.numeric(difftime(start_date_60d, as.Date("2021-12-16"),units = "weeks")),
+    calendar_day = as.numeric(difftime(start_date_60d, as.Date("2021-12-15"),units = "days")),
+    calendar_wk = as.numeric(difftime(start_date_60d, as.Date("2021-12-15"),units = "weeks")),
     age_treat_gp_rc = ifelse(age_treated_group=="90+","80-89",age_treated_group),
     had_hosp_covid60d6m = ifelse(!is.na(hosp_covid60d6m_date),"1yes","2no"),
     had_hosp_covid60d6m_01 = ifelse(!is.na(hosp_covid60d6m_date),1,0),
@@ -111,7 +111,8 @@ df_vars01<-df_vars00 %>%
     had_ons_dead_date = ifelse(!is.na(ons_dead_date),"1yes","2no"),
     had__ons_dead_date_01 = ifelse(!is.na(ons_dead_date),1,0),
     imd = as.character(imd),
-    had_housebound_r_num = ifelse(((housebound_lastdate > no_longer_housebound_lastdate) & (housebound_lastdate > moved_into_care_home_lastdate)),1,0)
+    had_housebound_r_num = ifelse(((housebound_lastdate > no_longer_housebound_lastdate) & (housebound_lastdate > moved_into_care_home_lastdate)),1,0),
+    vacc_last_treat_days = as.numeric(difftime(covid_vacc_last_date, treat_date, units = "days")),
 ) %>%  #12month
 mutate(
     death_covid_underly_60d12m_date =as.Date(ifelse(((underly_covid_deathcause0_1 == 1) & (ons_dead_date >start_date_60d) & (ons_dead_date <end_date_12mon)), as.character(ons_dead_date), NA)),
