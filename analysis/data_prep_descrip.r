@@ -155,10 +155,6 @@ mutate(
     surv24m_event_underly_num = as.numeric(ifelse(surv24m_event_underly == "1yes", 1, 0)) 
 )
 
-cat("#df_vars01$surv6m_event\n") 
-freq_single_nrst5(df_vars01$surv6m_event)
-# cat("#risk_cohort\n") 
-# freq_single_nrst5(df_vars01$risk_cohort)
 
 df_vars0 <- df_vars01 %>%
   mutate(had_highrisk_therap = grepl("IMID|solid organ recipients|haematologic malignancy|Patients with a haematological diseases \\(sic\\)|sickle cell disease|stem cell transplant recipient|immune deficiencies|primary immune deficiencies|solid cancer", risk_cohort, ignore.case = TRUE),
@@ -208,8 +204,7 @@ df_vars0 <- df_vars01 %>%
   dementia = as.integer(had_dementia),
   housebound = as.integer(had_housebound),                                                                                                   
 )
-#diabetes,hypertension,chronic_cardiac_disease,chronic_respiratory_disease,autism,learning_disability,serious_mental_illness,dementia,
-#was_allcause_death_under60d, allcause_death_under60d, 
+
 cat("#freq_single-df_vars0$allcause_death_under60d\n") 
 freq_single(df_vars0$allcause_death_under60d)
 
@@ -222,65 +217,21 @@ high_risk_cohort_inc60ddeath <- df_vars0 %>% filter(old_covid_treat == 0 ) %>% f
     surv12m_event_num = ifelse(allcause_death_under60d == 1, 0,surv12m_event_num), 
     surv24m_event_num = ifelse(allcause_death_under60d == 1, 0,surv24m_event_num))
 
-cat("#freq_single-high_risk_cohort_inc60ddeath$surv6m_event_num\n") 
-freq_single(high_risk_cohort_inc60ddeath$surv6m_event_num)
-
-cat("#freq_single-high_risk_cohort_inc60ddeath$surv12m_event_num\n") 
-freq_single(high_risk_cohort_inc60ddeath$surv12m_event_num)
-
-cat("#freq_single-high_risk_cohort_inc60ddeath$surv24m_event_num\n") 
-freq_single(high_risk_cohort_inc60ddeath$surv24m_event_num)
-
-cat("#freq_single-high_risk_cohort$surv6m_event_num\n") 
-freq_single(high_risk_cohort$surv6m_event_num)
-
-cat("#freq_single-high_risk_cohort$surv12m_event_num\n") 
-freq_single(high_risk_cohort$surv12m_event_num)
-
-cat("#freq_single-high_risk_cohort$surv24m_event_num\n") 
-freq_single(high_risk_cohort$surv24m_event_num)
 
 ##cohort_molnup
 cohort_molnup<-high_risk_cohort %>% filter(drug == 0 )
 ##cohort_sotro
 cohort_sotro<-high_risk_cohort %>% filter(drug == 1 )
 
-cat("#dim(df_vars0)\n") 
-dim(df_vars0)
-
-cat("#dim(df_vars)\n") 
-dim(df_vars)
-
-cat("#dim(high_risk_cohort)\n") 
-dim(high_risk_cohort)
-
-cat("#dim(high_risk_ever_cohort)\n") 
-dim(high_risk_ever_cohort)
-
-cat("#dim(cohort_molnup)\n") 
-dim(cohort_molnup)
-
-cat("#dim(cohort_sotro)\n") 
-dim(cohort_sotro)
-
-cat("#high_risk_cohort$imd\n") 
-freq_single(high_risk_cohort$imd)
-
-cat("#high_risk_cohort$housebound\n") 
-freq_single(high_risk_cohort$housebound)
-
-cat("#freq_single-high_risk_cohort$had_housebound_r_num\n") 
-freq_single(high_risk_cohort$had_housebound_r_num)
-
 ##calendar_day
-cat("#summary(#high_risk_cohort$calendar_day)\n") 
+cat("#summary(high_risk_cohort$calendar_day)\n") 
 summary(high_risk_cohort$calendar_day)
 
 ## Clinical and demographics table
 vars <- c("age_treat_gp_rc", "sex","surv6m_event", "surv12m_event", "surv24m_event","ethnicity", "region", 
 "total_covid_vacc_cat", "bmi_rc_cat","bmi_cat_num","imd", "high_risk_group","diabetes","hypertension","chronic_cardiac_disease",
 "chronic_respiratory_disease","autism","learning_disability","serious_mental_illness","dementia","first_covid_treat_interve")
-##bmi_rc_cat,bmi_cat_num
+
 vars2 <- c("age_treated","age_treat_gp_rc", "sex","surv6m_event", "surv12m_event", "surv24m_event","ethnicity", "region", 
 "total_covid_vacc_cat", "bmi_rc_cat","bmi_cat_num","imd", "high_risk_group","diabetes","hypertension","chronic_cardiac_disease",
 "chronic_respiratory_disease","autism","learning_disability","serious_mental_illness","dementia","first_covid_treat_interve")
@@ -313,7 +264,7 @@ str(high_risk_cohort_sum_rd_m10, list.len = ncol(high_risk_cohort_sum_rd_m10), g
 cat("#str(high_risk_cohort)\n") 
 str(high_risk_cohort, list.len = ncol(high_risk_cohort), give.attr= F)
 
-# Save dataset(s) ----#high_risk_cohort_tb1_rd10#
+# Save dataset(s) ----
 write_csv(high_risk_cohort_sum, here::here("output", "tables", "table1_sum_num.csv"))
 write_csv(high_risk_cohort_sum_rd_m10, here::here("output", "tables", "table1_sum_rd_m10.csv"))
 write_csv(high_risk_cohort_tb1, here::here("output", "tables", "table1_redacted_under8.csv"))
@@ -321,6 +272,3 @@ write.csv(df_vars0, here::here("output", "data", "data4analyses.csv"))
 write.csv(high_risk_cohort, here::here("output", "data", "high_risk_cohort.csv"))
 write.csv(high_risk_cohort_inc60ddeath, here::here("output", "data", "high_risk_cohort_inc60ddeath.csv"))
 write.csv(high_risk_ever_cohort, here::here("output", "data", "high_risk_ever_cohort.csv"))
-# #write.csv(high_risk_cohort_tb1_df, "C:/Users/qw/Documents/Github/prophy_effects_Sotro_Molnup/output/data/high_risk_cohort_tb1_bydrug.csv", row.names = FALSE)
-# write.csv(df_vars,"C:/Users/qw/Documents/Github/prophy_effects_Sotro_Molnup/output/data/cohort_data4analyse.csv", row.names = FALSE)
-
