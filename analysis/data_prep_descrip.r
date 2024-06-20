@@ -11,7 +11,7 @@ library('survminer')
 library('splines')
 library('gtsummary')
 
-## import functions
+## import funs
 source(here("analysis", "lib", "r_funs.R"))
 
 ## Create directories 
@@ -19,7 +19,7 @@ dir_create(here::here("output", "tables"), showWarnings = FALSE, recurse = TRUE)
 dir_create(here::here("output", "data"), showWarnings = FALSE, recurse = TRUE)
 
 
-#df_vars00<- read_csv("C:/Users/qw/Documents/Github/prophy_effects_Sotro_Molnup/output/data/dataset_table.csv.gz") %>% #,
+#df_vars00<- read_csv("C:/Users/qw/Documents/Github/prophy_effects_Sotro_Molnup/output/data/dataset_table.csv.gz") %>% 
 df_vars00 <- read_csv(here::here("output", "data", "dataset_table.csv.gz")) %>%
   select(patient_id,age_treated, sex, age_treated_group, ethnicity, imd1, imd, stp,region, 
   if_old_covid_treat,old_covid_treat, had_first_covid_treat, first_covid_treat_interve,drug, first_covid_treat_status,
@@ -45,7 +45,6 @@ df_vars00 <- read_csv(here::here("output", "data", "dataset_table.csv.gz")) %>%
   had_serious_mental_illness, had_dementia, rural_urban, had_housebound, housebound_lastdate, no_longer_housebound_lastdate, moved_into_care_home_lastdate) 
 
 
-#bmi_rc_cat,bmi_cat_num
 df_vars01<-df_vars00 %>%  
     mutate(
     bmi_num_rc = ifelse((bmi<10|bmi>60),NA,bmi),
@@ -155,7 +154,6 @@ mutate(
     surv24m_event_underly_num = as.numeric(ifelse(surv24m_event_underly == "1yes", 1, 0)) 
 )
 
-
 df_vars0 <- df_vars01 %>%
   mutate(had_highrisk_therap = grepl("IMID|solid organ recipients|haematologic malignancy|Patients with a haematological diseases \\(sic\\)|sickle cell disease|stem cell transplant recipient|immune deficiencies|primary immune deficiencies|solid cancer", risk_cohort, ignore.case = TRUE),
   highrisk_therap = as.integer(had_highrisk_therap),
@@ -172,7 +170,7 @@ df_vars0 <- df_vars01 %>%
   therap_IMDs = as.integer((grepl("immune deficiencies", risk_cohort, ignore.case = TRUE))), #immune deficiencies
   therap_PID = as.integer((grepl("primary immune deficiencies", risk_cohort, ignore.case = TRUE))), #primary immune deficiencies (PID)
   therap_solid_cancer = as.integer((grepl("solid cancer", risk_cohort, ignore.case = TRUE)))# solid_cancer
-)%>% ##high-risk-cohort-therap-codelist
+) %>% 
   mutate(imid_therap_code = ifelse(rowSums(cbind(imid,therap_IMID),na.rm = TRUE)>= 1, 1, 0),
   dialysis_therap_code = dialysis, kidney_transplant_therap_code = kidney_transplant,
   solid_organ_transplant_therap_code = ifelse(rowSums(cbind(solid_organ_transplant_new,therap_SOR),na.rm = TRUE)>= 1, 1, 0),
@@ -215,15 +213,15 @@ high_risk_ever_cohort <- df_vars %>% filter(highrisk_ever == 1 )
 high_risk_cohort_inc60ddeath <- df_vars0 %>% filter(old_covid_treat == 0 ) %>% filter(!is.na(stp)) %>% filter(highrisk == 1) %>% ###mutate
    mutate(surv6m_event_num = ifelse(allcause_death_under60d == 1, 0,surv6m_event_num),
     surv12m_event_num = ifelse(allcause_death_under60d == 1, 0,surv12m_event_num), 
-    surv24m_event_num = ifelse(allcause_death_under60d == 1, 0,surv24m_event_num))
+    surv24m_event_num = ifelse(allcause_death_under60d == 1, 0,surv24m_event_num)
+)
 
 
-##cohort_molnup
 cohort_molnup<-high_risk_cohort %>% filter(drug == 0 )
-##cohort_sotro
+
 cohort_sotro<-high_risk_cohort %>% filter(drug == 1 )
 
-##calendar_day
+
 cat("#summary(high_risk_cohort$calendar_day)\n") 
 summary(high_risk_cohort$calendar_day)
 
@@ -240,7 +238,7 @@ high_risk_cohort_data <- high_risk_cohort %>%
   select(all_of(vars)) %>%
     mutate(
     across(where(is.character), as.factor)
-    ) 
+) 
 
 high_risk_cohort_tb1_overall <- proc_rm_b8(high_risk_cohort_data,var=vars)
 high_risk_cohort_tb1_bydrug <- proc_rm_b8_str(high_risk_cohort_data, "first_covid_treat_interve")
@@ -251,12 +249,14 @@ high_risk_cohort_tb1 <- cbind((as_tibble(high_risk_cohort_tb1_overall)[1:len_a,]
 high_risk_cohort_sum_bydrug <- gen_sum_num(high_risk_cohort, var=vars, by_var = "first_covid_treat_interve")
 high_risk_cohort_sum <-as_tibble(high_risk_cohort_sum_bydrug) %>% 
   mutate(across(tail(names(.), 2), ~ as.numeric(gsub(",", "", .)))) %>%
-  mutate(total = rowSums(across(where(is.numeric)), na.rm = TRUE))
+  mutate(total = rowSums(across(where(is.numeric)), na.rm = TRUE)
+)
 
 high_risk_cohort_sum_rd_m10 <- as_tibble(high_risk_cohort_sum_bydrug) %>% 
   mutate(across(tail(names(.), 2), ~ as.numeric(gsub(",", "", .)))) %>%
   mutate(across(where(is.numeric), roundmid_any10)) %>%
-  mutate(total = rowSums(across(where(is.numeric)), na.rm = TRUE))
+  mutate(total = rowSums(across(where(is.numeric)), na.rm = TRUE)
+)
 
 cat("#str(high_risk_cohort_sum_rd_m10)\n") 
 str(high_risk_cohort_sum_rd_m10, list.len = ncol(high_risk_cohort_sum_rd_m10), give.attr= F)
