@@ -30,8 +30,8 @@ high_risk_vars_age_rc<-high_risk_vars_age %>%
      "65-69","70-74","75-79","80-200"),include.lowest = T)))
 
 vars_age=c("age_50a_cat","age_60a_cat","age_5ygroup_cat")
-high_risk_vars_age_rc_overall <- gen_sum(high_risk_vars_age_rc, var=vars_age)
-high_risk_vars_age_rc_bydrug <- gen_sum(high_risk_vars_age_rc, var=vars_age, by_var = "first_covid_treat_interve")
+high_risk_vars_age_rc_overall <- gen_sum_perct(high_risk_vars_age_rc, var=vars_age)
+high_risk_vars_age_rc_bydrug <- gen_sum_perct(high_risk_vars_age_rc, var=vars_age, by_var = "first_covid_treat_interve")
 len_c<-dim(as_tibble(high_risk_vars_age_rc_bydrug))[1]
 high_risk_vars_age_rc_table <- cbind((as_tibble(high_risk_vars_age_rc_overall)[1:len_c,]),(as_tibble(high_risk_vars_age_rc_bydrug)))
 
