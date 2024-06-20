@@ -8,7 +8,7 @@ library('readr')
 library('fs')
 library('gtsummary')
 
-## import functions
+## import funs
 source(here("analysis", "lib", "r_funs.R"))
 
 ## Create directories 
@@ -20,7 +20,6 @@ high_risk_vars_age <- read_csv(here::here("output", "data", "high_risk_cohort.cs
   select(patient_id, age_treated, sex, age_treated_group, first_covid_treat_interve, drug) 
 
 
-#bmi_rc_cat,bmi_cat_num
 high_risk_vars_age_rc<-high_risk_vars_age %>%  
     mutate(
     age_50a_cat = ifelse((age_treated<55),"age<55","age>=55"),
