@@ -115,7 +115,7 @@ surv0_regn6_rd2<-org_cox_mod_rd2(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_co
 ## surv0_regn_rd2<-rbind("#1surv0_regn",surv0_regn1_rd2, surv0_regn2_rd2, surv0_regn3_rd2, surv0_regn5_rd2)
 
 surv0_regn<-rbind("#1surv0_regn1", surv0_regn1,"#1surv0_regn2",surv0_regn2, "#1surv0_regn3", surv0_regn3,"#1surv0_regn4", surv0_regn4, "#1surv0_regn5", surv0_regn5, "#1surv0_regn6", surv0_regn6)
-surv0_regn_rd2<-rbind("#1surv0_regn1", surv0_regn1_rd2, "#1surv0_regn2",surv0_regn2_rd2, "#1surv0_regn3", surv0_regn3_rd2,"#1surv0_regn4", surv0_regn4_rd2, "#1surv0_regn5",surv0_regn5_rd2, "#1surv0_regn6", surv0_regn6_rd2)
+surv0_regn_rd2<-rbind("#1surv0_regn1", surv0_regn1_rd2, "#1surv0_regn2", surv0_regn2_rd2, "#1surv0_regn3", surv0_regn3_rd2, "#1surv0_regn4", surv0_regn4_rd2, "#1surv0_regn5", surv0_regn5_rd2, "#1surv0_regn6", surv0_regn6_rd2)
 
 cat("#Model01_2summary(cox_model1_age_sex_strata(stp) )")
 cox_model1_age_sex_stp <- coxph(Surv(surv6m_days, surv6m_event_num) ~ drug + age_treated + sex_num 
@@ -172,8 +172,8 @@ surv0_stp6_rd2 <-org_cox_mod_rd2(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_co
 
 # surv0_stp_rd2<-rbind("#surv0_stp_rd2",surv0_stp1_rd2, surv0_stp2_rd2, surv0_stp3_rd2,surv0_stp5_rd2)
 # surv0_stp<-rbind("#surv0_stp",surv0_stp1, surv0_stp2, surv0_stp3,surv0_stp5)
-surv0_stp<-rbind("#surv0_stp1",surv0_stp1, "#surv0_stp2",surv0_stp2, "#surv0_stp3",surv0_stp3,"#surv0_stp4",surv0_stp4,"#surv0_stp5",surv0_stp5,"#surv0_stp6",surv0_stp6)
-surv0_stp_rd2<-rbind("#surv0_stp_rd2", surv0_stp1_rd2, "#surv0_stp2", surv0_stp2_rd2, "#surv0_stp3",surv0_stp3_rd2,"#surv0_stp4",surv0_stp4_rd2,"#surv0_stp5",surv0_stp5_rd2,"#surv0_stp6",surv0_stp6_rd2)
+surv0_stp<-rbind("#surv0_stp1",surv0_stp1, "#surv0_stp2", surv0_stp2, "#surv0_stp3", surv0_stp3,"#surv0_stp4", surv0_stp4, "#surv0_stp5", surv0_stp5,"#surv0_stp6", surv0_stp6)
+surv0_stp_rd2<-rbind("#surv0_stp_rd2", surv0_stp1_rd2, "#surv0_stp2", surv0_stp2_rd2, "#surv0_stp3", surv0_stp3_rd2,"#surv0_stp4", surv0_stp4_rd2,"#surv0_stp5", surv0_stp5_rd2, "#surv0_stp6", surv0_stp6_rd2)
 
 # Save dataset(s) ----surv0_regn
 write.csv(surv0_regn, here::here("output", "tables", "table_cox_model_surv0_regn_6m.csv"))
