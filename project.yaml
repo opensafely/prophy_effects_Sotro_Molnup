@@ -18,7 +18,9 @@ actions:
       moderately_sensitive:
         table1: output/tables/table1_sum_num.csv
         table2: output/tables/table1_sum_rd_m10.csv
+        table2a: output/tables/table2_high_risk_extend_rd_m10.csv
         table3: output/tables/table1_redacted_under8.csv
+
       highly_sensitive:
         data1: output/data/data4analyses.csv
         data2: output/data/high_risk_cohort.csv
