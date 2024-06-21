@@ -226,7 +226,6 @@ summary(high_risk_cohort$calendar_day)
 cat("#summary(high_risk_cohort_inc60ddeath$first_covid_treat_interve)\n") 
 freq_single(high_risk_cohort_inc60ddeath$first_covid_treat_interve)
 
-
 ## Clinical and demographics table
 vars <- c("age_treat_gp_rc", "sex","surv6m_event", "surv12m_event", "surv24m_event","ethnicity", "region", 
 "total_covid_vacc_cat", "bmi_rc_cat","bmi_cat_num","imd", "high_risk_group","diabetes","hypertension","chronic_cardiac_disease",
@@ -260,6 +259,12 @@ high_risk_cohort_sum_rd_m10 <- as_tibble(high_risk_cohort_sum_bydrug) %>%
   mutate(total = rowSums(across(where(is.numeric)), na.rm = TRUE)
 )
 
+high_risk_extend_bydrug <- gen_sum_num(high_risk_cohort_inc60ddeath, var=vars, by_var = "first_covid_treat_interve")
+high_risk_extend_rd_m10 <- as_tibble(high_risk_extend_bydrug) %>% 
+  mutate(across(tail(names(.), 2), ~ as.numeric(gsub(",", "", .)))) %>%
+  mutate(across(where(is.numeric), roundmid_any10)) %>%
+  mutate(total = rowSums(across(where(is.numeric)), na.rm = TRUE)
+  )
 cat("#str(high_risk_cohort_sum_rd_m10)\n") 
 str(high_risk_cohort_sum_rd_m10, list.len = ncol(high_risk_cohort_sum_rd_m10), give.attr= F)
 
@@ -269,6 +274,7 @@ str(high_risk_cohort, list.len = ncol(high_risk_cohort), give.attr= F)
 # Save dataset(s) ----
 write_csv(high_risk_cohort_sum, here::here("output", "tables", "table1_sum_num.csv"))
 write_csv(high_risk_cohort_sum_rd_m10, here::here("output", "tables", "table1_sum_rd_m10.csv"))
+write_csv(high_risk_extend_rd_m10, here::here("output", "tables", "table2_high_risk_extend_rd_m10.csv"))
 write_csv(high_risk_cohort_tb1, here::here("output", "tables", "table1_redacted_under8.csv"))
 write.csv(df_vars0, here::here("output", "data", "data4analyses.csv"))
 write.csv(high_risk_cohort, here::here("output", "data", "high_risk_cohort.csv"))
