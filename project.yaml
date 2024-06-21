@@ -34,6 +34,8 @@ actions:
       moderately_sensitive:
         table3: output/tables/table_cox_model_surv0_regn_6m.csv
         table4: output/tables/table_cox_model_surv0_stp_6m.csv
+        table3a: output/tables/table_cox_model_surv0_regn_rd2.csv
+        table4a: output/tables/table_cox_model_surv0_stp_rd2.csv
       highly_sensitive:
         data5: output/data/high_risk_surv_data.csv
 
