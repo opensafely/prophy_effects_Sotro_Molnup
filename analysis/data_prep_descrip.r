@@ -216,14 +216,16 @@ high_risk_cohort_inc60ddeath <- df_vars0 %>% filter(old_covid_treat == 0 ) %>% f
     surv24m_event_num = ifelse(allcause_death_under60d == 1, 0,surv24m_event_num)
 )
 
-
 cohort_molnup<-high_risk_cohort %>% filter(drug == 0 )
-
 cohort_sotro<-high_risk_cohort %>% filter(drug == 1 )
 
 
 cat("#summary(high_risk_cohort$calendar_day)\n") 
 summary(high_risk_cohort$calendar_day)
+
+cat("#summary(high_risk_cohort_inc60ddeath$first_covid_treat_interve)\n") 
+freq_single(high_risk_cohort_inc60ddeath$first_covid_treat_interve)
+
 
 ## Clinical and demographics table
 vars <- c("age_treat_gp_rc", "sex","surv6m_event", "surv12m_event", "surv24m_event","ethnicity", "region", 
