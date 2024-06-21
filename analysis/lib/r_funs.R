@@ -142,12 +142,12 @@ ranksum_test <- function(data, var, group_var) {
 org_cox_mod_rd2 <- function(c_model) {
   tidy(c_model, exponentiate = TRUE, conf.int = TRUE) %>%
     rename(hazard_ratio = estimate) %>%
-    select(p.value, hazard_ratio, conf.low, conf.high, everything()) %>%
+    select(term, p.value, hazard_ratio, conf.low, conf.high, everything()) %>%
     mutate(across(where(is.numeric), ~ round(.x, 2)))
 }
 
 org_cox_mod <- function(c_model) {
   tidy(c_model, exponentiate = TRUE, conf.int = TRUE) %>%
     rename(hazard_ratio = estimate) %>%
-    select(p.value, hazard_ratio, conf.low, conf.high, everything()) 
+    select(term, p.value, hazard_ratio, conf.low, conf.high, everything()) 
 }
