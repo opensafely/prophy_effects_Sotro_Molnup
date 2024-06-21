@@ -66,7 +66,7 @@ proc_rm_b8_str <- function(data, group_var = first_covid_treat_interve) {
   data %>% group_by(first_covid_treat_interve) %>%
   mutate(
     across(where(is.factor), ~ {
-      # Calculate frequencies within each  group
+      # Calculate frequencies within each group
       freq <- table(.x)  
       levels_to_replace <- names(freq[freq < 8])  
       .x <- factor(.x, levels = levels(.x))
@@ -137,4 +137,17 @@ ranksum_test <- function(data, var, group_var) {
   tidy_result <- tidy(test_result)
   tidy_result <- tidy_result %>% mutate(variable = var)
   return(tidy_result)
+}
+
+org_cox_mod_rd2 <- function(c_model) {
+  tidy(c_model, exponentiate = TRUE, conf.int = TRUE) %>%
+    rename(hazard_ratio = estimate) %>%
+    select(p.value, hazard_ratio, conf.low, conf.high, everything()) %>%
+    mutate(across(where(is.numeric), ~ round(.x, 2)))
+}
+
+org_cox_mod <- function(c_model) {
+  tidy(c_model, exponentiate = TRUE, conf.int = TRUE) %>%
+    rename(hazard_ratio = estimate) %>%
+    select(p.value, hazard_ratio, conf.low, conf.high, everything()) 
 }
