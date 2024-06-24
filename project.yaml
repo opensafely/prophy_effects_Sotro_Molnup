@@ -27,6 +27,17 @@ actions:
         data3: output/data/high_risk_ever_cohort.csv
         data4: output/data/high_risk_cohort_inc60ddeath.csv
 
+  prep_base_comp_r:
+    run: r:latest analysis/prep_base_comp.r
+    needs: [prep_descrip_r]
+    outputs:
+      moderately_sensitive:
+        table15: output/tables/sum_continu_vars_output.csv
+        table16: output/tables/ttest_output.csv
+        table17: output/tables/chisq_output.csv
+      highly_sensitive:
+        data15: output/data/high_risk_basecomp_data.csv
+
   prep_model_surv_r:
     run: r:latest analysis/prep_model_surv.r
     needs: [prep_descrip_r]
@@ -97,6 +108,8 @@ actions:
         table14: output/tables/table_ext_cox_surv2_stp_24m.csv
       highly_sensitive:
         data10: output/data/ext_high_risk_surv2_data.csv
+
+
 
 
 
