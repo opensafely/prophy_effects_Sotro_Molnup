@@ -123,7 +123,7 @@ ttests <- function(data, vars, group_var) {
     unnest(tidy_t_test)
 }
 
-chi_sq <- function(data, var, group_var) {
+chisq <- function(data, var, group_var) {
   formula <- as.formula(paste(var, "~", group_var))
   test_result <- chisq.test(table(data[[var]], data[[group_var]]))
   tidy_result <- tidy(test_result)
