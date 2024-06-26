@@ -43,7 +43,7 @@ ttest_output <- ttests(data=high_risk_basecomp_data, cont_vars1, ("drug"))
 ranksum_output <- map_df(cont_vars1, ~ ranksum_test(high_risk_basecomp_data, .x, "drug"))
 
 cat_vars3 <- c("sex_num", "imd_num", "bmi_cat_num", "region_num","ethnicity_num","covid_vacc_num","high_risk_num","diabetes",
- "hypertension","chronic_cardiac_disease", "autism","serious_mental_illness")
+ "hypertension","chronic_cardiac_disease", "autism","serious_mental_illness", "stp")
 chisq_output <- map_df(cat_vars3, ~ chisq(high_risk_basecomp_data, .x, "drug"))
 
 # Save dataset(s) ----
@@ -55,10 +55,3 @@ write.csv(high_risk_basecomp_data, here::here("output", "data", "high_risk_basec
 
 
 
-ranksum_test <- function(data, var, group_var) {
-  formula <- as.formula(paste(var, "~", group_var))
-  test_result <- wilcox.test(as.formula(paste(var, "~", group_var)), data = data)
-  tidy_result <- tidy(test_result)
-  tidy_result <- tidy_result %>% mutate(variable = var)
-  return(tidy_result)
-}
