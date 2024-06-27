@@ -51,6 +51,15 @@ actions:
       highly_sensitive:
         data5: output/data/high_risk_surv_data.csv
 
+  model_surv_asum_r:
+    run: r:latest analysis/model_surv_asum.r  #model_surv_asum.r
+    needs: [prep_descrip_r]
+    outputs: 
+      moderately_sensitive:
+        plot: output/graps/plot_*.png 
+      highly_sensitive:
+        data5: output/data/high_risk_surv_data_plot.csv
+
   prep_model_1surv_r:
     run: r:latest analysis/prep_model_1surv.r
     needs: [prep_descrip_r]
