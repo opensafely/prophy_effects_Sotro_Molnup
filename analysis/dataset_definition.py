@@ -2,7 +2,7 @@
 ##<dadaset_definition.py> for repo: <prophy_effects_Sotro_Molnup>
 ##Description: This script extracts data for project 91:[Coverage, effectiveness and safety 
 ##of neutralising monoclonal antibodies or antivirals for non-hospitalised patients with COVID-19]
-##Author(s): Qing Wen   Date last updated: 25/05/2024
+##Author(s): Qing Wen   Date last updated: 28/06/2024
 ########################################################################################################
 from ehrql import(
     months,
