@@ -44,7 +44,7 @@ cat("#high_risk_surv_data$stp, high_risk_surv_data$surv6m_event_num")
 table(high_risk_surv_data$stp, high_risk_surv_data$surv6m_event_num)
 
 ploting<- function(modl_fit, figname){
-    plot<-ggcoxzph(fit)
+    plot<-ggcoxzph(modl_fit)
     ggsave(here::here("output", "graps", paste0("plot_",figname,".png")))
  }
 options(scipen = 999)
