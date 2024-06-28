@@ -184,15 +184,15 @@ hosp_60d_24m_covid_pdiag_1stdate_df = (
     ).sort_by(apcs.admission_date).first_for_patient()
 )
 
-def had_hosp_covid_pdiag_1stdate_df(df, where=True):
+def had_ccare_covid_pdiag_df(df, where=True): 
     return(
     df.admission_method.is_in(["21", "22", "23", "24", "25", "2A", "2B", "2C", "2D", "28"]) & \
     (df.days_in_critical_care>0))
 ###
 ##critical_care     
 # ##added
-ccare_bf30d_covid_pdiag = had_hosp_covid_pdiag_1stdate_df(hosp_bf30d_covid_pdiag_1stdate_df)
-ccare_bf60d_covid_pdiag = had_hosp_covid_pdiag_1stdate_df(hosp_bf60d_covid_pdiag_1stdate_df)
+ccare_bf30d_covid_pdiag = had_ccare_covid_pdiag_df(hosp_bf30d_covid_pdiag_1stdate_df)
+ccare_bf60d_covid_pdiag = had_ccare_covid_pdiag_df(hosp_bf60d_covid_pdiag_1stdate_df)
 #                
 ccare_af60d_covid_pdiag = (
     hosp_af60d_covid_pdiag_1stdate_df.admission_method.is_in(["21", "22", "23", "24", "25", "2A", "2B", "2C", "2D", "28"]) & \
