@@ -130,7 +130,11 @@ surv0_regn_rd2<-rbind("#1surv0_regn",surv0_regn1_rd2, surv0_regn2_rd2, surv0_reg
 # surv0_regn<-rbind("#1surv0_regn1", surv0_regn1,"#1surv0_regn2",surv0_regn2, "#1surv0_regn3", surv0_regn3,"#1surv0_regn4", surv0_regn4, "#1surv0_regn5", surv0_regn5, "#1surv0_regn6", surv0_regn6)
 # surv0_regn_rd2<-rbind("#1surv0_regn1", surv0_regn1_rd2, "#1surv0_regn2", surv0_regn2_rd2, "#1surv0_regn3", surv0_regn3_rd2, "#1surv0_regn4", surv0_regn4_rd2, "#1surv0_regn5", surv0_regn5_rd2, "#1surv0_regn6", surv0_regn6_rd2)
 
-ploting(cox_model1_age_sex_region_fit, "cox_model1_region")
+cox_model0_fit, cox_model_region_fit, cox_model_stp_fit
+ploting(cox_model0_fit, "cox_model0_fit")
+ploting(cox_model_region_fit, "cox_model0_region_fit")
+ploting(cox_model_stp_fit, "cox_model0_stp_fit")
+ploting(cox_model1_age_sex_region_fit, "cox_model1_age_sex_region_fit")
 # ploting(cox_model1_age_sex_highrisk_region_fit, "cox_model2_region")
 # ploting(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_region_fit, "cox_model3_region")
 
