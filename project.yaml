@@ -36,7 +36,8 @@ actions:
         table15: output/tables/sum_continu_vars_output.csv
         table16: output/tables/ttest_output.csv
         table17: output/tables/chisq_output.csv
-        table18: output/tables/ranksum_output.csv
+        table18: output/tables/ranksum_output.csv 
+        plot: output/graps/norm_plot_*.png 
       highly_sensitive:
         data15: output/data/high_risk_basecomp_data.csv
 
