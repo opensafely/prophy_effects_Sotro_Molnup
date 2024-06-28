@@ -18,14 +18,18 @@ source(here("analysis", "lib", "r_funs.R"))
 dir_create(here::here("output", "tables"), showWarnings = FALSE, recurse = TRUE)
 dir_create(here::here("output", "data"), showWarnings = FALSE, recurse = TRUE)
 
+##hosp_covid_bf30d_date,hosp_covid_bf30d_classfic,hosp_covid_bf30d_pdiag,had_ccare_covid_bf30d,
+##hosp_covid_bf60d_date,hosp_covid_bf60d_classfic,hosp_covid_bf60d_pdiag,had_ccare_covid_bf60d,
+#hosp_covid60d6m_date
 
 #df_vars00<- read_csv("C:/Users/qw/Documents/Github/prophy_effects_Sotro_Molnup/output/data/dataset_table.csv.gz") %>% 
 df_vars00 <- read_csv(here::here("output", "data", "dataset_table.csv.gz")) %>%
   select(patient_id,age_treated, sex, age_treated_group, ethnicity, imd1, imd, stp,region, 
   if_old_covid_treat,old_covid_treat, had_first_covid_treat, first_covid_treat_interve,drug, first_covid_treat_status,
   end_date_6mon, end_date_12mon, end_date_24mon, start_date_60d, treat_date, first_molnupiravir_date, first_sotrovimab_date, date_of_first_admis_af_treat, hosp_af_treat_alldiag_date,
-  hosp_60daf_treat_alldiag_date, ccare_covid_first_af_treat_alldiag_date, hosp_covid60d6m_date, hosp_covid60d6m_classfic,
-  hosp_covid60d12m_date, hosp_covid60d12m_classfic,hosp_covid60d24m_date, hosp_covid60d24m_classfic,
+  hosp_60daf_treat_alldiag_date, ccare_covid_first_af_treat_alldiag_date,hosp_covid_bf30d_date, hosp_covid_bf30d_classfic, hosp_covid_bf30d_pdiag, had_ccare_covid_bf30d,
+  hosp_covid_bf60d_date, hosp_covid_bf60d_classfic, hosp_covid_bf60d_pdiag, had_ccare_covid_bf60d, 
+  hosp_covid60d6m_date, hosp_covid60d6m_classfic, hosp_covid60d12m_date, had_ccare_covid60d12m, hosp_covid60d12m_classfic, hosp_covid60d24m_date, hosp_covid60d24m_classfic,had_ccare_covid60d24m,
   hosp_covid60d6m_pdiag, had_ccare_covid60d6m, ccare_covid60d6m_date, hosp_allcause60d6m_date, hosp_allcause60d6m_classfic, hosp_allcause60d6m_pdiag, 
   hospitalise_disc_covid, hospitalise_disc_allcause, ons_dead_date, underly_deathcause_code, death_cause_covid, was_allcause_death_60d_6m,
   allcause_death_60d_6m, was_covid_death_60d_6m, covid_death_60d_6m, was_allcause_death_under60d, allcause_death_under60d, allcause_death_under30d, bmi, bmi_date, 
@@ -44,6 +48,11 @@ df_vars00 <- read_csv(here::here("output", "data", "dataset_table.csv.gz")) %>%
   had_diabetes, had_hypertension,had_chronic_cardiac_disease, had_chronic_respiratory_disease, had_autism,had_learning_disability,
   had_serious_mental_illness, had_dementia, rural_urban, had_housebound, housebound_lastdate, no_longer_housebound_lastdate, moved_into_care_home_lastdate) 
 
+##hosp_covid_bf30d_date,had_ccare_covid_bf30d,
+##hosp_covid_bf60d_date,had_ccare_covid_bf60d,
+#hosp_covid60d6m_date #had_ccare_covid60d6m
+##hosp_covid60d12m_date, #had_ccare_covid60d12m
+#hosp_covid60d24m_date, #had_ccare_covid60d24m
 
 df_vars01<-df_vars00 %>%  
     mutate(
@@ -112,6 +121,12 @@ df_vars01<-df_vars00 %>%
     imd = as.character(imd),
     had_housebound_r_num = ifelse(((housebound_lastdate > no_longer_housebound_lastdate) & (housebound_lastdate > moved_into_care_home_lastdate)),1,0),
     vacc_last_treat_days = as.numeric(difftime(covid_vacc_last_date, treat_date, units = "days")),
+    had_hosp_covid_bf30d_date = as.character(ifelse(!is.na(hosp_covid_bf30d_date),"1yes","2no")),
+    had_hosp_covid_bf60d_date = as.character(ifelse(!is.na(hosp_covid_bf60d_date),"1yes","2no")),
+    had_hosp_covid60d6m_date = as.character(ifelse(!is.na(hosp_covid60d6m_date),"1yes","2no")),
+    had_hosp_covid60d12m_date = as.character(ifelse(!is.na(hosp_covid60d12m_date),"1yes","2no")),
+    had_hosp_covid60d24m_date = as.character(ifelse(!is.na(hosp_covid60d24m_date),"1yes","2no")),
+
 ) %>%  #12month
 mutate(
     death_covid_underly_60d12m_date =as.Date(ifelse(((underly_covid_deathcause0_1 == 1) & (ons_dead_date >start_date_60d) & (ons_dead_date <end_date_12mon)), as.character(ons_dead_date), NA)),
@@ -235,6 +250,10 @@ vars2 <- c("age_treated","age_treat_gp_rc", "sex","surv6m_event", "surv12m_event
 "total_covid_vacc_cat", "bmi_rc_cat","bmi_cat_num","imd", "high_risk_group","diabetes","hypertension","chronic_cardiac_disease",
 "chronic_respiratory_disease","autism","learning_disability","serious_mental_illness","dementia","first_covid_treat_interve")
 
+vars3 <- c("had_hosp_covid_bf30d_date","had_hosp_covid_bf60d_date", "had_hosp_covid60d6m_date","had_hosp_covid60d12m_date", "had_hosp_covid60d24m_date", 
+"had_ccare_covid_bf30d", "had_ccare_covid_bf60d","had_ccare_covid60d6m","had_ccare_covid60d12m", "had_ccare_covid60d24m")
+
+
 high_risk_cohort_data <- high_risk_cohort %>%
   select(all_of(vars)) %>%
     mutate(
@@ -259,6 +278,20 @@ high_risk_cohort_sum_rd_m10 <- as_tibble(high_risk_cohort_sum_bydrug) %>%
   mutate(total = rowSums(across(where(is.numeric)), na.rm = TRUE)
 )
 
+#############
+high_risk_cohort_sum_bydrug_added <- gen_sum_num(high_risk_cohort, var=vars3, by_var = "first_covid_treat_interve")
+high_risk_cohort_sum_added <-as_tibble(high_risk_cohort_sum_bydrug_added) %>% 
+  mutate(across(tail(names(.), 2), ~ as.numeric(gsub(",", "", .)))) %>%
+  mutate(total = rowSums(across(where(is.numeric)), na.rm = TRUE)
+)
+
+high_risk_cohort_sum_rd_m10_added <- as_tibble(high_risk_cohort_sum_bydrug_added) %>% 
+  mutate(across(tail(names(.), 2), ~ as.numeric(gsub(",", "", .)))) %>%
+  mutate(across(where(is.numeric), roundmid_any10)) %>%
+  mutate(total = rowSums(across(where(is.numeric)), na.rm = TRUE)
+)
+
+###################
 high_risk_extend_bydrug <- gen_sum_num(high_risk_cohort_inc60ddeath, var=vars, by_var = "first_covid_treat_interve")
 high_risk_extend_rd_m10 <- as_tibble(high_risk_extend_bydrug) %>% 
   mutate(across(tail(names(.), 2), ~ as.numeric(gsub(",", "", .)))) %>%
@@ -274,6 +307,9 @@ str(high_risk_cohort, list.len = ncol(high_risk_cohort), give.attr= F)
 # Save dataset(s) ----
 write_csv(high_risk_cohort_sum, here::here("output", "tables", "table1_sum_num.csv"))
 write_csv(high_risk_cohort_sum_rd_m10, here::here("output", "tables", "table1_sum_rd_m10.csv"))
+write_csv(high_risk_cohort_sum_added, here::here("output", "tables", "table1_sum_num_added.csv"))
+write_csv(high_risk_cohort_sum_rd_m10_added, here::here("output", "tables", "table1_sum_rd_m10_added.csv"))
+
 write_csv(high_risk_extend_rd_m10, here::here("output", "tables", "table2_high_risk_extend_rd_m10.csv"))
 write_csv(high_risk_cohort_tb1, here::here("output", "tables", "table1_redacted_under8.csv"))
 write.csv(df_vars0, here::here("output", "data", "data4analyses.csv"))
