@@ -72,20 +72,23 @@ summary(cox_model1_age_sex_region)
 
 cox_model1_age_sex_region_fit<-cox.zph(cox_model1_age_sex_region)
 
+cat("#Model01_cox.zph(cox_model1_age_sex_region)")
+cox_model1_age_sex_region_fit
 
 cat("#Model02_1summary(cox_model1_age_sex_highrisk_(region_num)")
 cox_model1_age_sex_highrisk_region <- coxph(Surv(surv6m_days, surv6m_event_num) ~ drug + age_treated + sex_num 
 + high_risk_num + strata(region_num), data = high_risk_surv_data)
 summary(cox_model1_age_sex_highrisk_region)
 
-cox_model1_age_sex_highrisk_region_fit<-cox.zph(cox_model1_age_sex_highrisk_region)
+#cox_model1_age_sex_highrisk_region_fit<-cox.zph(cox_model1_age_sex_highrisk_region)
+
 
 cat("#Model03_1summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_region )")
 cox_model1_age_sex_highrisk_vacc_imd_reg_eth_region <- coxph(Surv(surv6m_days, surv6m_event_num) ~ drug + age_treated + sex_num 
     + high_risk_num + covid_vacc_num + imd_num + ethnicity_num + ns(calendar_day, df = 4) + strata(region_num), data = high_risk_surv_data) 
 summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_region)
 
-cox_model1_age_sex_highrisk_vacc_imd_reg_eth_region_fit<-cox.zph(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_region)
+#cox_model1_age_sex_highrisk_vacc_imd_reg_eth_region_fit<-cox.zph(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_region)
 
 cat("#Model05_1summary(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_excl_calday_region )")
 cox_model1_age_sex_highrisk_vacc_imd_reg_eth__excl_calday_region <- coxph(Surv(surv6m_days, surv6m_event_num) ~ drug + age_treated + sex_num 
@@ -119,8 +122,8 @@ surv0_regn_rd2<-rbind("#1surv0_regn",surv0_regn1_rd2, surv0_regn2_rd2, surv0_reg
 # surv0_regn_rd2<-rbind("#1surv0_regn1", surv0_regn1_rd2, "#1surv0_regn2", surv0_regn2_rd2, "#1surv0_regn3", surv0_regn3_rd2, "#1surv0_regn4", surv0_regn4_rd2, "#1surv0_regn5", surv0_regn5_rd2, "#1surv0_regn6", surv0_regn6_rd2)
 
 ploting(cox_model1_age_sex_region_fit, "cox_model1_region")
-ploting(cox_model1_age_sex_highrisk_region_fit, "cox_model2_region")
-ploting(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_region_fit, "cox_model3_region")
+# ploting(cox_model1_age_sex_highrisk_region_fit, "cox_model2_region")
+# ploting(cox_model1_age_sex_highrisk_vacc_imd_reg_eth_region_fit, "cox_model3_region")
 
 # Save dataset(s) ----surv0_regn
 write.csv(high_risk_surv_data, here::here("output", "data", "high_risk_surv_data_plot.csv"))
