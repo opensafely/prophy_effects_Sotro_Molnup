@@ -250,8 +250,8 @@ vars2 <- c("age_treated","age_treat_gp_rc", "sex","surv6m_event", "surv12m_event
 "total_covid_vacc_cat", "bmi_rc_cat","bmi_cat_num","imd", "high_risk_group","diabetes","hypertension","chronic_cardiac_disease",
 "chronic_respiratory_disease","autism","learning_disability","serious_mental_illness","dementia","first_covid_treat_interve")
 
-vars3 <- c("had_hosp_covid_bf30d_date","had_hosp_covid_bf60d_date", "had_hosp_covid60d6m_date","had_hosp_covid60d12m_date", "had_hosp_covid60d24m_date", 
-"had_ccare_covid_bf30d", "had_ccare_covid_bf60d","had_ccare_covid60d6m","had_ccare_covid60d12m", "had_ccare_covid60d24m","first_covid_treat_interve")
+vars3 <- c("allcause_death_under60d","death_cause_covid0_1","had_hosp_covid_bf30d_date","had_hosp_covid_bf60d_date", "had_hosp_covid60d6m_date","had_hosp_covid60d12m_date", "had_hosp_covid60d24m_date", 
+"had_ccare_covid_bf30d", "had_ccare_covid_bf60d","had_ccare_covid60d6m","had_ccare_covid60d12m", "had_ccare_covid60d24m", "first_covid_treat_interve")
 
 
 high_risk_cohort_data <- high_risk_cohort %>%
