@@ -13,6 +13,8 @@ library('ggpubr')
 library('broom')
 library('purrr')
 library('tidyr')
+#library("nortest")
+
 ## import functions
 source(here("analysis", "lib", "r_funs.R"))
 
@@ -27,7 +29,7 @@ checkNor <- function(x, label="") {
 	cat("Test raw data x")
 	print(shp_test)
 
-	z <- (x - mean(x))/sd(x)
+	z <- (x - mean(x, na.rm = T))/sd(x, na.rm = T )
 	shp_test <- shapiro.test(z)
 	cat("Test standardised data z")
 	print(shp_test)
@@ -73,8 +75,7 @@ checkNor(gp_molnup$age_treated, label="gp_molnup_age")
 checkNor(gp_sotro$age_treated, label="gp_sotro_age")
 checkNor(gp_molnup$calendar_wk, label="gp_molnup_cal_wk")
 checkNor(gp_sotro$calendar_wk, label="gp_sotro_cal_wk")
-checkNor(gp_molnup$vacc_last_treat_days, label="gp_molnup_vacc_days")
-checkNor(gp_sotro$vacc_last_treat_days, label="gp_sotro_vacc_days")
+
 
 sum_output <- high_risk_basecomp_data %>% select(age_treated,bmi,calendar_wk,vacc_last_treat_days)%>%
   pivot_longer(cols = everything(), names_to = "variable", values_to = "value") %>%
@@ -83,7 +84,7 @@ sum_output <- high_risk_basecomp_data %>% select(age_treated,bmi,calendar_wk,vac
 
 options(scipen = 999)
 
-cont_vars1 <- c("age_treated","calendar_wk", "vacc_last_treat_days")
+cont_vars1 <- c("age_treated","calendar_wk")
 ttest_output <- ttests(data=high_risk_basecomp_data, cont_vars1, ("drug"))
 ranksum_output <- map_df(cont_vars1, ~ ranksum_test(high_risk_basecomp_data, .x, "drug"))
 
