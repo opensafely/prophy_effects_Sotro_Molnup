@@ -43,26 +43,35 @@ table(high_risk_surv_data$drug, high_risk_surv_data$surv6m_event_num)
 cat("#high_risk_surv_data$stp, high_risk_surv_data$surv6m_event_num")
 table(high_risk_surv_data$stp, high_risk_surv_data$surv6m_event_num)
 
+ploting<- function(modl_fit, figname){
+    plot<-ggcoxzph(fit)
+    ggsave(here::here("output", "graps", paste0("plot_",figname,".png")))
+ }
 options(scipen = 999)
 #strata(region_num)
 cat("#summary(cox_model0)")
 cox_model0 <- coxph(Surv(surv6m_days, surv6m_event_num) ~ (drug), data = high_risk_surv_data) 
 summary(cox_model0)
 
+cox_model0_fit<-cox.zph(cox_model0)
+cat("#cox_model0_fit-cox.zph(cox_model0)")
+cox_model0_fit
+
 cat("#1summary(cox_model_strata(region_num))")
 cox_model_region<- coxph(Surv(surv6m_days, surv6m_event_num) ~ (drug)+ strata(region_num), data = high_risk_surv_data) 
 summary(cox_model_region)
+
 cox_model_region_fit<-cox.zph(cox_model_region)
-
-ploting<- function(modl_fit, figname){
-    plot<-ggcoxzph(fit)
-    ggsave(here::here("output", "graps", paste0("plot_",figname,".png")))
- }
-
+cat("#cox_model_region_fit-cox.zph(cox_model_region)")
+cox_model_region_fit
 
 cat("#2summary(cox_model_strata(stp))")
 cox_model_stp <- coxph(Surv(surv6m_days, surv6m_event_num) ~ (drug)+ strata(stp), data = high_risk_surv_data)
 summary(cox_model_stp)
+
+cox_model_stp_fit<-cox.zph(cox_model_stp)
+cat("#cox_model_stp_fit-cox.zph(cox_model_stp)")
+cox_model_stp_fit
 
 ##age_treated, sex_num
 cat("#Model01_1summary(cox_model1_age_sex_strata_region )")
@@ -127,3 +136,5 @@ ploting(cox_model1_age_sex_region_fit, "cox_model1_region")
 
 # Save dataset(s) ----surv0_regn
 write.csv(high_risk_surv_data, here::here("output", "data", "high_risk_surv_data_plot.csv"))
+
+
