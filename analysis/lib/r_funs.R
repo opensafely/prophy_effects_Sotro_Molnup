@@ -43,6 +43,19 @@ gen_sum_perct <- function(data, var, by_var = NULL) {
     )
 }
 
+show_mis <- function(data) {
+  mis_count <- sapply(data, function(x) sum(is.na(x)))
+  mis_perct <- sapply(data, function(x) mean(is.na(x)) * 100)
+  # Create a dataframe with the results
+  mis_df <- data.frame(
+    Variable = names(mis_count),
+    missing_Count = mis_count,
+    missing_Percentage = mis_perct
+  )
+
+  print(mis_df)
+}
+
 proc_rm_b8 <- function(data,var=vars) {
   result <- data %>%
     select(all_of(vars)) %>%
@@ -151,3 +164,4 @@ org_cox_mod <- function(c_model) {
     rename(hazard_ratio = estimate) %>%
     select(term, p.value, hazard_ratio, conf.low, conf.high, everything()) 
 }
+
