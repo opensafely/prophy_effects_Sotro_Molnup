@@ -13,9 +13,7 @@ library('ggpubr')
 library('broom')
 library('purrr')
 library('tidyr')
-#library("nortest")
 library('ggplot2')
-library('ggpubr')
 
 ## import functions
 source(here("analysis", "lib", "r_funs.R"))
