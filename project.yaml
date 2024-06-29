@@ -33,11 +33,12 @@ actions:
     needs: [prep_descrip_r]
     outputs:
       moderately_sensitive:
-        table15: output/tables/sum_continu_vars_output.csv
-        table16: output/tables/ttest_output.csv
-        table17: output/tables/chisq_output.csv
-        table18: output/tables/ranksum_output.csv 
-        plot: output/graps/norm_plot_*.png 
+        table1: output/tables/sum_continu_vars_output.csv
+        table2: output/tables/ttest_output.csv
+        table3: output/tables/chisq_output.csv
+        table4: output/tables/ranksum_output.csv 
+        table5: output/tables/high_risk_basecomp_data_miss.csv
+        plot: output/graps/norm_plot_*.png  
       highly_sensitive:
         data15: output/data/high_risk_basecomp_data.csv
 
@@ -54,7 +55,7 @@ actions:
         data5: output/data/high_risk_surv_data.csv
 
   model_surv_asum_r:
-    run: r:latest analysis/model_surv_asum.r  #model_surv_asum.r
+    run: r:latest analysis/model_surv_asum.r  
     needs: [prep_descrip_r]
     outputs: 
       moderately_sensitive:
