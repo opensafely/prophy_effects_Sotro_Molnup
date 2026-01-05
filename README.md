@@ -21,7 +21,7 @@ Affiliations:
 2. Centre for Public Health, School of Medicine, Dentistry and Biomedical Sciences, Queen’s University Belfast, Belfast, UK 
 3. Nuffield Department of Primary Care Health Sciences, University of Oxford, UK
 
-#### <sup>**</sup>Not peer-reviewed  Not for publication  Not suitable for reanalysis.
+#### <sup>**</sup>Not peer-reviewed  Not for publication  Not suitable for reanalysis
 
 **This was an exploratory analysis undertaken to develop and document methods rather than to generate definitive findings. The important limitations in this study include the absence of propensity score matching to control for confounding, due to permissions to access the COVID-related data expiring before the analyses could be fully completed. This report is therefore provided solely for transparency and to document the analytical approach used; it is not intended to support substantive conclusions or interpretation of results.
 ## Background
