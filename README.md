@@ -12,7 +12,7 @@ No clinical, policy or safety conclusions must be drawn from the contents of thi
 # Research Report
 # Comparison of the Sustained Effectiveness of Sotrovimab and Molnupiravir in Preventing Severe COVID-19 Outcomes
 
-Qing Wen <sup>1,2 </sup>, *Amelia CA Green<sup>3</sup> ,*Bang Zhang<sup>1</sup>, Viyaasan Mahalingasivam<sup>1</sup>, Ruth E. Costello<sup>1</sup>, John Tazare<sup>1</sup>,  Thomas Hartney<sup>1</sup>, Dave Evans<sup>3</sup>, Becky Smith<sup>3</sup>, Amir Mehrkar<sup>3</sup>, Rosalind M Eggo<sup>1</sup>, Stephen J W Evans<sup>1</sup>, Ian J Douglas<sup>1</sup>, Ben Goldacre<sup>3</sup>, <sup>#</sup>Laurie A Tomlinson<sup>1</sup>
+Qing Wen <sup>1,2 </sup>, *Amelia CA Green<sup>3</sup> ,*Bang Zhang<sup>1</sup>, Viyaasan Mahalingasivam<sup>1</sup>, Ruth E. Costello<sup>1</sup>, John Tazare<sup>1</sup>, Edward P K Parker<sup>1</sup>,Thomas Hartney<sup>1</sup>, Rosalind M Eggo<sup>1</sup>, Stephen J W Evans<sup>1</sup>, Dave Evans<sup>3</sup>, Becky Smith<sup>3</sup>, Amir Mehrkar<sup>3</sup>, Ian J Douglas<sup>1</sup>, Ben Goldacre<sup>3</sup>, <sup>#</sup>Laurie A Tomlinson<sup>1</sup>
 
 *Contributed equally #Correspondence to: Laurie A Tomlinson
 
